@@ -14,6 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+      async authorize(credentials) {
         try {
             // BACKDOOR PARA TESTE DE INFRAESTRUTURA (SERÁ REMOVIDO)
             if (credentials?.email === "admin@admin.com" && credentials.password === "123456") {
