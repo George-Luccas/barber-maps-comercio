@@ -1,4 +1,4 @@
-import { auth } from "@/app/api/auth/[...nextauth]/route"; // Ajuste o caminho se necessário
+import { auth } from "@/app/_lib/auth"; // Ajuste o caminho se necessário
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -29,6 +29,6 @@ export const config = {
      * - _next/image (otimização de imagens)
      * - favicon.ico, manifest.json (arquivos públicos)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|manifest.json|icons).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest.json|icons|.*\\.png|.*\\.svg|.*\\.jpg|.*\\.jpeg).*)",
   ],
 };

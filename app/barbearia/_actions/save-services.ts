@@ -8,7 +8,8 @@ export async function saveBarberServices(
   services: { name: string, price: number }[],
   barbershopName: string,
   imageUrl: string,
-  horarios: { abertura: string, almocoInicio: string, almocoFim: string, fechamento: string }
+  horarios: { abertura: string, almocoInicio: string, almocoFim: string, fechamento: string },
+  photos: string[] = [] // Novo parâmetro opcional para não quebrar chamadas antigas
 ) {
   try {
     const session = await auth();
@@ -16,14 +17,21 @@ export async function saveBarberServices(
 
     const userId = (session.user as any).id;
 
+    const userExists = await db.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new Error("Usuário não encontrado found. Faça login novamente.");
+    }
+
     // 1. Upsert da Barbearia
-    // Usamos valores padrão para campos obrigatórios (address e description) 
-    // para o banco não dar erro enquanto não configuramos o Google Maps.
     const barbershop = await db.barbershop.upsert({
       where: { managerId: userId },
       update: {
         name: barbershopName,
         imageUrl: imageUrl || null,
+        photos: photos, // Atualiza a galeria
         openingTime: horarios.abertura,
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
@@ -32,12 +40,13 @@ export async function saveBarberServices(
       create: {
         name: barbershopName,
         imageUrl: imageUrl || null,
+        photos: photos,
         openingTime: horarios.abertura,
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
         closingTime: horarios.fechamento,
-        address: "Endereço Pendente", // Campo obrigatório no seu Prisma
-        description: "Barbearia configurada pelo painel", // Campo obrigatório no seu Prisma
+        address: "Endereço Pendente", 
+        description: "Barbearia configurada pelo painel",
         managerId: userId,
       },
     });
@@ -61,6 +70,7 @@ export async function saveBarberServices(
     }
 
     revalidatePath("/barbearia");
+    revalidatePath("/financeiro"); // Garante que a lista de serviços atualize no caixa
     return { success: true };
 
   } catch (error) {

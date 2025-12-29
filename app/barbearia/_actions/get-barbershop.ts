@@ -17,7 +17,7 @@ export async function getBarbershopData() {
         managerId: userId 
       },
       include: {
-        services: true,
+       BarbershopService: true
       },
     });
   } catch (error) {

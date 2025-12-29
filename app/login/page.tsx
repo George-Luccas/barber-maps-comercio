@@ -49,18 +49,22 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* IMAGEM DE FUNDO */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-105"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop')" }}
-      >
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 z-0 bg-zinc-950">
+        {/* LOGO GIRANDO NO FUNDO */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none opacity-[0.3] [perspective:1000px]">
+           <img 
+              src="/logo-spin-v2.png" 
+              alt="Background Logo" 
+              className="w-[500vw] h-auto object-contain animate-sway -translate-y-[10%]"
+           />
+        </div>
       </div>
 
-      {/* CARD DE VIDRO */}
-      <div className="relative z-10 w-full max-w-xl p-10 mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-[3rem] shadow-2xl">
+      {/* CARD DE VIDRO REMOVIDO (CONTAINER TRANSPARENTE) */}
+      <div className="relative z-10 w-full max-w-xl p-6 md:p-10 mx-4">
         
         <div className="text-center mb-10">
-          <h1 className="text-6xl font-black text-yellow-500 uppercase tracking-tighter mb-2">
+          <h1 className="text-4xl md:text-6xl font-black text-yellow-500 uppercase tracking-tighter mb-2">
             {isLogin ? 'Entrar' : 'Cadastro'}
           </h1>
           <p className="text-gray-400 text-xl font-medium tracking-widest uppercase">

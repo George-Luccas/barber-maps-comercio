@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "./prisma";
 import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
@@ -20,8 +21,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!user || !user.password) return null;
 
-        // Aqui você pode adicionar a lógica de verificar senha com bcrypt depois
-        const isValid = credentials.password === user.password;
+        const isValid = await bcrypt.compare(
+          credentials.password as string,
+          user.password
+        );
 
         if (!isValid) return null;
 
@@ -30,9 +33,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
+        // Quando o usuário faz login, buscamos a barbearia associada
+        const dbUser = await db.user.findUnique({
+          where: { email: user.email! },
+          include: { Barbershop: true }
+        });
+        
+        if (dbUser?.Barbershop) {
+          token.barbershopId = dbUser.Barbershop.id;
+        }
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (token?.sub && session.user) {
         session.user.id = token.sub;
+        session.user.barbershopId = token.barbershopId as string;
       }
       return session;
     },
@@ -41,6 +59,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   pages: {
-    signIn: "/loguin",
+    signIn: "/login",
   },
 });

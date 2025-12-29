@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import SessionWrapper from "./components/SessionWrapper";
+import Sidebar from "./components/Sidebar";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,12 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-br">
-      <body className={inter.className}>
-        {/* O SessionProvider deve envolver o children */}
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+    <html lang="pt-br" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <SessionWrapper>
+          <Providers>
+            <Sidebar />
+            <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+              {children}
+            </main>
+          </Providers>
+        </SessionWrapper>
       </body>
     </html>
   );
