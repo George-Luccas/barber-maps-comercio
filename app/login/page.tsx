@@ -35,12 +35,18 @@ export default function LoginPage() {
         }
       } else {
         // LÓGICA DE CADASTRO (Server Action)
-        await registerUser(formData)
-        alert("Cadastro realizado! Agora faça o login.")
-        setIsLogin(true)
+        const res = await registerUser(formData);
+        
+        if (!res.success) {
+          alert(res.error || "Erro ao criar conta.");
+          return;
+        }
+
+        alert("Cadastro realizado! Agora faça o login.");
+        setIsLogin(true);
       }
     } catch (error) {
-      alert("Ocorreu um erro: " + error)
+      alert("Ocorreu um erro inesperado: " + error);
     } finally {
       setLoading(false)
     }
