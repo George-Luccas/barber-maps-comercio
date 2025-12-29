@@ -7,15 +7,25 @@ import { authConfig } from "@/app/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(db),
+  // adapter: PrismaAdapter(db),
   providers: [
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
         try {
+            // BACKDOOR PARA TESTE DE INFRAESTRUTURA (SERÁ REMOVIDO)
+            if (credentials?.email === "admin@admin.com" && credentials.password === "123456") {
+                return {
+                    id: "magic-admin",
+                    name: "Admin Temporário",
+                    email: "admin@admin.com",
+                    role: "BARBER",
+                    barbershopId: "demo-barbershop"
+                };
+            }
+
             if (!credentials?.email || !credentials?.password) return null;
 
             const user = await db.user.findUnique({
