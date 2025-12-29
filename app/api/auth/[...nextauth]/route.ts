@@ -1,3 +1,5 @@
 import { handlers } from "@/app/_lib/auth"
 
 export const { GET, POST } = handlers
+export const runtime = "nodejs" 
+// export const dynamic = "force-dynamic" // Opcional, mas nodejs ja ajuda
