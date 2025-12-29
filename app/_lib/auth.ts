@@ -3,8 +3,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "./prisma";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { authConfig } from "@/app/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(db),
   providers: [
     Credentials({
@@ -33,6 +35,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    // Merge callbacks if needed, or simply override/extend
     async jwt({ token, user, trigger, session }) {
       if (user) {
         // Quando o usuário faz login, buscamos a barbearia associada
@@ -54,11 +57,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
+    // We can include the 'authorized' callback from authConfig here or let it be handled by middleware import
   },
   session: {
     strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
   },
 });

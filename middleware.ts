@@ -1,25 +1,8 @@
-import { auth } from "@/app/_lib/auth"; // Ajuste o caminho se necessário
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "./app/auth.config";
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const isAuthPage = req.nextUrl.pathname.startsWith("/login"); // Ou a rota da sua página de login
+export default NextAuth(authConfig).auth;
 
-  // 1. Se o usuário NÃO está logado e tenta acessar qualquer página que não seja o login
-  if (!isLoggedIn && !isAuthPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-
-  // 2. Se o usuário JÁ ESTÁ logado e tenta ir para o login, joga ele para o painel
-  if (isLoggedIn && isAuthPage) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  return NextResponse.next();
-});
-
-// Configura quais páginas o middleware vai proteger
 export const config = {
   matcher: [
     /*
