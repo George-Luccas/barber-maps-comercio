@@ -4,10 +4,10 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   // Enable static export configs only for Capacitor builds
-  ...(process.env.CAPACITOR_BUILD === 'true' ? { 
-    output: 'export',
-    distDir: 'out',
-  } : {}), 
+  // ...(process.env.CAPACITOR_BUILD === 'true' ? { 
+  //   output: 'export',
+  //   distDir: 'out',
+  // } : {}), 
 };
 
 export default nextConfig;
