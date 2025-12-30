@@ -21,20 +21,6 @@ export default function GaleriaEstilos() {
 
   const barbershopId = (session?.user as any)?.barbershopId;
 
-  // Se não tiver barbearia, avisa
-  if (session?.user && !barbershopId) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-gray-50 dark:bg-black text-zinc-900 dark:text-white">
-        <Sparkles size={48} className="text-purple-500 mb-4 animate-pulse" />
-        <h1 className="text-2xl font-black uppercase mb-2">Configure sua Barbearia</h1>
-        <p className="text-zinc-500 mb-6 max-w-md">Para acessar a galeria exclusiva, você precisa primeiro configurar o perfil da sua barbearia.</p>
-        <Link href="/barbearia" className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl uppercase tracking-widest transition-all">
-          Ir para Configuração
-        </Link>
-      </div>
-    );
-  }
-
   // Carregar estilos do banco
   useEffect(() => {
     if (barbershopId) {
@@ -178,9 +164,9 @@ export default function GaleriaEstilos() {
                            }
                            setLoading(false);
                         }}
-                        className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all shadow-lg hover:shadow-red-500/30"
+                        className="p-2 bg-black/50 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all border border-white/20"
                      >
-                        <Trash2 size={20} />
+                        <X size={20} />
                      </button>
                 </div>
 
