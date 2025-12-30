@@ -40,3 +40,20 @@ export async function testDatabaseConnection() {
     };
   }
 }
+
+export async function resetDatabase() {
+  try {
+    // Ordem importa por causa das chaves estrangeiras
+    await db.financialTransaction.deleteMany({});
+    await db.stockItem.deleteMany({});
+    await db.booking.deleteMany({});
+    await db.barbershopService.deleteMany({});
+    await db.barbershop.deleteMany({});
+    // Por último o usuário
+    await db.user.deleteMany({});
+    
+    return { success: true, message: "Banco de dados limpo com sucesso!" };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

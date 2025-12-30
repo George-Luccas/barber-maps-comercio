@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { testDatabaseConnection } from "./_actions";
+import { testDatabaseConnection, resetDatabase } from "./_actions";
 
 export default function TestDbPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const runTest = async () => {
     setLoading(true);
@@ -19,18 +20,43 @@ export default function TestDbPage() {
     }
   };
 
+  const handleReset = async () => {
+    if (!confirm("TEM CERTEZA? Isso apagará TODOS os usuários e dados!")) return;
+    
+    setResetLoading(true);
+    try {
+      const res = await resetDatabase();
+      alert(res.message || res.error);
+      runTest(); // Re-run test to update count
+    } catch (error: any) {
+      alert("Erro ao resetar: " + error.message);
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="p-8 font-mono text-sm max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Diagnóstico de Banco de Dados</h1>
       <p className="mb-4 text-gray-500">Este teste verifica se a aplicação Vercel consegue falar com o Banco de Dados.</p>
       
-      <button 
-        onClick={runTest} 
-        disabled={loading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-      >
-        {loading ? "Testando Conexão..." : "Executar Teste de Conexão"}
-      </button>
+      <div className="flex gap-4">
+        <button 
+          onClick={runTest} 
+          disabled={loading}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? "Testando..." : "Testar Conexão"}
+        </button>
+
+        <button 
+          onClick={handleReset} 
+          disabled={resetLoading}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+        >
+          {resetLoading ? "Resetando..." : "💣 RESETAR TUDO"}
+        </button>
+      </div>
 
       {result && (
         <div className={`mt-6 p-4 rounded border ${result.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
