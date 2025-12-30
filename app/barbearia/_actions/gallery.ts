@@ -30,11 +30,26 @@ export async function createStyle({
     const session = await auth();
     if (!session?.user) return { success: false, error: "Não autorizado" };
 
+    // Se o ID não veio (pode acontecer se session estiver stale), tenta buscar
+    let finalBarbershopId = barbershopId;
+    
+    if (!finalBarbershopId) {
+       const user = await db.user.findUnique({
+          where: { id: (session.user as any).id },
+          include: { Barbershop: true }
+       });
+       if (user?.Barbershop) {
+          finalBarbershopId = user.Barbershop.id;
+       } else {
+          return { success: false, error: "Configure sua Barbearia antes de salvar estilos!" };
+       }
+    }
+
     const style = await db.style.create({
       data: {
         name,
         imageUrl,
-        barbershopId,
+        barbershopId: finalBarbershopId,
       },
     });
 
