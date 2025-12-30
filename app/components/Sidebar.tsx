@@ -16,8 +16,8 @@ export default function Sidebar() {
   const menuItems = [
     { name: 'Início', icon: Home, href: '/' },
     { name: 'Financeiro', icon: DollarSign, href: '/financeiro' },
-    { name: 'Minha Barbearia', icon: Scissors, href: '/minha-barbearia' },
-    { name: 'Estilo', icon: Palette, href: '/estilo' },
+    { name: 'Minha Barbearia', icon: Scissors, href: '/barbearia' },
+    { name: 'Estilo', icon: Palette, href: '/galeria-estilos' },
   ]
 
   return (
