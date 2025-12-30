@@ -129,7 +129,7 @@ export default function AdminDashboard() {
           {/* CARD MINHA BARBEARIA (NOVO) */}
           <Link href="/barbearia" className="block group">
             <div className="relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full shadow-sm dark:shadow-none hover:shadow-xl">
-              <div className="absolute inset-0 bg-yellow-500/10 dark:bg-yellow-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-yellow-500/10 dark:bg-yellow-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
           {/* CARD GALERIA DE ESTILOS */}
           <Link href="/galeria-estilos" className="block group">
             <div className="relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group shadow-sm dark:shadow-none hover:shadow-xl">
-              <div className="absolute inset-0 bg-purple-500/10 dark:bg-purple-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-yellow-500/10 dark:bg-yellow-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
