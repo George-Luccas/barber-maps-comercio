@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, ArrowLeft, Upload, ChevronLeft, ChevronRight, X, Image as ImageIcon, Plus } from "lucide-react";
+import { Sparkles, ArrowLeft, Upload, ChevronLeft, ChevronRight, X, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { UploadButton } from "@uploadthing/react";
 import { useSession } from "next-auth/react";
-import { getStyles, createStyle } from "../barbearia/_actions/gallery";
+import { getStyles, createStyle, deleteStyle } from "../barbearia/_actions/gallery";
 
 export default function GaleriaEstilos() {
   const { data: session } = useSession();
@@ -20,6 +20,20 @@ export default function GaleriaEstilos() {
   const [novaImagem, setNovaImagem] = useState("");
 
   const barbershopId = (session?.user as any)?.barbershopId;
+
+  // Se não tiver barbearia, avisa
+  if (session?.user && !barbershopId) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-gray-50 dark:bg-black text-zinc-900 dark:text-white">
+        <Sparkles size={48} className="text-purple-500 mb-4 animate-pulse" />
+        <h1 className="text-2xl font-black uppercase mb-2">Configure sua Barbearia</h1>
+        <p className="text-zinc-500 mb-6 max-w-md">Para acessar a galeria exclusiva, você precisa primeiro configurar o perfil da sua barbearia.</p>
+        <Link href="/barbearia" className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl uppercase tracking-widest transition-all">
+          Ir para Configuração
+        </Link>
+      </div>
+    );
+  }
 
   // Carregar estilos do banco
   useEffect(() => {
@@ -145,6 +159,31 @@ export default function GaleriaEstilos() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 pointer-events-none" />
                 
+                <div className="absolute top-4 right-4 z-20">
+                     <button
+                        onClick={async (e) => {
+                           e.stopPropagation();
+                           if(!confirm("Excluir este estilo?")) return;
+                           
+                           setLoading(true);
+                           const res = await deleteStyle(estilos[currentIndex].id);
+                           if(res.success) {
+                              const newEstilos = estilos.filter(s => s.id !== estilos[currentIndex].id);
+                              setEstilos(newEstilos);
+                              if(newEstilos.length > 0) {
+                                 setCurrentIndex(0);
+                              }
+                           } else {
+                              alert("Erro ao excluir");
+                           }
+                           setLoading(false);
+                        }}
+                        className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all shadow-lg hover:shadow-red-500/30"
+                     >
+                        <Trash2 size={20} />
+                     </button>
+                </div>
+
                 <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 pointer-events-none">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}

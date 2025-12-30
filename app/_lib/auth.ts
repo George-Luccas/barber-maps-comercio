@@ -1,13 +1,13 @@
 import NextAuth from "next-auth";
-// import { PrismaAdapter } from "@auth/prisma-adapter";
-// import { db } from "./prisma";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { db } from "./prisma";
 import Credentials from "next-auth/providers/credentials";
-// import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { authConfig } from "@/app/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  // adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db),
   providers: [
     Credentials({
       credentials: {
@@ -16,35 +16,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-            // BACKDOOR PARA TESTE DE INFRAESTRUTURA (SERÁ REMOVIDO)
-            if (credentials?.email === "admin@admin.com" && credentials.password === "123456") {
-                return {
-                    id: "magic-admin",
-                    name: "Admin Temporário",
-                    email: "admin@admin.com",
-                    role: "BARBER",
-                    barbershopId: "demo-barbershop"
-                };
-            }
-
             if (!credentials?.email || !credentials?.password) return null;
 
-            return null; // Forçando falha para quem não é Admin por enquanto
+            const user = await db.user.findUnique({
+              where: { email: credentials.email as string },
+            });
 
-            // const user = await db.user.findUnique({
-            //   where: { email: credentials.email as string },
-            // });
+            if (!user || !user.password) return null;
 
-            // if (!user || !user.password) return null;
+            const isValid = await bcrypt.compare(
+              credentials.password as string,
+              user.password
+            );
 
-            // const isValid = await bcrypt.compare(
-            //   credentials.password as string,
-            //   user.password
-            // );
+            if (!isValid) return null;
 
-            // if (!isValid) return null;
-
-            // return user;
+            return user;
         } catch (error) {
             console.error("Erro na autorização:", error);
             return null;
@@ -56,20 +43,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Merge callbacks if needed, or simply override/extend
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        // try {
-        //     // Quando o usuário faz login, buscamos a barbearia associada
-        //     const dbUser = await db.user.findUnique({
-        //        where: { email: user.email! },
-        //        include: { Barbershop: true }
-        //     });
-        //    
-        //     if (dbUser?.Barbershop) {
-        //         token.barbershopId = dbUser.Barbershop.id;
-        //     }
-        // } catch (error) {
-        //     console.error("Erro no callback JWT:", error);
-        //     // Não quebramos o login, apenas seguimos sem o barbershopId se der erro no banco
-        // }
+        try {
+            // Quando o usuário faz login, buscamos a barbearia associada
+            const dbUser = await db.user.findUnique({
+               where: { email: user.email! },
+               include: { Barbershop: true }
+            });
+            
+            if (dbUser?.Barbershop) {
+                token.barbershopId = dbUser.Barbershop.id;
+            }
+        } catch (error) {
+            console.error("Erro no callback JWT:", error);
+            // Não quebramos o login, apenas seguimos sem o barbershopId se der erro no banco
+        }
       }
       return token;
     },
