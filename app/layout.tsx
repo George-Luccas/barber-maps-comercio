@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionWrapper from "./components/SessionWrapper";
 import Sidebar from "./components/Sidebar";
 import { Providers } from "./providers";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             <Sidebar />
             <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
               {children}
+              <Toaster position="top-right" richColors />
             </main>
           </Providers>
         </SessionWrapper>
