@@ -22,6 +22,9 @@ model Barbershop {
   lunchStart        String?
   lunchEnd          String?
   closingTime       String?
+  
+  latitude          Float?
+  longitude         Float?
 
   managerId         String?             @unique
   user              user?               @relation(fields: [managerId], references: [id])

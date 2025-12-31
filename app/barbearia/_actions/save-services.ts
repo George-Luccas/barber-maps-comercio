@@ -9,7 +9,8 @@ export async function saveBarberServices(
   barbershopName: string,
   imageUrl: string,
   horarios: { abertura: string, almocoInicio: string, almocoFim: string, fechamento: string },
-  photos: string[] = [] // Novo parâmetro opcional para não quebrar chamadas antigas
+  photos: string[] = [],
+  location?: { latitude: number | null, longitude: number | null }
 ) {
   try {
     const session = await auth();
@@ -22,7 +23,8 @@ export async function saveBarberServices(
     });
 
     if (!userExists) {
-      throw new Error("Usuário não encontrado found. Faça login novamente.");
+      console.error(`Tentativa de salvamento para usuário inexistente: ${userId}`);
+      throw new Error("Usuário não encontrado. Faça login novamente.");
     }
 
     // 1. Upsert da Barbearia
@@ -36,6 +38,8 @@ export async function saveBarberServices(
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
         closingTime: horarios.fechamento,
+        latitude: location?.latitude ?? null,
+        longitude: location?.longitude ?? null,
       },
       create: {
         name: barbershopName,
@@ -45,6 +49,8 @@ export async function saveBarberServices(
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
         closingTime: horarios.fechamento,
+        latitude: location?.latitude ?? null,
+        longitude: location?.longitude ?? null,
         address: "Endereço Pendente", 
         description: "Barbearia configurada pelo painel",
         managerId: userId,
@@ -70,7 +76,11 @@ export async function saveBarberServices(
     }
 
     revalidatePath("/barbearia");
-    revalidatePath("/financeiro"); // Garante que a lista de serviços atualize no caixa
+    revalidatePath("/financeiro"); 
+    revalidatePath("/"); // Home para ver logo/nome atualizados
+    revalidatePath("/galeria"); // Se houver
+    
+    console.log(`Configurações da barbearia ${barbershop.id} salvas com sucesso.`);
     return { success: true };
 
   } catch (error) {

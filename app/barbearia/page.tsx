@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin } from "lucide-react";
 import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
@@ -28,6 +28,8 @@ export default function MinhaBarbearia() {
   const [nomeBarbearia, setNomeBarbearia] = useState("");
   const [imageUrl, setImageUrl] = useState(""); 
   const [photos, setPhotos] = useState<string[]>([]);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   
   // Novo Estado de Serviços Dinâmicos
   const [servicos, setServicos] = useState<{id: string, name: string, price: number}[]>([]);
@@ -43,11 +45,13 @@ export default function MinhaBarbearia() {
 
   useEffect(() => {
     async function loadData() {
-      const data = await getBarbershopData();
+      const data = await getBarbershopData() as any;
       if (data) {
         setNomeBarbearia(data.name);
         setImageUrl(data.imageUrl || "");
         setPhotos(data.photos || []);
+        if (data.latitude) setLatitude(data.latitude.toString());
+        if (data.longitude) setLongitude(data.longitude.toString());
         
         // Carrega serviços existentes
         if (data.BarbershopService && data.BarbershopService.length > 0) {
@@ -126,7 +130,11 @@ export default function MinhaBarbearia() {
         nomeBarbearia, 
         imageUrl, 
         horarios,
-        photos 
+        photos,
+        {
+          latitude: latitude ? parseFloat(latitude.replace(",", ".")) : null,
+          longitude: longitude ? parseFloat(longitude.replace(",", ".")) : null
+        }
       );
       alert("✅ Configurações salvas com sucesso!");
     } catch (error) {
@@ -231,6 +239,34 @@ export default function MinhaBarbearia() {
                 className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
                 placeholder="Ex: Barber Shop do George"
               />
+            </div>
+
+            {/* LOCALIZAÇÃO (RADAR) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-yellow-500" /> Latitude (Para o Radar)
+                </label>
+                <input 
+                  type="text"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+                  placeholder="-23.5505"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-yellow-500" /> Longitude (Para o Radar)
+                </label>
+                <input 
+                  type="text"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+                  placeholder="-46.6333"
+                />
+              </div>
             </div>
 
             {/* HORÁRIOS */}
