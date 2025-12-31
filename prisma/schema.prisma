@@ -15,7 +15,7 @@ model Barbershop {
   description       String
   imageUrl          String?
   photos            String[]            @default([]) // Galeria de fotos
-  phones            String[]
+  phones            String[]            @default([])
   
   // Seus 4 campos de horário mantidos conforme planejado
   openingTime       String?

@@ -83,8 +83,9 @@ export async function saveBarberServices(
     console.log(`Configurações da barbearia ${barbershop.id} salvas com sucesso.`);
     return { success: true };
 
-  } catch (error) {
-    console.error("ERRO NO BANCO:", error);
-    throw new Error("Falha ao salvar no banco de dados");
+  } catch (error: any) {
+    console.error("ERRO CRÍTICO NO SALVAMENTO:", error);
+    const errorMessage = error?.message || "Erro desconhecido no banco de dados";
+    throw new Error(`Falha ao salvar no banco de dados: ${errorMessage}`);
   }
 }
