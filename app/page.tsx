@@ -73,6 +73,28 @@ export default function AdminDashboard() {
     }
   }, [barbershopId]);
 
+  // Busca dados de Analytics
+  useEffect(() => {
+    async function loadAnalytics() {
+      if (!barbershopId) return;
+      try {
+        const [m, mix, heat] = await Promise.all([
+            getDashboardMetrics(barbershopId),
+            getRevenueMix(barbershopId),
+            getOccupancyHeatmap(barbershopId)
+        ]);
+        setMetrics(m);
+        setRevenueMix(mix);
+        setHeatmapData(heat);
+      } catch (error) {
+        console.error("Failed to load analytics", error);
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    }
+    loadAnalytics();
+  }, [barbershopId]);
+
   if (!mounted) return <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a]" />;
 
   const missingGoal = Math.max(financeData.dailyGoal - financeData.income, 0);

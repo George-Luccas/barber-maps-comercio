@@ -40,14 +40,16 @@ export async function seedMockData(barbershopId: string) {
   // Vou criar bookings usando o current user mesmo.
   const userId = session.user.id;
 
-  // 3. Gerar Agendamentos Passados (Histórico de 30 dias)
+  // 3. Gerar Agendamentos (Mês Atual)
   const bookingsData = [];
-  const start = subDays(new Date(), 30);
+  const now = new Date();
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1); // 1º dia do mês atual
   
   for (let i = 0; i < 40; i++) {
-     // Dia aleatório nos últimos 30 dias
-     const daysAgo = Math.floor(Math.random() * 30);
-     const date = subDays(new Date(), daysAgo);
+     // Dia aleatório no mês atual
+     const dayOffset = Math.floor(Math.random() * 28); // 0 a 28
+     const date = new Date(startMonth);
+     date.setDate(startMonth.getDate() + dayOffset);
      
      // Hora aleatória (09h as 19h)
      const hour = 9 + Math.floor(Math.random() * 10);
@@ -71,13 +73,15 @@ export async function seedMockData(barbershopId: string) {
       data: bookingsData
   });
 
-  // 4. Gerar Transações Financeiras (Venda de Produtos)
+  // 4. Gerar Transações Financeiras (Mês Atual)
   const transactionsData = [];
   const products = ["Pomada Matte", "Gel Fixador", "Shampoo 2em1", "Óleo para Barba"];
   
   for (let i = 0; i < 20; i++) {
-    const daysAgo = Math.floor(Math.random() * 30);
-    const date = subDays(new Date(), daysAgo);
+    const dayOffset = Math.floor(Math.random() * 28);
+    const date = new Date(startMonth);
+    date.setDate(startMonth.getDate() + dayOffset);
+
     const hour = 9 + Math.floor(Math.random() * 10);
     date.setHours(hour, 30, 0, 0);
 
