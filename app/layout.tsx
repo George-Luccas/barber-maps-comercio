@@ -5,6 +5,7 @@ import SessionWrapper from "./components/SessionWrapper";
 import Sidebar from "./components/Sidebar";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import { NotificationWatcher } from "./components/NotificationWatcher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
         <SessionWrapper>
           <Providers>
             <Sidebar />
+            <NotificationWatcher />
             <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
               {children}
               <Toaster position="top-right" richColors />
