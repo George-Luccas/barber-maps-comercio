@@ -110,22 +110,6 @@ export default function AdminDashboard() {
             </div>
             
             <div className="flex items-center gap-4 w-full md:w-auto justify-end">
-               <button 
-                  onClick={async () => {
-                      if(!confirm("Gerar dados de teste? Isso criará agendamentos passados.")) return;
-                      const toastId = toast.loading("Gerando dados...");
-                      try {
-                          await seedMockData(barbershopId);
-                          toast.success("Dados gerados! Recarregando...", { id: toastId });
-                          window.location.reload();
-                      } catch(e) {
-                          toast.error("Erro ao gerar dados", { id: toastId });
-                      }
-                  }}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-xs text-white px-3 py-1 rounded-full border border-zinc-700 transition-colors"
-               >
-                  ⚡ Simular Dados
-               </button>
                <ThemeToggle />
             </div>
           </header>
@@ -139,9 +123,30 @@ export default function AdminDashboard() {
              
              {/* SECTION: SMART INSIGHTS (Novo) */}
              <div className="space-y-4">
-                 <div className="flex items-center gap-2">
-                     <Sparkles className="text-yellow-500" size={18} />
-                     <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Smart Insights</h2>
+                 <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="text-yellow-500" size={18} />
+                        <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Smart Insights</h2>
+                    </div>
+                    
+                    {/* Botão de Simulação Temporário */}
+                    <button 
+                        onClick={async () => {
+                            if(!confirm("Gerar dados de teste? Isso criará agendamentos passados.")) return;
+                            const toastId = toast.loading("Gerando dados...");
+                            try {
+                                await seedMockData(barbershopId);
+                                toast.success("Dados gerados! Recarregando...", { id: toastId });
+                                window.location.reload();
+                            } catch(e) {
+                                toast.error("Erro ao gerar dados", { id: toastId });
+                            }
+                        }}
+                        className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-yellow-500/20"
+                    >
+                        <Zap size={14} fill="black" />
+                        SIMULAR DADOS
+                    </button>
                  </div>
                  
                  {analyticsLoading ? (
