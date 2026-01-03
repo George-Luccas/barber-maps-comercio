@@ -53,7 +53,14 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
         const dateObj = new Date(selectedDate + 'T12:00:00'); 
         const data = await getBookings(barbershopId, dateObj);
         
-        const isToday = selectedDate === new Date().toISOString().split('T')[0];
+        // Compara com data local
+        const todayLocal = new Date();
+        const year = todayLocal.getFullYear();
+        const month = String(todayLocal.getMonth() + 1).padStart(2, '0');
+        const day = String(todayLocal.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+
+        const isToday = selectedDate === todayStr;
         const currentCount = data.length;
         
         if (isToday && !firstLoadRef.current && currentCount > lastCountRef.current) {
@@ -99,8 +106,8 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             <h2 className="text-lg md:text-xl font-bold text-yellow-500">Agenda</h2>
             <div className="flex items-center gap-2 mt-1">
                 <span className="text-[10px] text-zinc-500 uppercase font-black flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${selectedDate === new Date().toISOString().split('T')[0] ? 'bg-green-500 animate-pulse' : 'bg-zinc-600'}`} /> 
-                    {selectedDate === new Date().toISOString().split('T')[0] ? 'Visualizando Hoje' : 'Visualizando Histórico'}
+                    <div className={`w-2 h-2 rounded-full ${selectedDate === new Date().toLocaleDateString('fr-CA') ? 'bg-green-500 animate-pulse' : 'bg-zinc-600'}`} /> 
+                    {selectedDate === new Date().toLocaleDateString('fr-CA') ? 'Visualizando Hoje' : 'Visualizando Histórico'}
                 </span>
             </div>
          </div>

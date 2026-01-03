@@ -17,8 +17,16 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
     async function fetchData() {
        if (!barbershopId) return;
 
-       // Se não vier data, usa hoje
-       const dateStr = selectedDate || new Date().toISOString().split('T')[0];
+       // Se não vier data, usa hoje (Local)
+       let dateStr = selectedDate;
+       if (!dateStr) {
+          const d = new Date();
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          dateStr = `${year}-${month}-${day}`;
+       }
+       
        const dateObj = new Date(dateStr + 'T12:00:00');
 
        try {
