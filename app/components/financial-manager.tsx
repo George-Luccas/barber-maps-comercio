@@ -261,17 +261,17 @@ export default function FinancialManager() {
   if (!isMounted) return null;
 
   return (
-    <div className="flex flex-col gap-6 w-full font-sans p-4 md:p-8">
+    <div className="flex flex-col gap-6 w-full font-sans p-4 md:p-8 transition-colors duration-500">
       {/* HEADER */}
       <div className="max-w-4xl mx-auto w-full flex items-center justify-between mb-4">
-        <Link href="/" className="flex items-center gap-2 text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors group">
-          <div className="p-2 bg-white dark:bg-zinc-900 rounded-xl group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 transition-all border border-zinc-200 dark:border-transparent shadow-sm dark:shadow-none">
+        <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group">
+          <div className="p-2 bg-card rounded-xl group-hover:bg-muted transition-all border border-border shadow-sm">
             <ArrowLeft size={20} />
           </div>
           <span className="font-bold uppercase text-xs tracking-widest hidden md:block">Voltar ao Painel</span>
         </Link>
-        <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter leading-none">
-          Livro <span className="text-yellow-600 dark:text-yellow-500">Caixa</span>
+        <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter leading-none italic">
+          Livro <span className="text-brand-primary">Caixa</span>
         </h1>
       </div>
 
@@ -281,69 +281,69 @@ export default function FinancialManager() {
         <div className="md:col-span-5 space-y-6">
           
           {/* CARD DE SALDO */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-3xl flex items-center justify-between shadow-sm dark:shadow-none">
+          <div className="bg-card border border-border p-4 rounded-3xl flex items-center justify-between shadow-sm">
              <div className="flex items-center gap-3">
-               <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-500 dark:text-zinc-400">
+               <div className="p-2 bg-muted rounded-full text-brand-primary">
                   <DollarSign size={20} />
                </div>
                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Saldo em Caixa</p>
-                  <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tighter">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Saldo em Caixa</p>
+                  <h3 className="text-xl font-black text-foreground tracking-tighter italic">
                      {showBalance ? `R$ ${summary.balance.toFixed(2)}` : "R$ ••••••"}
                   </h3>
                </div>
              </div>
-             <button onClick={() => setShowBalance(!showBalance)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all">
+             <button onClick={() => setShowBalance(!showBalance)} className="p-2 hover:bg-muted rounded-xl text-muted-foreground hover:text-foreground transition-all">
                 {showBalance ? <EyeOff size={18} /> : <Eye size={18} />}
              </button>
           </div>
 
           {/* CARD DE META */}
-          <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] relative overflow-hidden shadow-sm dark:shadow-none">
+          <div className="bg-card/40 border border-border p-6 rounded-[2rem] relative overflow-hidden shadow-sm">
             <div className="flex justify-between items-start mb-4 relative z-10">
               <div>
-                <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1">Falta para a Meta</p>
-                <h2 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tighter">R$ {faltante.toFixed(2)}</h2>
+                <p className="text-muted-foreground text-[10px] uppercase font-black tracking-widest mb-1">Falta para a Meta</p>
+                <h2 className="text-4xl font-black text-foreground tracking-tighter italic">R$ {faltante.toFixed(2)}</h2>
               </div>
-              <button onClick={alterarMeta} className="p-2 bg-zinc-800/50 hover:bg-zinc-800 rounded-xl text-yellow-500 transition active:scale-95">
+              <button onClick={alterarMeta} className="p-2 bg-muted hover:bg-background rounded-xl text-brand-primary transition active:scale-95 border border-border">
                 <Target size={18} />
               </button>
             </div>
-            <div className="relative w-full h-2 bg-zinc-800 rounded-full overflow-hidden mt-2">
+            <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden mt-2">
               <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-1000"
+                className="absolute top-0 left-0 h-full bg-brand-primary transition-all duration-1000 shadow-[0_0_10px_rgba(234,179,8,0.5)] pro:shadow-[0_0_10px_rgba(204,255,0,0.5)]"
                 style={{ width: `${progresso}%` }}
               />
             </div>
             <div className="flex justify-between mt-3 items-center">
-              <p className="text-[9px] text-zinc-600 uppercase font-bold">{progresso.toFixed(0)}% Concluído</p>
+              <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">{progresso.toFixed(0)}% Concluído</p>
                {summary.income > 0 && (
-                <p className="text-[10px] font-bold text-zinc-500 flex items-center gap-1">
-                  Já Faturado: R$ {summary.income.toFixed(2)}
+                <p className="text-[10px] font-black uppercase text-brand-primary flex items-center gap-1 tracking-widest">
+                  Faturado: R$ {summary.income.toFixed(2)}
                 </p>
                )}
             </div>
           </div>
 
           {/* FORMULÁRIO */}
-          <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] shadow-sm dark:shadow-none">
-            <h3 className="text-sm font-black italic uppercase mb-6 flex items-center gap-2 text-zinc-900 dark:text-white">
-              <PlusCircle size={18} className="text-yellow-500" /> Novo Lançamento
+          <div className="bg-card border border-border p-6 rounded-[2rem] shadow-sm">
+            <h3 className="text-sm font-black italic uppercase mb-6 flex items-center gap-2 text-foreground italic">
+              <PlusCircle size={18} className="text-brand-primary" /> Novo Lançamento
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex gap-2 p-1 bg-gray-50 dark:bg-black/40 rounded-xl border border-zinc-200 dark:border-zinc-800/50">
+              <div className="flex gap-2 p-1 bg-muted rounded-xl border border-border">
                 <button
                   type="button"
                   onClick={() => setType("INCOME")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${type === "INCOME" ? "bg-green-500/10 text-green-500" : "text-zinc-600 hover:text-zinc-400"}`}
+                  className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${type === "INCOME" ? "bg-green-500/10 text-green-500" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Entrada
                 </button>
                 <button
                   type="button"
                   onClick={() => setType("EXPENSE")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${type === "EXPENSE" ? "bg-red-500/10 text-red-500" : "text-zinc-600 hover:text-zinc-400"}`}
+                  className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${type === "EXPENSE" ? "bg-red-500/10 text-red-500" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Saída
                 </button>
@@ -353,37 +353,37 @@ export default function FinancialManager() {
                {type === "INCOME" && (
                    <div className="grid grid-cols-2 gap-4">
                        {/* SELETOR DE SERVIÇOS */}
-                        <div className="relative col-span-2 md:col-span-1">
-                            <select
-                                value={selectedServiceId}
-                                onChange={handleServiceChange}
-                                className="w-full bg-gray-50 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-xs focus:border-yellow-500 outline-none transition-all text-zinc-900 dark:text-white font-bold uppercase tracking-widest appearance-none truncate"
-                            >
-                                <option value="">-- Serviço --</option>
-                                {services.map(s => (
-                                    <option key={s.id} value={s.id} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
-                                        {s.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <Scissors size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none"/>
-                        </div>
+                         <div className="relative col-span-2 md:col-span-1">
+                             <select
+                                 value={selectedServiceId}
+                                 onChange={handleServiceChange}
+                                 className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
+                             >
+                                 <option value="">-- Serviço --</option>
+                                 {services.map(s => (
+                                     <option key={s.id} value={s.id} className="bg-card text-foreground">
+                                         {s.name}
+                                     </option>
+                                 ))}
+                             </select>
+                             <Scissors size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
+                         </div>
 
                         {/* SELETOR DE PRODUTOS */}
                         <div className="relative col-span-2 md:col-span-1">
                            <select
                                value={selectedStockId}
                                onChange={handleStockChange}
-                               className="w-full bg-gray-50 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-xs focus:border-yellow-500 outline-none transition-all text-zinc-900 dark:text-white font-bold uppercase tracking-widest appearance-none truncate"
+                               className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
                            >
                                <option value="">-- Produto --</option>
                                {stockItems.map(item => (
-                                   <option key={item.id} value={item.id} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
+                                   <option key={item.id} value={item.id} className="bg-card text-foreground">
                                        {item.name} ({item.quantity})
                                    </option>
                                ))}
                            </select>
-                           <Package size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none"/>
+                           <Package size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
                        </div>
                    </div>
                )}
@@ -394,27 +394,27 @@ export default function FinancialManager() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Descrição (ex: Corte Degradê)" 
-                  className="w-full bg-gray-50 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm focus:border-yellow-500 outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-700 font-medium text-zinc-900 dark:text-white" 
+                  className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground font-black uppercase tracking-widest text-foreground" 
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-2 gap-4">
                 <input 
                   type="number" 
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00" 
-                  className="w-full bg-gray-50 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm focus:border-yellow-500 outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-700 font-medium text-zinc-900 dark:text-white" 
+                  className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground font-black uppercase tracking-widest text-foreground" 
                 />
                 <select 
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm focus:border-yellow-500 outline-none transition-all text-zinc-900 dark:text-white font-medium appearance-none"
+                  className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none"
                 >
-                  <option value="MONEY" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">Dinheiro</option>
-                  <option value="PIX" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">Pix</option>
-                  <option value="CARD" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">Cartão</option>
-                  <option value="OTHER" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">Outro</option>
+                  <option value="MONEY" className="bg-card text-foreground">Dinheiro</option>
+                  <option value="PIX" className="bg-card text-foreground">Pix</option>
+                  <option value="CARD" className="bg-card text-foreground">Cartão</option>
+                  <option value="OTHER" className="bg-card text-foreground">Outro</option>
                 </select>
               </div>
 
@@ -434,40 +434,40 @@ export default function FinancialManager() {
         <div className="md:col-span-7 space-y-6">
           
           {/* FILTRO DE DATA */}
-          <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-900">
-             <div className="flex items-center gap-2 text-zinc-400">
+          <div className="flex items-center justify-between pb-4 border-b border-border">
+             <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar size={18} />
-                <span className="text-xs font-bold uppercase tracking-widest">Movimentações de</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Movimentações de</span>
              </div>
              <input 
                 type="date" 
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white text-xs font-bold uppercase rounded-lg px-3 py-2 outline-none focus:border-yellow-500"
+                className="bg-card border border-border text-foreground text-[10px] font-black uppercase rounded-lg px-3 py-2 outline-none focus:border-brand-primary"
              />
           </div>
 
           {/* LISTA */}
           <div className="space-y-3">
             {transactions.length === 0 && (
-               <div className="p-8 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-900 rounded-3xl">
-                  <p className="text-zinc-500 dark:text-zinc-700 font-bold uppercase text-xs tracking-widest">Nenhum registro nesta data</p>
+               <div className="p-8 text-center border-2 border-dashed border-border rounded-3xl">
+                  <p className="text-muted-foreground font-black uppercase text-[10px] tracking-widest">Nenhum registro nesta data</p>
                </div>
             )}
 
             {transactions.map((t) => (
-              <div key={t.id} className="group flex items-center justify-between p-5 bg-white dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-800 rounded-2xl transition-all shadow-sm dark:shadow-none">
+              <div key={t.id} className="group flex items-center justify-between p-5 bg-card/40 border border-border hover:border-brand-primary/30 rounded-2xl transition-all shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-full ${t.type === 'INCOME' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                     {t.type === 'INCOME' ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-zinc-900 dark:text-white mb-1">{t.description}</h4>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-600 bg-gray-100 dark:bg-zinc-900 px-2 py-1 rounded-md">{t.paymentMethod}</span>
+                    <h4 className="font-black text-xs uppercase tracking-tight text-foreground mb-1">{t.description}</h4>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">{t.paymentMethod}</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`text-lg font-black tracking-tighter ${t.type === 'INCOME' ? 'text-zinc-900 dark:text-white' : 'text-red-500'}`}>
+                  <p className={`text-lg font-black tracking-tighter italic ${t.type === 'INCOME' ? 'text-foreground' : 'text-red-500'}`}>
                     {t.type === 'EXPENSE' && '- '}R$ {Number(t.amount).toFixed(2)}
                   </p>
                 </div>
@@ -476,11 +476,11 @@ export default function FinancialManager() {
           </div>
 
           {/* FOOTER DO EXTRATO */}
-          <div className="pt-6 border-t border-zinc-200 dark:border-zinc-900 flex justify-end">
+          <div className="pt-6 border-t border-border flex justify-end">
             <button 
               onClick={handleFecharCaixa}
               disabled={transactions.length === 0}
-              className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-black/5 dark:shadow-white/5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-4 bg-foreground text-background rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-lg hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed h-14"
             >
               <Landmark size={16} /> Fechar Caixa e Imprimir
             </button>

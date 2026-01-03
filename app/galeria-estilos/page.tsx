@@ -96,22 +96,25 @@ export default function GaleriaEstilos() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#050505] text-zinc-900 dark:text-white p-6 font-sans flex flex-col relative overflow-hidden transition-colors duration-300">
-      {/* Background Glows (Dark Mode Only) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none hidden dark:block" />
-      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none hidden dark:block" />
+    <div className="min-h-screen bg-background text-foreground p-6 font-sans flex flex-col relative overflow-hidden transition-colors duration-500 selection:bg-brand-primary/30">
+      {/* Background Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-primary/10 blur-[120px] rounded-full pointer-events-none hidden dark:block pro:bg-brand-primary/20" />
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-brand-secondary/10 blur-[100px] rounded-full pointer-events-none hidden dark:block" />
+
+      {/* Grid Pattern para o modo Pro */}
+      <div className="hidden pro:block absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(var(--brand-secondary) 1px, transparent 1px), linear-gradient(90deg, var(--brand-secondary) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
       <header className="flex justify-between items-center mb-8 relative z-10">
-        <Link href="/" className="p-3 bg-white dark:bg-zinc-900/50 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-purple-500/50 transition-all group shadow-sm dark:shadow-none">
-            <ArrowLeft size={20} className="text-zinc-600 dark:text-white group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors"/>
+        <Link href="/" className="p-3 bg-card backdrop-blur-md rounded-xl border border-border hover:border-brand-primary/50 transition-all group shadow-sm">
+            <ArrowLeft size={20} className="text-muted-foreground group-hover:text-brand-primary transition-colors"/>
         </Link>
         <div className="text-center">
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">Galeria Exclusiva</p>
-          <h1 className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-purple-200 dark:to-white dark:drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-            Meus <span className="text-purple-600 dark:text-purple-500">Estilos</span>
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-primary drop-shadow-[0_0_10px_rgba(234,179,8,0.3)] pro:drop-shadow-[0_0_10px_rgba(204,255,0,0.5)]">Galeria Exclusiva</p>
+          <h1 className="text-2xl font-black italic uppercase tracking-tighter text-foreground italic">
+            Meus <span className="text-brand-primary">Estilos</span>
           </h1>
         </div>
-        <div className="w-12 h-12 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-sm dark:shadow-[0_0_15px_rgba(168,85,247,0.2)] backdrop-blur-md">
+        <div className="w-12 h-12 bg-card border border-border rounded-2xl flex items-center justify-center text-brand-primary shadow-sm backdrop-blur-md">
             <Sparkles size={20} className="animate-pulse"/>
         </div>
       </header>
@@ -136,7 +139,7 @@ export default function GaleriaEstilos() {
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.2}
                 onDragEnd={onDragEnd}
-                className="absolute inset-0 rounded-[2.5rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl dark:shadow-[0_0_30px_rgba(168,85,247,0.15)] ring-1 ring-black/5 dark:ring-white/10 cursor-grab active:cursor-grabbing"
+                className="absolute inset-0 rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-xl dark:shadow-[0_0_30px_rgba(234,179,8,0.15)] pro:shadow-[0_0_30px_rgba(204,255,0,0.15)] ring-1 ring-black/5 dark:ring-white/10 cursor-grab active:cursor-grabbing"
                 >
                 <img 
                     src={estilos[currentIndex].url} 
@@ -176,7 +179,7 @@ export default function GaleriaEstilos() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <p className="text-purple-400 text-[10px] font-black uppercase tracking-[0.3em] mb-2 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">
+                        <p className="text-brand-primary text-[10px] font-black uppercase tracking-[0.3em] mb-2 drop-shadow-[0_0_8px_rgba(234,179,8,0.8)] pro:drop-shadow-[0_0_8px_rgba(204,255,0,0.8)]">
                             Estilo #{currentIndex + 1}
                         </p>
                         <h2 className="text-4xl font-black italic text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] uppercase">
@@ -187,7 +190,7 @@ export default function GaleriaEstilos() {
                 </motion.div>
             </AnimatePresence>
           ) : (
-            <div className="absolute inset-0 rounded-[2.5rem] border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 flex flex-col items-center justify-center p-8 text-center text-zinc-400 dark:text-zinc-500">
+            <div className="absolute inset-0 rounded-[2.5rem] border-2 border-dashed border-border bg-card/30 flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
                 <ImageIcon size={48} className="mb-4 opacity-50" />
                 <p className="text-sm font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Nenhum estilo na galeria</p>
                 <p className="text-xs opacity-60 mt-2">Adicione sua primeira foto abaixo</p>
@@ -197,10 +200,10 @@ export default function GaleriaEstilos() {
           {/* CONTROLS (Desktop Only mainly, but visible on mobile too) */}
           {estilos.length > 1 && (
             <>
-                <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 p-4 bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-full text-zinc-900 dark:text-white border border-white/20 hover:bg-purple-500/80 hover:border-purple-500 transition-all opacity-0 group-hover:opacity-100 active:scale-95 shadow-lg z-20">
+                <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 p-4 bg-background/40 backdrop-blur-xl rounded-full text-foreground border border-white/20 hover:bg-brand-primary hover:border-brand-primary hover:text-primary-foreground transition-all opacity-0 group-hover:opacity-100 active:scale-95 shadow-lg z-20">
                     <ChevronLeft size={24} />
                 </button>
-                <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 p-4 bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-full text-zinc-900 dark:text-white border border-white/20 hover:bg-purple-500/80 hover:border-purple-500 transition-all opacity-0 group-hover:opacity-100 active:scale-95 shadow-lg z-20">
+                <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 p-4 bg-background/40 backdrop-blur-xl rounded-full text-foreground border border-white/20 hover:bg-brand-primary hover:border-brand-primary hover:text-primary-foreground transition-all opacity-0 group-hover:opacity-100 active:scale-95 shadow-lg z-20">
                     <ChevronRight size={24} />
                 </button>
             </>
@@ -212,7 +215,7 @@ export default function GaleriaEstilos() {
                 {estilos.map((_, idx) => (
                 <div 
                     key={idx} 
-                    className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-purple-600 dark:bg-purple-500 shadow-md dark:shadow-[0_0_10px_rgba(168,85,247,0.8)]' : 'w-2 bg-zinc-300 dark:bg-zinc-800'}`} 
+                    className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-brand-primary shadow-md dark:shadow-[0_0_10px_rgba(234,179,8,0.8)] pro:shadow-[0_0_10px_rgba(204,255,0,0.8)]' : 'w-2 bg-muted'}`} 
                 />
                 ))}
             </div>
@@ -222,9 +225,9 @@ export default function GaleriaEstilos() {
         {/* ACTIONS */}
         <div className="mt-8">
           {showInput ? (
-            <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] backdrop-blur-md shadow-2xl animate-in slide-in-from-bottom-6 ring-1 ring-black/5 dark:ring-white/5">
+            <div className="bg-card border border-border p-6 rounded-[2rem] backdrop-blur-md shadow-2xl animate-in slide-in-from-bottom-6 ring-1 ring-black/5 dark:ring-white/5">
               <div className="flex justify-between items-center mb-6">
-                <span className="text-[10px] font-black uppercase text-purple-600 dark:text-purple-400 tracking-widest drop-shadow-none dark:drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]">
+                <span className="text-[10px] font-black uppercase text-brand-primary tracking-widest drop-shadow-none dark:drop-shadow-[0_0_5px_rgba(234,179,8,0.5)] pro:drop-shadow-[0_0_5px_rgba(204,255,0,0.5)]">
                     Novo Estilo
                 </span>
                 <button 
@@ -233,14 +236,14 @@ export default function GaleriaEstilos() {
                         setNovaImagem("");
                         setNovoNome("");
                     }}
-                    className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    className="p-1 rounded-full hover:bg-muted transition-colors"
                 >
-                    <X size={16} className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white"/>
+                    <X size={16} className="text-muted-foreground hover:text-foreground"/>
                 </button>
               </div>
 
               {!novaImagem ? (
-                  <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-xl p-8 mb-4 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-center group cursor-pointer relative">
+                  <div className="border-2 border-dashed border-border rounded-xl p-8 mb-4 hover:border-brand-primary/50 hover:bg-brand-primary/5 transition-all text-center group cursor-pointer relative">
                     <UploadButton
                         endpoint="imageUploader"
                         onClientUploadComplete={(res) => {
@@ -259,8 +262,8 @@ export default function GaleriaEstilos() {
                         }}
                     />
                     <div className="pointer-events-none">
-                        <Upload size={32} className="mx-auto text-zinc-400 dark:text-zinc-600 group-hover:text-purple-500 dark:group-hover:text-purple-400 mb-2 transition-colors"/>
-                        <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 uppercase tracking-wide">Toque para Upload</p>
+                        <Upload size={32} className="mx-auto text-muted-foreground group-hover:text-brand-primary mb-2 transition-colors"/>
+                        <p className="text-xs font-bold text-muted-foreground group-hover:text-foreground uppercase tracking-wide">Toque para Upload</p>
                     </div>
                   </div>
               ) : (
@@ -278,14 +281,14 @@ export default function GaleriaEstilos() {
               <input 
                 type="text" 
                 placeholder="NOME DO ESTILO..." 
-                className="w-full bg-gray-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-700/50 rounded-xl p-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 outline-none focus:border-purple-500 focus:bg-white dark:focus:bg-black/60 focus:shadow-[0_0_15px_rgba(168,85,247,0.1)] transition-all uppercase font-black text-sm tracking-wide mb-4"
+                className="w-full bg-muted border border-border rounded-xl p-4 text-foreground placeholder:text-muted-foreground outline-none focus:border-brand-primary focus:bg-background focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all uppercase font-black text-sm tracking-wide mb-4"
                 value={novoNome}
                 onChange={(e) => setNovoNome(e.target.value)}
               />
 
               <button 
                 onClick={adicionarEstilo}
-                className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-purple-600 dark:hover:bg-purple-400 hover:text-white rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-lg dark:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-xl dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-brand-primary text-primary-foreground hover:opacity-90 rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-lg shadow-brand-primary/10 hover:shadow-xl hover:shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!novoNome || !novaImagem}
               >
                 Salvar na Galeria
@@ -294,10 +297,10 @@ export default function GaleriaEstilos() {
           ) : (
             <button 
               onClick={() => setShowInput(true)}
-              className="w-full py-6 bg-white dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-purple-500/30 hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] active:scale-95 transition-all group"
+              className="w-full py-6 bg-card backdrop-blur-md border border-border text-foreground rounded-[2.5rem] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-muted hover:border-brand-primary/30 hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] pro:hover:shadow-[0_0_30px_rgba(204,255,0,0.15)] active:scale-95 transition-all group"
             >
-              <Plus size={24} className="text-purple-500 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]"/> 
-              <span className="group-hover:text-purple-200 transition-colors">Adicionar Estilo</span>
+              <Plus size={24} className="text-brand-primary group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(234,179,8,0.8)] pro:drop-shadow-[0_0_8px_rgba(204,255,0,0.8)]"/> 
+              <span className="group-hover:text-brand-primary/80 transition-colors">Adicionar Estilo</span>
             </button>
           )}
         </div>

@@ -53,15 +53,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-background transition-colors duration-500">
       {/* IMAGEM DE FUNDO */}
-      <div className="absolute inset-0 z-0 bg-zinc-950">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-background" />
         {/* LOGO GIRANDO NO FUNDO */}
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none opacity-[0.3] [perspective:1000px]">
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none opacity-[0.1] dark:opacity-[0.2] pro:opacity-[0.1] [perspective:1000px]">
            <img 
               src="/logo-spin-v2.png" 
               alt="Background Logo" 
-              className="w-[500vw] h-auto object-contain animate-sway -translate-y-[10%]"
+              className="w-[500vw] h-auto object-contain animate-sway -translate-y-[10%] pro:invert"
            />
         </div>
       </div>
@@ -70,10 +71,10 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-xl p-6 md:p-10 mx-4">
         
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-6xl font-black text-yellow-500 uppercase tracking-tighter mb-2">
+          <h1 className="text-4xl md:text-6xl font-black text-brand-primary uppercase tracking-tighter mb-2 italic">
             {isLogin ? 'Entrar' : 'Cadastro'}
           </h1>
-          <p className="text-gray-400 text-xl font-medium tracking-widest uppercase">
+          <p className="text-muted-foreground text-sm font-black tracking-[0.2em] uppercase italic">
             {isLogin ? 'Painel Administrativo' : 'Crie sua conta de barbeiro'}
           </p>
         </div>
@@ -81,45 +82,45 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <div className="relative group">
-              <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-yellow-500 transition-colors" />
-              <input name="name" type="text" placeholder="NOME COMPLETO" required className="w-full bg-white/5 border-2 border-white/10 p-6 pl-14 rounded-2xl text-white text-xl font-bold focus:border-yellow-500 outline-none transition-all placeholder:text-gray-600" />
+              <User size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
+              <input name="name" type="text" placeholder="NOME COMPLETO" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
             </div>
           )}
 
           <div className="relative group">
-            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-yellow-500 transition-colors" />
-            <input name="email" type="email" placeholder="EMAIL" required className="w-full bg-white/5 border-2 border-white/10 p-6 pl-14 rounded-2xl text-white text-xl font-bold focus:border-yellow-500 outline-none transition-all placeholder:text-gray-600" />
+            <Mail size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
+            <input name="email" type="email" placeholder="EMAIL" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
           </div>
 
           {!isLogin && (
             <div className="relative group">
-              <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-yellow-500 transition-colors" />
-              <input name="phone" type="tel" placeholder="NÚMERO DE WHATSAPP" required className="w-full bg-white/5 border-2 border-white/10 p-6 pl-14 rounded-2xl text-white text-xl font-bold focus:border-yellow-500 outline-none transition-all placeholder:text-gray-600" />
+              <Phone size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
+              <input name="phone" type="tel" placeholder="NÚMERO DE WHATSAPP" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
             </div>
           )}
 
           <div className="relative group">
-            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-yellow-500 transition-colors" />
-            <input name="password" type="password" placeholder="SENHA" required className="w-full bg-white/5 border-2 border-white/10 p-6 pl-14 rounded-2xl text-white text-xl font-bold focus:border-yellow-500 outline-none transition-all placeholder:text-gray-600" />
+            <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
+            <input name="password" type="password" placeholder="SENHA" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
           </div>
 
           <button 
             disabled={loading}
             type="submit" 
-            className="group w-full flex items-center justify-between p-6 mt-10 border-2 border-yellow-500 rounded-2xl bg-yellow-500 text-black hover:bg-transparent hover:text-yellow-500 transition-all duration-300 disabled:opacity-50"
+            className="group w-full flex items-center justify-between p-6 mt-10 border-2 border-brand-primary rounded-2xl bg-brand-primary text-primary-foreground hover:bg-transparent hover:text-brand-primary transition-all duration-300 disabled:opacity-50"
           >
-            <span className="text-3xl font-black uppercase tracking-tighter">
+            <span className="text-3xl font-black uppercase tracking-tighter italic">
               {loading ? 'Processando...' : isLogin ? 'Acessar Painel' : 'Finalizar Registro'}
             </span>
-            <div className="w-14 h-14 border-2 border-black group-hover:border-yellow-500 rounded-xl flex items-center justify-center">
+            <div className="w-14 h-14 border-2 border-primary-foreground group-hover:border-brand-primary rounded-xl flex items-center justify-center">
               <ArrowRight className="w-8 h-8" />
             </div>
           </button>
         </form>
 
-        <p className="mt-8 text-center text-gray-400 text-lg font-bold">
+        <p className="mt-8 text-center text-muted-foreground text-xs font-black uppercase tracking-[0.2em] italic">
           {isLogin ? 'NÃO TEM CONTA?' : 'JÁ POSSUI CONTA?'} 
-          <button type="button" onClick={() => setIsLogin(!isLogin)} className="ml-2 text-yellow-500 hover:underline">
+          <button type="button" onClick={() => setIsLogin(!isLogin)} className="ml-2 text-brand-primary hover:underline font-black">
             CLIQUE AQUI
           </button>
         </p>

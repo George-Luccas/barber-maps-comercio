@@ -52,7 +52,7 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
   const tickerItems = [...items, ...items, ...items]; // Triplicar para garantir scroll suave em telas largas
 
   return (
-    <div className="w-full bg-card/50 border-y border-border py-3 overflow-hidden flex items-center shadow-sm">
+    <div className="w-full py-1 overflow-hidden flex items-center">
       {/* Container da Animação */}
       <motion.div
         className="flex whitespace-nowrap gap-8"
@@ -66,10 +66,10 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
         {tickerItems.map((item, idx) => (
           <div 
             key={`${item.id}-${idx}`} 
-            className={`flex items-center gap-4 border px-6 py-2 rounded-2xl shadow-sm ${
+            className={`flex items-center gap-4 px-4 py-1.5 transition-all ${
                 item.status === 'realizado' 
-                ? 'bg-green-500/10 border-green-500/20 opacity-70' 
-                : 'bg-background/40 dark:bg-black/40 border-border'
+                ? 'text-green-500/60' 
+                : 'text-foreground/80'
             }`}
           >
             {/* Indicador de Status Piscante para Pendente (Próximos) */}

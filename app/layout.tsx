@@ -30,7 +30,7 @@ export default function RootLayout({
             <ErrorBoundary>
               <Sidebar />
               <NotificationWatcher />
-              <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+              <main className="min-h-screen bg-background text-foreground transition-colors duration-500">
                 {children}
                 <Toaster position="top-right" richColors />
               </main>

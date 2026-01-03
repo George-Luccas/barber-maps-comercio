@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="p-8 text-center bg-zinc-900 border border-red-500/30 rounded-[2rem] m-4">
+        <div className="p-8 text-center bg-card border border-red-500/30 rounded-[2rem] m-4 shadow-lg">
           <h2 className="text-xl font-bold text-red-500 mb-2">Ops! Algo deu errado.</h2>
           <p className="text-zinc-400 text-sm mb-4">Ocorreu um erro ao carregar este componente.</p>
           <button

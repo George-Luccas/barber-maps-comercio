@@ -23,31 +23,31 @@ export default function CardsMetricas() {
       label: "Tempo Médio / Cliente",
       valor: "52 min",
       subtexto: "Meta: 45 min",
-      cor: "text-yellow-500",
+      cor: "text-brand-primary",
       icon: Timer,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {metricas.map((item, idx) => (
         <div 
           key={idx} 
-          className="bg-zinc-900/40 border border-zinc-800 p-6 rounded-[2rem] hover:border-zinc-700 transition-all group"
+          className="bg-card border border-border p-6 rounded-[2rem] hover:border-brand-primary/30 transition-all group shadow-sm"
         >
           <div className="flex justify-between items-start mb-4">
-            <div className={`p-3 rounded-2xl bg-black/50 border border-zinc-800 ${item.cor}`}>
+            <div className={`p-3 rounded-2xl bg-muted border border-border ${item.cor} shadow-sm group-hover:border-brand-primary/20`}>
               <item.icon size={24} />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 group-hover:text-zinc-400">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-brand-primary transition-colors">
               Live
             </span>
           </div>
           
           <div>
-            <p className="text-zinc-500 text-xs font-bold uppercase mb-1">{item.label}</p>
-            <h3 className="text-3xl font-black text-white italic tracking-tight">{item.valor}</h3>
-            <p className="text-[10px] text-zinc-600 mt-2 font-medium">{item.subtexto}</p>
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">{item.label}</p>
+            <h3 className="text-4xl font-black text-foreground italic tracking-tighter">{item.valor}</h3>
+            <p className="text-[10px] text-muted-foreground mt-2 font-black uppercase tracking-widest italic">{item.subtexto}</p>
           </div>
         </div>
       ))}

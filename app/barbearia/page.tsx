@@ -147,36 +147,36 @@ export default function MinhaBarbearia() {
 
   if (!mounted || fetching) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-black flex items-center justify-center">
-        <Loader2 className="animate-spin text-yellow-600" size={40} />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="animate-spin text-brand-primary" size={40} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-black text-zinc-900 dark:text-white p-4 md:p-8 pb-24 transition-colors duration-300">
-      <Link href="/" className="flex items-center gap-2 text-yellow-500 mb-6 w-fit hover:opacity-80 transition-opacity">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 pb-24 transition-colors duration-500">
+      <Link href="/" className="flex items-center gap-2 text-brand-primary mb-6 w-fit hover:opacity-80 transition-opacity">
         <ChevronLeft size={20} />
-        <span>Voltar</span>
+        <span className="font-bold uppercase text-xs tracking-widest">Voltar</span>
       </Link>
 
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-black italic uppercase tracking-tighter">Gestão <span className="text-yellow-500">Barbearia</span></h1>
-            <p className="text-zinc-500 text-sm font-medium">Configure sua identidade visual e informações</p>
+            <h1 className="text-3xl font-black italic uppercase tracking-tighter italic">Gestão <span className="text-brand-primary">Barbearia</span></h1>
+            <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest">Identidade Visual e Informações</p>
           </div>
           
-          <div className="flex bg-white dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <div className="flex bg-card p-1 rounded-xl border border-border">
              <button 
                 onClick={() => setActiveTab("geral")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === "geral" ? "bg-yellow-600 text-black shadow-lg shadow-yellow-600/20" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white"}`}
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "geral" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
              >
                 Geral
              </button>
              <button 
                 onClick={() => setActiveTab("galeria")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === "galeria" ? "bg-yellow-600 text-black shadow-lg shadow-yellow-600/20" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white"}`}
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "galeria" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
              >
                 Galeria
              </button>
@@ -186,23 +186,23 @@ export default function MinhaBarbearia() {
         {activeTab === "geral" ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* FOTO DESTAQUE */}
-            <div className="bg-white dark:bg-zinc-900/50 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 flex flex-col items-center gap-6 shadow-sm dark:shadow-none">
-              <label className="text-zinc-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2 self-start">
-                <Camera size={16} className="text-yellow-500" /> Foto de Destaque (Capa)
+            <div className="bg-card border border-border p-6 rounded-[2rem] flex flex-col items-center gap-6 shadow-sm">
+              <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2 self-start">
+                <Camera size={16} className="text-brand-primary" /> Foto de Destaque (Capa)
               </label>
               
-              <div className="relative group w-full max-w-md aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-gray-50 dark:bg-black/50">
+              <div className="relative group w-full max-w-md aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-border bg-background/50">
                 {imageUrl ? (
                   <>
                     <img src={imageUrl} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <p className="text-white text-xs font-bold uppercase">Alterar Foto</p>
+                       <p className="text-white text-xs font-bold uppercase tracking-widest">Alterar Foto</p>
                     </div>
                   </>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 gap-2">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2">
                     <ImageIcon size={32} />
-                    <span className="text-xs font-bold uppercase">Sem foto de capa</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Sem foto de capa</span>
                   </div>
                 )}
               </div>
@@ -216,7 +216,7 @@ export default function MinhaBarbearia() {
                   }}
                   onUploadError={(error: Error) => alert(`Erro: ${error.message}`)}
                   appearance={{
-                    button: "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-bold py-2 px-4 rounded-xl w-full text-xs uppercase tracking-widest transition-all",
+                    button: "bg-muted hover:bg-background border border-border text-foreground font-black py-4 px-4 rounded-xl w-full text-[10px] uppercase tracking-[0.2em] transition-all",
                     container: "w-full",
                     allowedContent: "hidden"
                   }}
@@ -228,15 +228,15 @@ export default function MinhaBarbearia() {
             </div>
 
             {/* NOME */}
-            <div className="space-y-2">
-              <label className="text-zinc-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                <Store size={16} className="text-yellow-500" /> Nome da Barbearia
+            <div className="space-y-4">
+              <label className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+                <Store size={16} className="text-brand-primary" /> Nome da Barbearia
               </label>
               <input 
                 type="text"
                 value={nomeBarbearia}
                 onChange={(e) => setNomeBarbearia(e.target.value)}
-                className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+                className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black uppercase text-sm tracking-widest text-foreground placeholder:text-muted-foreground"
                 placeholder="Ex: Barber Shop do George"
               />
             </div>
@@ -244,58 +244,58 @@ export default function MinhaBarbearia() {
             {/* LOCALIZAÇÃO (RADAR) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                  <MapPin size={14} className="text-yellow-500" /> Latitude (Para o Radar)
+                <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-brand-primary" /> Latitude
                 </label>
                 <input 
                   type="text"
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
-                  className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+                  className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground"
                   placeholder="-23.5505"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                  <MapPin size={14} className="text-yellow-500" /> Longitude (Para o Radar)
+                <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-brand-primary" /> Longitude
                 </label>
                 <input 
                   type="text"
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}
-                  className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 focus:border-yellow-600 outline-none transition-all font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+                  className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground"
                   placeholder="-46.6333"
                 />
               </div>
             </div>
 
             {/* HORÁRIOS */}
-            <div className="bg-white dark:bg-zinc-900/50 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 space-y-6 shadow-sm dark:shadow-none">
-              <label className="text-zinc-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                <Clock size={16} className="text-yellow-500" /> Horários de Funcionamento
+            <div className="bg-card p-6 rounded-[2rem] border border-border space-y-6 shadow-sm">
+              <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <Clock size={16} className="text-brand-primary" /> Horários de Funcionamento
               </label>
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <span className="text-[10px] uppercase text-zinc-500 font-bold">Abertura</span>
-                  <input type="time" value={horarios.abertura} onChange={e => setHorarios({...horarios, abertura: e.target.value})} className="w-full bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl focus:border-yellow-600 outline-none text-sm font-bold text-zinc-900 dark:text-white" />
+                  <span className="text-[10px] uppercase text-muted-foreground font-black tracking-widest">Abertura</span>
+                  <input type="time" value={horarios.abertura} onChange={e => setHorarios({...horarios, abertura: e.target.value})} className="w-full bg-muted border border-border p-4 rounded-xl focus:border-brand-primary outline-none text-sm font-black text-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <span className="text-[10px] uppercase text-zinc-500 font-bold">Fechamento</span>
-                  <input type="time" value={horarios.fechamento} onChange={e => setHorarios({...horarios, fechamento: e.target.value})} className="w-full bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl focus:border-yellow-600 outline-none text-sm font-bold text-zinc-900 dark:text-white" />
+                  <span className="text-[10px] uppercase text-muted-foreground font-black tracking-widest">Fechamento</span>
+                  <input type="time" value={horarios.fechamento} onChange={e => setHorarios({...horarios, fechamento: e.target.value})} className="w-full bg-muted border border-border p-4 rounded-xl focus:border-brand-primary outline-none text-sm font-black text-foreground" />
                 </div>
               </div>
 
-              <div className="border-t border-zinc-200 dark:border-zinc-800/50 pt-4">
-                <p className="text-[10px] text-yellow-600 mb-4 font-black uppercase tracking-widest">Pausa para Almoço (Opcional)</p>
+              <div className="border-t border-border pt-4">
+                <p className="text-[10px] text-brand-primary mb-4 font-black uppercase tracking-[0.2em]">Pausa para Almoço (Opcional)</p>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <span className="text-[10px] uppercase text-zinc-500 font-bold">Início</span>
-                    <input type="time" value={horarios.almocoInicio} onChange={e => setHorarios({...horarios, almocoInicio: e.target.value})} className="w-full bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl focus:border-yellow-600 outline-none text-sm font-bold text-zinc-900 dark:text-white" />
+                    <span className="text-[10px] uppercase text-muted-foreground font-black tracking-widest">Início</span>
+                    <input type="time" value={horarios.almocoInicio} onChange={e => setHorarios({...horarios, almocoInicio: e.target.value})} className="w-full bg-muted border border-border p-4 rounded-xl focus:border-brand-primary outline-none text-sm font-black text-foreground" />
                   </div>
                   <div className="space-y-2">
-                    <span className="text-[10px] uppercase text-zinc-500 font-bold">Retorno</span>
-                    <input type="time" value={horarios.almocoFim} onChange={e => setHorarios({...horarios, almocoFim: e.target.value})} className="w-full bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl focus:border-yellow-600 outline-none text-sm font-bold text-zinc-900 dark:text-white" />
+                    <span className="text-[10px] uppercase text-muted-foreground font-black tracking-widest">Retorno</span>
+                    <input type="time" value={horarios.almocoFim} onChange={e => setHorarios({...horarios, almocoFim: e.target.value})} className="w-full bg-muted border border-border p-4 rounded-xl focus:border-brand-primary outline-none text-sm font-black text-foreground" />
                   </div>
                 </div>
               </div>
@@ -303,8 +303,8 @@ export default function MinhaBarbearia() {
 
             {/* SERVIÇOS (REFATORADO) */}
             <div className="space-y-6">
-              <label className="text-zinc-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                <Edit3 size={16} className="text-yellow-500" /> Serviços e Preços
+              <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <Edit3 size={16} className="text-brand-primary" /> Serviços e Preços
               </label>
 
               {/* LISTA DE SERVIÇOS ATIVOS */}
@@ -312,15 +312,15 @@ export default function MinhaBarbearia() {
                 {servicos.map((servico) => (
                   <div 
                     key={servico.id} 
-                    className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 group hover:border-zinc-300 dark:hover:border-zinc-700 transition-all shadow-sm dark:shadow-none"
+                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-card/40 group hover:border-brand-primary/30 transition-all shadow-sm"
                   >
                     <div className="flex flex-col">
-                       <span className="text-zinc-900 dark:text-white font-bold">{servico.name}</span>
-                       <span className="text-zinc-500 text-xs font-bold">R$ {servico.price.toFixed(2)}</span>
+                       <span className="text-foreground font-black uppercase text-xs tracking-wider">{servico.name}</span>
+                       <span className="text-brand-primary text-xs font-black">R$ {servico.price.toFixed(2)}</span>
                     </div>
                     <button 
                        onClick={() => handleRemoveService(servico.id)}
-                       className="p-2 text-zinc-500 hover:text-red-500 bg-zinc-100 dark:bg-zinc-900 hover:bg-red-500/10 rounded-lg transition-all"
+                       className="p-2 text-muted-foreground hover:text-red-500 bg-muted hover:bg-red-500/10 rounded-lg transition-all"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -328,33 +328,33 @@ export default function MinhaBarbearia() {
                 ))}
 
                 {servicos.length === 0 && (
-                   <div className="text-center p-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
-                      <p className="text-zinc-600 font-bold uppercase text-xs">Nenhum serviço adicionado</p>
+                   <div className="text-center p-8 border-2 border-dashed border-border rounded-xl">
+                      <p className="text-muted-foreground font-black uppercase text-[10px] tracking-widest">Nenhum serviço adicionado</p>
                    </div>
                 )}
               </div>
 
               {/* ADICIONAR NOVO SERVIÇO */}
-              <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4 shadow-sm dark:shadow-none">
-                 <p className="text-[10px] font-bold uppercase text-zinc-500">Adicionar Novo Serviço</p>
+              <div className="bg-card p-4 rounded-2xl border border-border space-y-4 shadow-sm">
+                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Adicionar Novo Serviço</p>
                  <div className="flex gap-2">
                     <input 
                        type="text" 
                        placeholder="Nome (ex: Corte Infantil)" 
                        value={novoServico.name}
                        onChange={(e) => setNovoServico({...novoServico, name: e.target.value})}
-                       className="flex-1 bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-yellow-600 outline-none text-zinc-900 dark:text-white"
+                       className="flex-1 bg-muted border border-border rounded-xl p-3 text-sm focus:border-brand-primary outline-none text-foreground font-bold tracking-widest placeholder:text-muted-foreground"
                     />
                     <input 
                        type="number" 
                        placeholder="Preço" 
                        value={novoServico.price}
                        onChange={(e) => setNovoServico({...novoServico, price: e.target.value})}
-                       className="w-24 bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-yellow-600 outline-none text-zinc-900 dark:text-white"
+                       className="w-24 bg-muted border border-border rounded-xl p-3 text-sm focus:border-brand-primary outline-none text-foreground font-bold tracking-widest placeholder:text-muted-foreground"
                     />
                     <button 
                        onClick={handleAddService}
-                       className="bg-yellow-600 text-black p-3 rounded-xl hover:bg-yellow-500 transition-all"
+                       className="bg-brand-primary text-primary-foreground p-3 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-brand-primary/10"
                     >
                        <Plus size={20} />
                     </button>
@@ -366,7 +366,7 @@ export default function MinhaBarbearia() {
                        <button
                           key={sugestao.nome}
                           onClick={() => addSugestao(sugestao)}
-                          className="text-[10px] font-bold uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-3 py-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-all"
+                          className="text-[10px] font-black uppercase bg-muted text-muted-foreground px-3 py-1.5 rounded-lg hover:bg-brand-primary/10 hover:text-brand-primary transition-all border border-transparent hover:border-brand-primary/20"
                        >
                           + {sugestao.nome}
                        </button>
@@ -378,60 +378,57 @@ export default function MinhaBarbearia() {
         ) : (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {/* GALERIA DE FOTOS */}
-             <div className="bg-white dark:bg-zinc-900/50 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none">
+             <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm">
                <div className="flex justify-between items-center mb-6">
-                 <label className="text-zinc-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                   <ImageIcon size={16} className="text-yellow-500" /> Galeria de Fotos
+                 <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                   <ImageIcon size={16} className="text-brand-primary" /> Galeria de Fotos
                  </label>
-                 <span className="text-xs text-zinc-600 font-bold">{photos.length} fotos</span>
+                 <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{photos.length} fotos</span>
                </div>
 
-               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                 {photos.map((photo, index) => (
-                   <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-50 dark:bg-black border border-zinc-200 dark:border-zinc-800">
-                      <img src={photo} alt={`Foto ${index}`} className="w-full h-full object-cover" />
-                      <button 
-                        onClick={() => handleRemovePhoto(photo)}
-                        className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all scale-90 hover:scale-100"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                   </div>
-                 ))}
-                 
-                 {/* Placeholder para upload grid */}
-                  <div className="aspect-square rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-gray-50 dark:bg-black/30 flex flex-col items-center justify-center gap-2">
-                    <UploadButton
-                        endpoint="imageUploader"
-                        onClientUploadComplete={(res) => {
-                          // Adiciona novas fotos à lista existente
-                          const newPhotos = res.map(r => r.url);
-                          setPhotos(prev => [...prev, ...newPhotos]);
-                          alert(`${newPhotos.length} foto(s) adicionada(s)!`);
-                        }}
-                        onUploadError={(error: Error) => alert(`Erro: ${error.message}`)}
-                        appearance={{
-                          button: "bg-transparent text-zinc-500 hover:text-white w-full h-full",
-                          container: "w-full h-full flex items-center justify-center",
-                          allowedContent: "hidden"
-                        }}
-                        content={{
-                          button({ ready }) { 
-                             return (
-                               <div className="flex flex-col items-center gap-2">
-                                  <div className="p-3 bg-white dark:bg-zinc-900 rounded-full text-yellow-600 shadow-sm dark:shadow-none border border-zinc-200 dark:border-transparent"><Camera size={20} /></div>
-                                  <span className="text-[10px] font-bold uppercase">Adicionar</span>
-                                </div>
-                             );
-                          }
-                        }}
-                      />
-                 </div>
-               </div>
-               
-               <p className="text-[10px] text-zinc-500 text-center uppercase font-bold tracking-widest">
-                  Adicione fotos do interior, equipe e resultados para atrair mais clientes.
-               </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                  {photos.map((photo, index) => (
+                    <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border transition-all hover:border-brand-primary/30">
+                       <img src={photo} alt={`Foto ${index}`} className="w-full h-full object-cover" />
+                       <button 
+                         onClick={() => handleRemovePhoto(photo)}
+                         className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-400 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all scale-90 hover:scale-100 shadow-lg"
+                       >
+                         <Trash2 size={16} />
+                       </button>
+                    </div>
+                  ))}
+                  
+                  {/* Placeholder para upload grid */}
+                   <div className="aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 flex flex-col items-center justify-center gap-2 hover:border-brand-primary/50 transition-all group relative">
+                     <UploadButton
+                         endpoint="imageUploader"
+                         onClientUploadComplete={(res) => {
+                           // Adiciona novas fotos à lista existente
+                           const newPhotos = (res as any[]).map(r => r.url);
+                           setPhotos(prev => [...prev, ...newPhotos]);
+                           alert(`${newPhotos.length} foto(s) adicionada(s)!`);
+                         }}
+                         onUploadError={(error: Error) => alert(`Erro: ${error.message}`)}
+                         appearance={{
+                           button: "bg-transparent text-transparent w-full h-full absolute inset-0 z-10 cursor-pointer",
+                           container: "w-full h-full flex items-center justify-center",
+                           allowedContent: "hidden"
+                         }}
+                         content={{
+                           button() { return "" }
+                         }}
+                       />
+                       <div className="flex flex-col items-center gap-2 pointer-events-none group-hover:text-brand-primary transition-colors">
+                          <div className="p-3 bg-card border border-border rounded-full text-brand-primary shadow-sm group-hover:border-brand-primary/30"><Camera size={20} /></div>
+                          <span className="text-[10px] font-black uppercase tracking-widest">Adicionar</span>
+                       </div>
+                  </div>
+                </div>
+                
+                <p className="text-[10px] text-muted-foreground text-center uppercase font-black tracking-widest leading-relaxed">
+                   Adicione fotos do interior, equipe e resultados para atrair mais clientes.
+                </p>
              </div>
           </div>
         )}
@@ -439,7 +436,7 @@ export default function MinhaBarbearia() {
         <button 
           onClick={handleSave}
           disabled={loading}
-          className="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-yellow-600/20 transition-all active:scale-95 text-sm uppercase tracking-widest mb-10"
+          className="w-full bg-brand-primary text-primary-foreground font-black py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand-primary/20 transition-all active:scale-95 text-[10px] uppercase tracking-[0.2em] mb-10 h-14"
         >
           {loading ? <Loader2 className="animate-spin" /> : "SALVAR ALTERAÇÕES"}
         </button>

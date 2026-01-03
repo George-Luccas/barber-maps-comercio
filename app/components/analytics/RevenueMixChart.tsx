@@ -32,36 +32,54 @@ export function RevenueMixChart({ data }: RevenueMixChartProps) {
   }
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 h-full">
-       <h3 className="text-lg font-bold text-white mb-4">Mix de Receita</h3>
-       <div className="h-[300px] w-full">
+    <div className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 40 }}>
             <Pie
-                data={renderData}
+                data={renderData as any[]}
                 cx="50%"
-                cy="50%"
+                cy="45%"
                 innerRadius={60}
                 outerRadius={80}
                 paddingAngle={5}
                 dataKey="value"
             >
                 {renderData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.2)" />
                 ))}
             </Pie>
             <Tooltip
-                contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
+                contentStyle={{ 
+                  backgroundColor: 'var(--card)', 
+                  borderColor: 'var(--border)', 
+                  borderRadius: '1rem',
+                  color: 'var(--foreground)',
+                  fontSize: '10px',
+                  fontWeight: '900',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  zIndex: 100
+                }}
+                itemStyle={{ color: 'var(--foreground)' }}
                 formatter={(value: any, name: any) => [
                     Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                     name
                 ]}
             />
-            <Legend verticalAlign="bottom" height={36} />
+            <Legend 
+                verticalAlign="bottom" 
+                align="center"
+                iconType="circle"
+                wrapperStyle={{ 
+                  paddingTop: '20px',
+                  fontSize: '10px',
+                  fontWeight: '900',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}
+            />
             </PieChart>
         </ResponsiveContainer>
-       </div>
     </div>
   );
 }

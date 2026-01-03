@@ -202,3 +202,52 @@ export async function getOccupancyHeatmap(barbershopId: string) {
         return { day, hour: parseInt(hourStr), count };
     });
 }
+
+export async function getWeeklyRevenue(barbershopId: string) {
+  const session = await auth();
+  if (!session?.user) return [];
+
+  const days = [];
+  const now = new Date();
+  
+  // Buscar dados dos últimos 7 dias
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    
+    const nextDay = new Date(d);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    // Soma agendamentos
+    const bookings = await db.booking.findMany({
+      where: {
+        barbershopId,
+        date: { gte: d, lt: nextDay }
+      },
+      include: { BarbershopService: true }
+    });
+
+    const bookingsRevenue = bookings.reduce((acc, curr) => acc + (curr.BarbershopService?.priceInCents || 0), 0) / 100;
+
+    // Soma transações financeiras extras
+    const transactions = await db.financialTransaction.findMany({
+      where: {
+        barbershopId,
+        date: { gte: d, lt: nextDay },
+        type: "INCOME"
+      }
+    });
+
+    const transactionsRevenue = transactions.reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+    const weekDays = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+    days.push({
+      day: weekDays[d.getDay()],
+      amount: bookingsRevenue + transactionsRevenue,
+      date: d.toISOString()
+    });
+  }
+
+  return days;
+}

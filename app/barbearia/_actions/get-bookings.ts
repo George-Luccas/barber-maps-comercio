@@ -50,7 +50,19 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
       clientName: booking.user?.name || "Cliente",
       serviceName: booking.BarbershopService?.name || "Serviço",
       time: booking.date?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || "--:--",
-      status: booking.date < new Date() ? 'realizado' : 'pendente' // Lógica simplificada de status
+      
+      // Lógica aprimorada de status
+      status: (() => {
+        if (booking.cancelledAt) return 'cancelado';
+        
+        const now = new Date();
+        const bookingTime = new Date(booking.date);
+        const endTime = new Date(bookingTime.getTime() + 45 * 60000); // Assume 45 min duração padrão
+        
+        if (now > endTime) return 'realizado';
+        if (now >= bookingTime && now <= endTime) return 'em-atendimento';
+        return 'pendente';
+      })() // 'realizado' | 'pendente' | 'em-atendimento' | 'cancelado'
     }));
 
   } catch (error) {

@@ -24,30 +24,28 @@ export function OccupancyHeatmap({ data }: OccupancyHeatmapProps) {
   });
 
   const getIntensityClass = (count: number) => {
-      if (count === 0) return 'bg-zinc-800/50';
+      if (count === 0) return 'bg-muted/30';
       const ratio = count / (maxCount || 1);
-      if (ratio < 0.3) return 'bg-yellow-500/20';
-      if (ratio < 0.6) return 'bg-yellow-500/50';
-      return 'bg-yellow-500';
+      if (ratio < 0.3) return 'bg-brand-primary/20';
+      if (ratio < 0.6) return 'bg-brand-primary/50';
+      return 'bg-brand-primary';
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 h-full overflow-x-auto">
-      <h3 className="text-lg font-bold text-white mb-4">Mapa de Frequência</h3>
-      
+    <div className="h-full w-full overflow-x-auto scrollbar-hide">
       <div className="min-w-[500px]">
           {/* Header Dias */}
-          <div className="grid grid-cols-[50px_repeat(6,1fr)] mb-2">
+          <div className="grid grid-cols-[50px_repeat(6,1fr)] mb-4">
              <div />
              {weekDays.map(day => (
-                 <div key={day} className="text-center text-xs font-bold text-zinc-500 uppercase">{day}</div>
+                 <div key={day} className="text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest">{day}</div>
              ))}
           </div>
 
           {/* Linhas de Horas */}
           {hours.map(hour => (
-             <div key={hour} className="grid grid-cols-[50px_repeat(6,1fr)] gap-1 mb-1 items-center">
-                 <div className="text-xs text-zinc-600 font-mono text-right pr-2">
+             <div key={hour} className="grid grid-cols-[50px_repeat(6,1fr)] gap-2 mb-2 items-center">
+                 <div className="text-[10px] text-muted-foreground font-black text-right pr-3 italic">
                      {hour}:00
                  </div>
                  {weekDays.map(day => {
@@ -56,7 +54,7 @@ export function OccupancyHeatmap({ data }: OccupancyHeatmapProps) {
                          <div 
                             key={`${day}-${hour}`}
                             title={`${day} ${hour}:00 - ${count} atendimentos`}
-                            className={`h-8 rounded-md transition-all hover:border hover:border-white/20 ${getIntensityClass(count)}`}
+                            className={`h-8 rounded-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-brand-primary/20 ${getIntensityClass(count)}`}
                          />
                      );
                  })}
@@ -64,13 +62,13 @@ export function OccupancyHeatmap({ data }: OccupancyHeatmapProps) {
           ))}
       </div>
       
-      <div className="mt-4 flex items-center justify-end gap-2 text-[10px] text-zinc-500 font-bold uppercase">
+      <div className="mt-6 flex items-center justify-end gap-3 text-[10px] text-muted-foreground font-black uppercase tracking-widest italic">
           <span>Menos mov.</span>
-          <div className="flex gap-1">
-              <div className="w-3 h-3 bg-zinc-800/50 rounded" />
-              <div className="w-3 h-3 bg-yellow-500/20 rounded" />
-              <div className="w-3 h-3 bg-yellow-500/50 rounded" />
-              <div className="w-3 h-3 bg-yellow-500 rounded" />
+          <div className="flex gap-1.5">
+              <div className="w-3 h-3 bg-muted/30 rounded-sm" />
+              <div className="w-3 h-3 bg-brand-primary/20 rounded-sm" />
+              <div className="w-3 h-3 bg-brand-primary/50 rounded-sm" />
+              <div className="w-3 h-3 bg-brand-primary rounded-sm" />
           </div>
           <span>Mais mov.</span>
       </div>
