@@ -42,7 +42,10 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
     let intervalId: NodeJS.Timeout;
 
     async function fetchAppointments() {
-      if (!barbershopId) return;
+      if (!barbershopId) {
+        setLoading(false);
+        return;
+      }
       
       try {
         setLoading(true);
