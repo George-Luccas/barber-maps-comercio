@@ -47,9 +47,9 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
 
     return bookings.map(booking => ({
       id: booking.id,
-      clientName: booking.user.name,
-      serviceName: booking.BarbershopService.name,
-      time: booking.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      clientName: booking.user?.name || "Cliente",
+      serviceName: booking.BarbershopService?.name || "Serviço",
+      time: booking.date?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || "--:--",
       status: booking.date < new Date() ? 'realizado' : 'pendente' // Lógica simplificada de status
     }));
 

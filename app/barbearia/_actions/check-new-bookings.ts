@@ -27,10 +27,10 @@ export async function checkNewBookings(barbershopId: string, after: Date) {
 
     return newBookings.map(b => ({
       id: b.id,
-      clientName: b.user.name,
-      serviceName: b.BarbershopService.name,
-      date: b.date.toLocaleDateString('pt-BR'),
-      time: b.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      clientName: b.user?.name || "Cliente",
+      serviceName: b.BarbershopService?.name || "Serviço",
+      date: b.date?.toLocaleDateString('pt-BR') || "",
+      time: b.date?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || "--:--",
       createdAt: b.createdAt
     }));
   } catch (error) {

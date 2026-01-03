@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col justify-center h-full pt-2 sm:pt-4 w-full">
                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
                    <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase border-l-4 border-yellow-500 pl-4 py-1 truncate">
-                     {session?.user?.name?.split(' ')[0] || "Mestre"} <span className="text-yellow-500">Barber</span>
+                     {session?.user?.name ? session.user.name.split(' ')[0] : "Mestre"} <span className="text-yellow-500">Barber</span>
                    </h1>
                 </div>
             </div>

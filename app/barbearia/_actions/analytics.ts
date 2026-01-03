@@ -41,7 +41,7 @@ export async function getDashboardMetrics(barbershopId: string): Promise<Dashboa
       include: { BarbershopService: true }
     });
 
-    const bookingsRevenue = bookings.reduce((acc, curr) => acc + (curr.BarbershopService.priceInCents || 0), 0) / 100;
+    const bookingsRevenue = bookings.reduce((acc, curr) => acc + (curr.BarbershopService?.priceInCents || 0), 0) / 100;
 
     // Busca transações financeiras extras (vanda de produtos, etc)
     const transactions = await db.financialTransaction.findMany({
@@ -141,8 +141,8 @@ export async function getRevenueMix(barbershopId: string) {
 
   const serviceMix: Record<string, number> = {};
   bookings.forEach(b => {
-    const name = b.BarbershopService.name;
-    const val = (b.BarbershopService.priceInCents || 0) / 100;
+    const name = b.BarbershopService?.name || "Serviço";
+    const val = (b.BarbershopService?.priceInCents || 0) / 100;
     serviceMix[name] = (serviceMix[name] || 0) + val;
   });
 
