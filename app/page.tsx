@@ -14,6 +14,8 @@ import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
+  // Estado para a data selecionada (compartilhado entre Ticker e Lista)
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [financeData, setFinanceData] = useState({ income: 0, dailyGoal: 500 });
   const [mounted, setMounted] = useState(false);
   const [stockItems, setStockItems] = useState<any[]>([]);
@@ -81,7 +83,10 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <AgendamentosTicker barbershopId={barbershopId} />
+      <AgendamentosTicker 
+        barbershopId={barbershopId} 
+        selectedDate={selectedDate} 
+      />
 
       <main className="p-8 pt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -218,7 +223,11 @@ export default function AdminDashboard() {
 
         <div className="mt-10 bg-white/40 dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-8 shadow-sm dark:shadow-none">
           <h2 className="text-2xl font-black italic uppercase mb-8 text-zinc-900 dark:text-white">Timeline <span className="text-yellow-500">Radar</span></h2>
-          <AppointmentsList barbershopId={barbershopId} />
+          <AppointmentsList 
+            barbershopId={barbershopId} 
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
         </div>
       </main>
     </div>

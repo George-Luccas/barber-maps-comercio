@@ -1,20 +1,50 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Scissors, Clock, User, Zap } from "lucide-react";
+import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 
-// Dados mockados baseados nos seus serviços reais
-const AGENDAMENTOS_DIA = [
-  { id: 1, cliente: "Marcos Silva", servico: "Hair", tempo: "40 min", hora: "14:00", status: "concluido" },
-  { id: 2, cliente: "Felipe Souza", servico: "Nevou / Platinado", tempo: "120 min", hora: "15:00", status: "em-andamento" },
-  { id: 3, cliente: "Lucas Lima", servico: "Beard", tempo: "40 min", hora: "17:30", status: "agendado" },
-  { id: 4, cliente: "João Pedro", servico: "Combo", tempo: "80 min", hora: "18:10", status: "agendado" },
-  { id: 5, cliente: "Ricardo Dias", servico: "Kids Cut", tempo: "45 min", hora: "19:40", status: "agendado" },
-];
+interface AgendamentosTickerProps {
+  barbershopId?: string;
+  selectedDate?: string;
+}
 
-export default function AgendamentosTicker() {
+export default function AgendamentosTicker({ barbershopId, selectedDate }: AgendamentosTickerProps) {
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+       if (!barbershopId) return;
+
+       // Se não vier data, usa hoje
+       const dateStr = selectedDate || new Date().toISOString().split('T')[0];
+       const dateObj = new Date(dateStr + 'T12:00:00');
+
+       try {
+         const bookings = await getBookings(barbershopId, dateObj);
+         
+         const formatted = bookings.map(b => ({
+            id: b.id,
+            cliente: b.clientName,
+            servico: b.serviceName,
+            tempo: "40 min", // O banco ainda não retornava tempo, assumindo padrão por enquanto ou ajustar action depois
+            hora: b.time,
+            status: b.status // 'realizado' | 'pendente'
+         }));
+         
+         setItems(formatted);
+       } catch (error) {
+         console.error("Erro ticker:", error);
+       }
+    }
+    fetchData();
+  }, [barbershopId, selectedDate]);
+
+  if (items.length === 0) return null;
+
   // Duplicamos a lista para criar o efeito de loop infinito sem buracos
-  const tickerItems = [...AGENDAMENTOS_DIA, ...AGENDAMENTOS_DIA];
+  const tickerItems = [...items, ...items, ...items]; // Triplicar para garantir scroll suave em telas largas
 
   return (
     <div className="w-full bg-zinc-900/50 border-y border-zinc-800 py-3 overflow-hidden flex items-center">
@@ -24,17 +54,21 @@ export default function AgendamentosTicker() {
         animate={{ x: ["0%", "-50%"] }} // Move metade da largura total
         transition={{
           ease: "linear",
-          duration: 30, // Velocidade: quanto maior, mais devagar
+          duration: Math.max(30, tickerItems.length * 3), // Ajusta velocidade baseado na qtd de itens
           repeat: Infinity,
         }}
       >
         {tickerItems.map((item, idx) => (
           <div 
-            key={idx} 
-            className="flex items-center gap-4 bg-black/40 border border-zinc-800 px-6 py-2 rounded-2xl"
+            key={`${item.id}-${idx}`} 
+            className={`flex items-center gap-4 border px-6 py-2 rounded-2xl ${
+                item.status === 'realizado' 
+                ? 'bg-green-900/20 border-green-900/50 opacity-60' 
+                : 'bg-black/40 border-zinc-800'
+            }`}
           >
-            {/* Indicador de Status Piscante para o que está rolando agora */}
-            {item.status === "em-andamento" && (
+            {/* Indicador de Status Piscante para Pendente (Próximos) */}
+            {item.status === "pendente" && (
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-ping" />
             )}
             
@@ -43,18 +77,19 @@ export default function AgendamentosTicker() {
                 <Clock size={10} /> {item.hora}
               </span>
               <span className="text-sm font-bold text-white flex items-center gap-2">
-                <User size={14} className="text-yellow-500" /> {item.cliente}
+                <User size={14} className={item.status === 'realizado' ? 'text-green-500' : 'text-yellow-500'} /> 
+                {item.cliente}
               </span>
             </div>
 
             <div className="h-8 w-[1px] bg-zinc-800 mx-2" />
 
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase text-yellow-500 flex items-center gap-1">
+              <span className={`text-[10px] font-black uppercase flex items-center gap-1 ${item.status === 'realizado' ? 'text-green-500' : 'text-yellow-500'}`}>
                 <Scissors size={10} /> {item.servico}
               </span>
               <span className="text-[10px] text-zinc-400 font-medium">
-                Duração: {item.tempo}
+                {item.status === 'realizado' ? 'Concluído' : 'Agendado'}
               </span>
             </div>
           </div>

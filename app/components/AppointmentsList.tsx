@@ -16,11 +16,15 @@ interface Appointment {
 // Som de notificação (Ding simples)
 const ALERT_SOUND = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAZAAABmwBMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTFExTlAAAADUAAAAGQAAAAAAAAAAAAAA//uQZAAAAAAAIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//uQZAA/8AAAKQAAAAwAAANIAAAAQAAAaQAAAAgAAA0gAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//uQZAA/8AAAKQAAAAwAAANIAAAAQAAAaQAAAAgAAA0gAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//"
 
-// Recebemos o barbershopId como "prop" vinda do Dashboard
-export default function AppointmentsList({ barbershopId }: { barbershopId?: string }) {
+interface AppointmentsListProps {
+  barbershopId?: string;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
+}
+
+export default function AppointmentsList({ barbershopId, selectedDate, onDateChange }: AppointmentsListProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
   
   // Refs para controle de notificação
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -42,18 +46,15 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
       
       try {
         setLoading(true);
-        // Passa a data selecionada para a server action
-        const dateObj = new Date(selectedDate + 'T12:00:00'); // Garante que não volta um dia por fuso
+        // Passa a data selecionada (vinda por prop) para a server action
+        const dateObj = new Date(selectedDate + 'T12:00:00'); 
         const data = await getBookings(barbershopId, dateObj);
         
-        // Verifica se houve novos agendamentos (apenas se estivermos olhando para data atual, opcional)
-        // Aqui mantemos a lógica geral: se count aumentou, notifica.
-        // Mas idealmente só notificamos se a data for "hoje", mas deixaremos geral por enquanto ou checamos a data.
         const isToday = selectedDate === new Date().toISOString().split('T')[0];
         const currentCount = data.length;
         
         if (isToday && !firstLoadRef.current && currentCount > lastCountRef.current) {
-           // Toca som
+           // Toca som apenas se estiver vendo "hoje"
            audioRef.current?.play().catch(e => console.log("Audio play failed (user interaction needed)", e));
            
            // Mostra notificação
@@ -87,9 +88,7 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
     return () => clearInterval(intervalId);
   }, [barbershopId, selectedDate]);
 
-  // Se loading e não for a primeira carga (pra não piscar tanto) ou primeira carga
-  // if (loading && firstLoadRef.current) return <div className="p-4 text-zinc-500 animate-pulse">Sincronizando radar...</div>;
-
+  // UI Components
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 transition-all">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -103,12 +102,12 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
             </div>
          </div>
 
-         {/* Seletor de Data Estilizado */}
+         {/* Seletor de Data Estilizado usando a prop onDateChange */}
          <div className="relative group">
             <input 
                 type="date" 
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={(e) => onDateChange(e.target.value)}
                 className="bg-black/40 border border-zinc-700 text-white rounded-lg px-4 py-2 text-sm uppercase font-bold tracking-wider outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:hover:scale-110"
             />
          </div>
