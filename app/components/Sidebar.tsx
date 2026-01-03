@@ -50,7 +50,7 @@ export default function Sidebar() {
           
           {/* Cabeçalho do Menu */}
           <div className="flex items-center justify-between mb-10">
-            <img src="/logo.png" alt="Barber Maps Logo" className="h-32 md:h-40 w-auto object-contain drop-shadow-xl dark:invert-0 invert" />
+            <img src="/logo.png" alt="Barber Maps Logo" className="h-32 md:h-40 w-auto object-contain drop-shadow-xl" />
             <button onClick={() => setIsOpen(false)} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
               <X size={24} />
             </button>

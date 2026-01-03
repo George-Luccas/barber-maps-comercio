@@ -88,7 +88,7 @@ export default function AdminDashboard() {
           <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 bg-white/50 dark:bg-black/50 backdrop-blur-md gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
                 {/* LOGO (Mobile vs Desktop) */}
-                <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300 dark:invert-0 invert" />
+                <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" />
                 
                 <div className="flex sm:hidden items-center gap-2">
                    <MapPin className="text-yellow-500" size={24} fill="currentColor" />
