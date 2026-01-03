@@ -109,7 +109,7 @@ export default function AdminDashboard() {
           <main className="p-4 sm:p-8 space-y-8 flex-1">
              
              {/* SECTION: OPERACIONAL */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               
                {/* CARD INSIGHTS (Novo) */}
                <Link href="/insights" className="block group">
@@ -131,6 +131,32 @@ export default function AdminDashboard() {
                      
                      <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-yellow-500 transition-colors">
                         <span className="text-[10px] font-bold uppercase tracking-widest">Acessar Métricas</span>
+                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                     </div>
+                   </div>
+                 </div>
+               </Link>
+
+               {/* CARD FINANCEIRO / CAIXA */}
+               <Link href="/financeiro" className="block group">
+                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-green-500/30">
+                   <div className="absolute inset-0 bg-green-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                   
+                   <div className="relative z-10">
+                     <div className="flex justify-between items-start mb-4">
+                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-green-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-green-500/30">
+                         <DollarSign size={24} />
+                       </div>
+                       <div className="bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
+                          <span className="text-[9px] text-green-500 font-black uppercase">Caixa</span>
+                       </div>
+                     </div>
+    
+                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Gestão de Vendas</h3>
+                     <p className="text-3xl font-black text-white italic group-hover:text-green-500 transition-colors">Financeiro</p>
+                     
+                     <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-green-500 transition-colors">
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Fluxo de Caixa</span>
                         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                      </div>
                    </div>
