@@ -52,7 +52,7 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
   const tickerItems = [...items, ...items, ...items]; // Triplicar para garantir scroll suave em telas largas
 
   return (
-    <div className="w-full bg-white/50 dark:bg-zinc-900/50 border-y border-zinc-200 dark:border-zinc-800 py-3 overflow-hidden flex items-center shadow-sm">
+    <div className="w-full bg-card/50 border-y border-border py-3 overflow-hidden flex items-center shadow-sm">
       {/* Container da Animação */}
       <motion.div
         className="flex whitespace-nowrap gap-8"
@@ -69,31 +69,31 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
             className={`flex items-center gap-4 border px-6 py-2 rounded-2xl shadow-sm ${
                 item.status === 'realizado' 
                 ? 'bg-green-500/10 border-green-500/20 opacity-70' 
-                : 'bg-zinc-50 dark:bg-black/40 border-zinc-200 dark:border-zinc-800'
+                : 'bg-background/40 dark:bg-black/40 border-border'
             }`}
           >
             {/* Indicador de Status Piscante para Pendente (Próximos) */}
             {item.status === "pendente" && (
-              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-ping" />
+              <div className="w-2 h-2 bg-brand-primary rounded-full animate-ping" />
             )}
             
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-tighter text-zinc-500 flex items-center gap-1">
+              <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground flex items-center gap-1">
                 <Clock size={10} /> {item.hora}
               </span>
-              <span className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                <User size={14} className={item.status === 'realizado' ? 'text-green-500' : 'text-yellow-500'} /> 
+              <span className="text-sm font-bold text-foreground flex items-center gap-2">
+                <User size={14} className={item.status === 'realizado' ? 'text-green-500' : 'text-brand-primary'} /> 
                 {item.cliente}
               </span>
             </div>
 
-            <div className="h-8 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-2" />
+            <div className="h-8 w-[1px] bg-border mx-2" />
 
             <div className="flex flex-col">
-              <span className={`text-[10px] font-black uppercase flex items-center gap-1 ${item.status === 'realizado' ? 'text-green-500' : 'text-yellow-500'}`}>
+              <span className={`text-[10px] font-black uppercase flex items-center gap-1 ${item.status === 'realizado' ? 'text-green-500' : 'text-brand-primary'}`}>
                 <Scissors size={10} /> {item.servico}
               </span>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+              <span className="text-[10px] text-muted-foreground font-medium">
                 {item.status === 'realizado' ? 'Concluído' : 'Agendado'}
               </span>
             </div>

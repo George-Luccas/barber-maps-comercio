@@ -73,32 +73,38 @@ export default function AdminDashboard() {
   const userFirstName = session?.user?.name ? session.user.name.split(' ')[0] : "Mestre";
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black/95 text-zinc-900 dark:text-zinc-100 font-sans relative selection:bg-yellow-500/30">
-        {/* Background Image & Overlay */}
-        <div className="fixed inset-0 z-0">
-            <div className="absolute inset-0 bg-white/60 dark:bg-black/80 z-10" />
+    <div className="min-h-screen bg-background text-foreground font-sans relative selection:bg-brand-primary/30 transition-colors duration-500">
+        {/* Background Image & Overlay (Different per theme) */}
+        <div className="fixed inset-0 z-0 overflow-hidden">
+            <div className="absolute inset-0 bg-background/80 dark:bg-background/90 pro:bg-background/95 z-10" />
+            
+            {/* Dark/Light BG */}
             <img 
                 src="https://4kwallpapers.com/images/wallpapers/dark-background-abstract-background-network-3d-background-8192x5464-8324.jpg" 
                 alt="Background" 
-                className="w-full h-full object-cover opacity-20 dark:opacity-40"
+                className="w-full h-full object-cover opacity-20 dark:opacity-40 pro:hidden"
             />
+            
+            {/* Pro BG (Digital lines/grid) */}
+            <div className="hidden pro:block absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.05),transparent_70%)]" />
+            <div className="hidden pro:block absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#38bdf8 1px, transparent 1px), linear-gradient(90deg, #38bdf8 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
-          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 bg-white/50 dark:bg-black/50 backdrop-blur-md gap-4">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-border p-6 sm:p-8 bg-card/50 backdrop-blur-md gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
                 {/* LOGO (Mobile vs Desktop) */}
                 <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" />
                 
                 <div className="flex sm:hidden items-center gap-2">
-                   <MapPin className="text-yellow-500" size={24} fill="currentColor" />
-                   <span className="text-2xl font-black text-yellow-500 uppercase tracking-tighter">Barber Maps</span>
+                   <MapPin className="text-brand-primary" size={24} fill="currentColor" />
+                   <span className="text-2xl font-black text-brand-primary uppercase tracking-tighter">Barber Maps</span>
                 </div>
                 
                 <div className="flex flex-col justify-center h-full pt-2 sm:pt-4 w-full">
-                   <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
-                   <h1 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase border-l-4 border-yellow-500 pl-4 py-1 truncate">
-                     {userFirstName} <span className="text-yellow-500">Barber</span>
+                   <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
+                   <h1 className="text-lg sm:text-xl font-black text-foreground tracking-tighter uppercase border-l-4 border-brand-primary pl-4 py-1 truncate">
+                     {userFirstName} <span className="text-brand-primary italic">Barber</span>
                    </h1>
                 </div>
             </div>
@@ -123,23 +129,23 @@ export default function AdminDashboard() {
                 
                 {/* CARD INSIGHTS (Novo) */}
                 <Link href="/insights" className="block group">
-                    <div className="relative overflow-hidden bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-yellow-500/30 shadow-sm">
-                    <div className="absolute inset-0 bg-yellow-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    <div className="relative overflow-hidden bg-card border border-border p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-brand-primary/30 shadow-sm">
+                    <div className="absolute inset-0 bg-brand-primary/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-yellow-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-yellow-500/30">
+                        <div className="p-3 rounded-2xl bg-background/50 border border-border text-brand-primary transition-all duration-500 group-hover:rotate-12 group-hover:border-brand-primary/30">
                             <Sparkles size={24} />
                         </div>
-                        <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
-                            <span className="text-[9px] text-yellow-500 font-black uppercase">Analytics</span>
+                        <div className="bg-brand-primary/10 border border-brand-primary/20 px-2 py-1 rounded-full">
+                            <span className="text-[9px] text-brand-primary font-black uppercase tracking-widest">Analytics</span>
                         </div>
                         </div>
 
-                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inteligência Estratégica</h3>
-                        <p className="text-3xl font-black text-zinc-900 dark:text-white italic group-hover:text-yellow-500 transition-colors">Insights</p>
+                        <h3 className="text-muted-foreground mb-1 font-bold uppercase text-[10px] tracking-widest">Inteligência Estratégica</h3>
+                        <p className="text-3xl font-black text-foreground italic group-hover:text-brand-primary transition-colors">Insights</p>
                         
-                        <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-yellow-500 transition-colors">
+                        <div className="flex items-center gap-2 mt-4 text-muted-foreground group-hover:text-brand-primary transition-colors">
                             <span className="text-[10px] font-bold uppercase tracking-widest">Acessar Métricas</span>
                             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -149,23 +155,23 @@ export default function AdminDashboard() {
 
                 {/* CARD FINANCEIRO / CAIXA */}
                 <Link href="/financeiro" className="block group">
-                    <div className="relative overflow-hidden bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-green-500/30 shadow-sm">
+                    <div className="relative overflow-hidden bg-card border border-border p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-green-500/30 shadow-sm">
                     <div className="absolute inset-0 bg-green-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-green-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-green-500/30">
+                        <div className="p-3 rounded-2xl bg-background/50 border border-border text-green-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-green-500/30">
                             <DollarSign size={24} />
                         </div>
                         <div className="bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                            <span className="text-[9px] text-green-500 font-black uppercase">Caixa</span>
+                            <span className="text-[9px] text-green-500 font-black uppercase tracking-widest">Caixa</span>
                         </div>
                         </div>
 
-                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Gestão de Vendas</h3>
-                        <p className="text-3xl font-black text-zinc-900 dark:text-white italic group-hover:text-green-500 transition-colors">Financeiro</p>
+                        <h3 className="text-muted-foreground mb-1 font-bold uppercase text-[10px] tracking-widest">Gestão de Vendas</h3>
+                        <p className="text-3xl font-black text-foreground italic group-hover:text-green-500 transition-colors">Financeiro</p>
                         
-                        <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-green-500 transition-colors">
+                        <div className="flex items-center gap-2 mt-4 text-muted-foreground group-hover:text-green-500 transition-colors">
                             <span className="text-[10px] font-bold uppercase tracking-widest">Fluxo de Caixa</span>
                             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -176,31 +182,31 @@ export default function AdminDashboard() {
                 {/* CARD ESTOQUE */}
                 <Link href="/estoque" className="block group">
                     <div 
-                    className={`relative overflow-hidden bg-white dark:bg-zinc-900/60 border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full hover:shadow-xl shadow-sm ${
-                        estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-zinc-200 dark:border-zinc-800'
+                    className={`relative overflow-hidden bg-card border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full hover:shadow-xl shadow-sm ${
+                        estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-border'
                     }`}
                     >
                     {estoqueCritico && <div className="absolute inset-0 bg-red-500/5 blur-[40px] animate-pulse" />}
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-4">
-                        <div className={`p-3 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500'}`}>
+                        <div className={`p-3 rounded-2xl bg-background/50 border border-border transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500'}`}>
                             <Package size={24} className={estoqueCritico ? 'animate-bounce' : 'group-hover:-rotate-12'} />
                         </div>
                         {estoqueCritico ? (
                             <span className="text-[9px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/20">Reposição Urgente</span>
                         ) : (
                             <div className="bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-full">
-                            <span className="text-[9px] text-blue-400 font-black uppercase">Controle</span>
+                            <span className="text-[9px] text-blue-400 font-black uppercase tracking-widest">Controle</span>
                             </div>
                         )}
                         </div>
-                        <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
-                        <h3 className="text-3xl font-black text-zinc-900 dark:text-white italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
+                        <p className="text-muted-foreground font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
+                        <h3 className="text-3xl font-black text-foreground italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
                         <div className="flex items-center gap-2 mt-4">
-                        <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                             <div className={`h-full transition-all duration-1000 ${estoqueCritico ? 'w-[15%] bg-red-500' : 'w-[90%] bg-blue-500'}`} />
                         </div>
-                        <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-zinc-500'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
+                        <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-muted-foreground'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
                         </div>
                     </div>
                     </div>
@@ -208,24 +214,24 @@ export default function AdminDashboard() {
         
                 {/* CARD GALERIA DE ESTILOS */}
                 <Link href="/galeria-estilos" className="block group">
-                    <div className="relative overflow-hidden bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl shadow-sm">
+                    <div className="relative overflow-hidden bg-card border border-border p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl shadow-sm">
                     <div className="absolute inset-0 bg-purple-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
+                        <div className="p-3 rounded-2xl bg-background/50 border border-border text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
                             <Sparkles size={24} />
                         </div>
                         <div className="bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-full animate-pulse">
-                            <span className="text-[9px] text-purple-400 font-black uppercase">Novo Recurso</span>
+                            <span className="text-[9px] text-purple-400 font-black uppercase tracking-widest">Novo Recurso</span>
                         </div>
                         </div>
         
-                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
-                        <p className="text-3xl font-black text-zinc-900 dark:text-white italic group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
+                        <h3 className="text-muted-foreground mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
+                        <p className="text-3xl font-black text-foreground italic group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
                         
                         <div className="flex items-center gap-2 mt-4">
-                            <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                             <div className="h-full w-[100%] bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
                             </div>
                             <span className="text-[10px] font-bold text-purple-500">Generativa</span>
@@ -237,8 +243,8 @@ export default function AdminDashboard() {
              </ErrorBoundary>
     
              {/* TIMELINE RADAR */}
-             <div className="bg-white/40 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-4 sm:p-8 backdrop-blur-sm shadow-sm">
-               <h2 className="text-2xl font-black italic uppercase mb-8 text-zinc-900 dark:text-white">Timeline <span className="text-yellow-500">Radar</span></h2>
+             <div className="bg-card/40 border border-border rounded-[2.5rem] p-4 sm:p-8 backdrop-blur-sm shadow-sm">
+               <h2 className="text-2xl font-black italic uppercase mb-8 text-foreground">Timeline <span className="text-brand-primary">Radar</span></h2>
                <ErrorBoundary>
                 <AppointmentsList 
                     barbershopId={barbershopId} 
