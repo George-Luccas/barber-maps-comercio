@@ -25,6 +25,21 @@ interface AppointmentsListProps {
 export default function AppointmentsList({ barbershopId, selectedDate, onDateChange }: AppointmentsListProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+
+  if (!barbershopId) {
+    return (
+        <div className="bg-red-900/20 border border-red-500/50 rounded-xl p-6 text-center">
+            <h3 className="text-red-400 font-bold mb-2">Erro de Sessão</h3>
+            <p className="text-zinc-400 text-sm mb-4">Não foi possível identificar sua barbearia. Isso pode acontecer se sua sessão expirou ou ficou incompleta.</p>
+            <button 
+                onClick={() => window.location.href = "/api/auth/signout"}
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors text-sm"
+            >
+                Sair e Entrar Novamente
+            </button>
+        </div>
+    );
+  }
   
   // Refs para controle de notificação
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -166,10 +181,6 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             ))}
         </div>
       )}
-      {/* Debug Info Temporário */}
-      <div className="mt-4 p-2 bg-red-900/20 border border-red-500/20 rounded text-[10px] text-red-400 font-mono">
-        DEBUG: ID: {barbershopId || 'UNDEFINED'} | Date: {selectedDate} | Items: {appointments.length}
-      </div>
     </div>
   );
 }
