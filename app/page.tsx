@@ -11,6 +11,7 @@ import { getDailySummary } from "./barbearia/_actions/finance";
 const AppointmentsList = dynamic(() => import('@/app/components/AppointmentsList'), { ssr: false });
 const AgendamentosTicker = dynamic(() => import('@/app/components/AgendamentosTicker'), { ssr: false });
 import { ThemeToggle } from "@/app/components/ThemeToggle";
+import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
@@ -60,10 +61,16 @@ export default function AdminDashboard() {
     }
   }, [barbershopId]);
 
-  if (!mounted) return <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a]" />;
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const missingGoal = Math.max(financeData.dailyGoal - financeData.income, 0);
-  const goalPercent = Math.min((financeData.income / financeData.dailyGoal) * 100, 100);
+  const userFirstName = session?.user?.name ? session.user.name.split(' ')[0] : "Mestre";
 
   return (
     <div className="min-h-screen bg-black/95 text-zinc-100 font-sans relative selection:bg-yellow-500/30">
@@ -91,7 +98,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col justify-center h-full pt-2 sm:pt-4 w-full">
                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
                    <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase border-l-4 border-yellow-500 pl-4 py-1 truncate">
-                     {session?.user?.name ? session.user.name.split(' ')[0] : "Mestre"} <span className="text-yellow-500">Barber</span>
+                     {userFirstName} <span className="text-yellow-500">Barber</span>
                    </h1>
                 </div>
             </div>
@@ -101,138 +108,144 @@ export default function AdminDashboard() {
             </div>
           </header>
     
-          <AgendamentosTicker 
-            barbershopId={barbershopId} 
-            selectedDate={selectedDate} 
-          />
+          <ErrorBoundary>
+            <AgendamentosTicker 
+                barbershopId={barbershopId} 
+                selectedDate={selectedDate} 
+            />
+          </ErrorBoundary>
     
           <main className="p-4 sm:p-8 space-y-8 flex-1">
              
-             {/* SECTION: OPERACIONAL */}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
-               {/* CARD INSIGHTS (Novo) */}
-               <Link href="/insights" className="block group">
-                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-yellow-500/30">
-                   <div className="absolute inset-0 bg-yellow-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                   
-                   <div className="relative z-10">
-                     <div className="flex justify-between items-start mb-4">
-                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-yellow-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-yellow-500/30">
-                         <Sparkles size={24} />
-                       </div>
-                       <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
-                          <span className="text-[9px] text-yellow-500 font-black uppercase">Analytics</span>
-                       </div>
-                     </div>
-    
-                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inteligência Estratégica</h3>
-                     <p className="text-3xl font-black text-white italic group-hover:text-yellow-500 transition-colors">Insights</p>
-                     
-                     <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-yellow-500 transition-colors">
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Acessar Métricas</span>
-                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                     </div>
-                   </div>
-                 </div>
-               </Link>
-
-               {/* CARD FINANCEIRO / CAIXA */}
-               <Link href="/financeiro" className="block group">
-                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-green-500/30">
-                   <div className="absolute inset-0 bg-green-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                   
-                   <div className="relative z-10">
-                     <div className="flex justify-between items-start mb-4">
-                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-green-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-green-500/30">
-                         <DollarSign size={24} />
-                       </div>
-                       <div className="bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                          <span className="text-[9px] text-green-500 font-black uppercase">Caixa</span>
-                       </div>
-                     </div>
-    
-                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Gestão de Vendas</h3>
-                     <p className="text-3xl font-black text-white italic group-hover:text-green-500 transition-colors">Financeiro</p>
-                     
-                     <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-green-500 transition-colors">
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Fluxo de Caixa</span>
-                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                     </div>
-                   </div>
-                 </div>
-               </Link>
-
-               {/* CARD ESTOQUE */}
-               <Link href="/estoque" className="block group">
-                 <div 
-                   className={`relative overflow-hidden bg-zinc-900/60 border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full hover:shadow-xl ${
-                     estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-zinc-800'
-                   }`}
-                 >
-                   {estoqueCritico && <div className="absolute inset-0 bg-red-500/5 blur-[40px] animate-pulse" />}
-                   <div className="relative z-10">
-                     <div className="flex justify-between items-start mb-4">
-                       <div className={`p-3 rounded-2xl bg-black/50 border border-zinc-800 transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500'}`}>
-                         <Package size={24} className={estoqueCritico ? 'animate-bounce' : 'group-hover:-rotate-12'} />
-                       </div>
-                       {estoqueCritico ? (
-                         <span className="text-[9px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/20">Reposição Urgente</span>
-                       ) : (
-                         <div className="bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-full">
-                            <span className="text-[9px] text-blue-400 font-black uppercase">Controle</span>
-                         </div>
-                       )}
-                     </div>
-                     <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
-                     <h3 className="text-3xl font-black text-white italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
-                     <div className="flex items-center gap-2 mt-4">
-                       <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                         <div className={`h-full transition-all duration-1000 ${estoqueCritico ? 'w-[15%] bg-red-500' : 'w-[90%] bg-blue-500'}`} />
-                       </div>
-                       <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-zinc-500'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
-                     </div>
-                   </div>
-                 </div>
-               </Link>
-    
-               {/* CARD GALERIA DE ESTILOS */}
-               <Link href="/galeria-estilos" className="block group">
-                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl">
-                   <div className="absolute inset-0 bg-purple-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                   
-                   <div className="relative z-10">
-                     <div className="flex justify-between items-start mb-4">
-                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
-                         <Sparkles size={24} />
-                       </div>
-                       <div className="bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-full animate-pulse">
-                          <span className="text-[9px] text-purple-400 font-black uppercase">Novo Recurso</span>
-                       </div>
-                     </div>
-    
-                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
-                     <p className="text-3xl font-black text-white italic group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
-                     
-                     <div className="flex items-center gap-2 mt-4">
-                        <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                           <div className="h-full w-[100%] bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
+             <ErrorBoundary>
+                {/* SECTION: OPERACIONAL */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                {/* CARD INSIGHTS (Novo) */}
+                <Link href="/insights" className="block group">
+                    <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-yellow-500/30">
+                    <div className="absolute inset-0 bg-yellow-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-4">
+                        <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-yellow-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-yellow-500/30">
+                            <Sparkles size={24} />
                         </div>
-                        <span className="text-[10px] font-bold text-purple-500">Generativa</span>
-                     </div>
-                   </div>
-                 </div>
-               </Link>
-             </div>
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
+                            <span className="text-[9px] text-yellow-500 font-black uppercase">Analytics</span>
+                        </div>
+                        </div>
+
+                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inteligência Estratégica</h3>
+                        <p className="text-3xl font-black text-white italic group-hover:text-yellow-500 transition-colors">Insights</p>
+                        
+                        <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-yellow-500 transition-colors">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Acessar Métricas</span>
+                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </div>
+                    </div>
+                </Link>
+
+                {/* CARD FINANCEIRO / CAIXA */}
+                <Link href="/financeiro" className="block group">
+                    <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-green-500/30">
+                    <div className="absolute inset-0 bg-green-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-4">
+                        <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-green-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-green-500/30">
+                            <DollarSign size={24} />
+                        </div>
+                        <div className="bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
+                            <span className="text-[9px] text-green-500 font-black uppercase">Caixa</span>
+                        </div>
+                        </div>
+
+                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Gestão de Vendas</h3>
+                        <p className="text-3xl font-black text-white italic group-hover:text-green-500 transition-colors">Financeiro</p>
+                        
+                        <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-green-500 transition-colors">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Fluxo de Caixa</span>
+                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </div>
+                    </div>
+                </Link>
+
+                {/* CARD ESTOQUE */}
+                <Link href="/estoque" className="block group">
+                    <div 
+                    className={`relative overflow-hidden bg-zinc-900/60 border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full hover:shadow-xl ${
+                        estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-zinc-800'
+                    }`}
+                    >
+                    {estoqueCritico && <div className="absolute inset-0 bg-red-500/5 blur-[40px] animate-pulse" />}
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-4">
+                        <div className={`p-3 rounded-2xl bg-black/50 border border-zinc-800 transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500'}`}>
+                            <Package size={24} className={estoqueCritico ? 'animate-bounce' : 'group-hover:-rotate-12'} />
+                        </div>
+                        {estoqueCritico ? (
+                            <span className="text-[9px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/20">Reposição Urgente</span>
+                        ) : (
+                            <div className="bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-full">
+                            <span className="text-[9px] text-blue-400 font-black uppercase">Controle</span>
+                            </div>
+                        )}
+                        </div>
+                        <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
+                        <h3 className="text-3xl font-black text-white italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
+                        <div className="flex items-center gap-2 mt-4">
+                        <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className={`h-full transition-all duration-1000 ${estoqueCritico ? 'w-[15%] bg-red-500' : 'w-[90%] bg-blue-500'}`} />
+                        </div>
+                        <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-zinc-500'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
+                        </div>
+                    </div>
+                    </div>
+                </Link>
+        
+                {/* CARD GALERIA DE ESTILOS */}
+                <Link href="/galeria-estilos" className="block group">
+                    <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl">
+                    <div className="absolute inset-0 bg-purple-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-4">
+                        <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
+                            <Sparkles size={24} />
+                        </div>
+                        <div className="bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-full animate-pulse">
+                            <span className="text-[9px] text-purple-400 font-black uppercase">Novo Recurso</span>
+                        </div>
+                        </div>
+        
+                        <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
+                        <p className="text-3xl font-black text-white italic group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
+                        
+                        <div className="flex items-center gap-2 mt-4">
+                            <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className="h-full w-[100%] bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
+                            </div>
+                            <span className="text-[10px] font-bold text-purple-500">Generativa</span>
+                        </div>
+                    </div>
+                    </div>
+                </Link>
+                </div>
+             </ErrorBoundary>
     
              {/* TIMELINE RADAR */}
              <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] p-4 sm:p-8 backdrop-blur-sm">
                <h2 className="text-2xl font-black italic uppercase mb-8 text-white">Timeline <span className="text-yellow-500">Radar</span></h2>
-               <AppointmentsList 
-                 barbershopId={barbershopId} 
-                 selectedDate={selectedDate}
-                 onDateChange={setSelectedDate}
-               />
+               <ErrorBoundary>
+                <AppointmentsList 
+                    barbershopId={barbershopId} 
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                />
+               </ErrorBoundary>
              </div>
           </main>
       </div>

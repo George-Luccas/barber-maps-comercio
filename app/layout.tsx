@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import { NotificationWatcher } from "./components/NotificationWatcher";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,12 +27,14 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <SessionWrapper>
           <Providers>
-            <Sidebar />
-            <NotificationWatcher />
-            <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
-              {children}
-              <Toaster position="top-right" richColors />
-            </main>
+            <ErrorBoundary>
+              <Sidebar />
+              <NotificationWatcher />
+              <main className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+                {children}
+                <Toaster position="top-right" richColors />
+              </main>
+            </ErrorBoundary>
           </Providers>
         </SessionWrapper>
       </body>
