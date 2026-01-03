@@ -114,7 +114,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
 
   // UI Components
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 transition-all">
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-6 transition-all shadow-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
          <div>
             <h2 className="text-lg md:text-xl font-bold text-yellow-500">Agenda</h2>
@@ -132,7 +132,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                 type="date" 
                 value={selectedDate}
                 onChange={(e) => onDateChange(e.target.value)}
-                className="bg-black/40 border border-zinc-700 text-white rounded-lg px-4 py-2 text-sm uppercase font-bold tracking-wider outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:hover:scale-110"
+                className="bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-lg px-4 py-2 text-sm uppercase font-bold tracking-wider outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:invert-0 dark:[&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:hover:scale-110 shadow-sm"
             />
          </div>
       </div>
@@ -142,7 +142,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
               Carregando agendamentos...
           </div>
       ) : appointments.length === 0 ? (
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 text-center mb-4">
+        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 text-center mb-4 shadow-inner">
             <p className="text-zinc-500 uppercase text-xs font-bold tracking-widest">Nenhum agendamento para esta data</p>
         </div>
       ) : (
@@ -150,7 +150,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             {appointments.map((item) => (
             <div 
                 key={item.id} 
-                className="flex items-center justify-between bg-zinc-800/50 p-3 rounded-lg border border-zinc-700/50 hover:border-yellow-500/30 transition-colors"
+                className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border border-zinc-100 dark:border-zinc-700/50 hover:border-yellow-500/30 transition-colors shadow-sm"
             >
                 <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${
@@ -159,17 +159,17 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                 }`} />
                 
                 <div>
-                    <p className="font-medium text-sm md:text-base text-white leading-tight">
+                    <p className="font-bold text-sm md:text-base text-zinc-900 dark:text-white leading-tight">
                     {item.clientName}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {item.serviceName}
                     </p>
                 </div>
                 </div>
 
                 <div className="text-right">
-                <p className="text-sm font-bold text-yellow-500">{item.time}</p>
+                <p className="text-sm font-black text-yellow-500">{item.time}</p>
                 <p className={`text-[10px] uppercase tracking-wider font-bold ${
                     item.status === 'realizado' ? 'text-green-500' : 
                     item.status === 'pendente' ? 'text-yellow-600' : 'text-blue-500'
