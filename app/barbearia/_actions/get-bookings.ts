@@ -3,17 +3,29 @@
 import { db } from "@/app/_lib/prisma";
 import { auth } from "@/app/_lib/auth";
 
-export async function getBookings(barbershopId: string, date?: Date) {
+export async function getBookings(barbershopId: string, dateStr?: string) {
   const session = await auth();
   
   if (!session?.user) return [];
 
-  const targetDate = date || new Date();
-  const startOfDay = new Date(targetDate);
-  startOfDay.setHours(0, 0, 0, 0);
+  // Se não vier string, pega data de hoje em YYYY-MM-DD UTC ou Local Server
+  // Melhor: se não vier, assume hoje.
+  let targetDateStr = dateStr;
+  if (!targetDateStr) {
+      const now = new Date();
+      targetDateStr = now.toISOString().split('T')[0]; // Fallback
+  }
+
+  // Cria data UTC a partir da string "YYYY-MM-DD"
+  // Ao fazer new Date("2026-01-05"), em server side (Node), se for UTC, é 00:00 UTC.
+  // Para garantir busca abrangente no dia, pegamos o start (00:00:00) e end (23:59:59) desse dia.
   
-  const endOfDay = new Date(targetDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = new Date(`${targetDateStr}T00:00:00.000Z`);
+  const endOfDay = new Date(`${targetDateStr}T23:59:59.999Z`);
+
+  // NOTA: Se o banco estiver salvando com -03:00, e buscarmos UTC, pode haver deslocamento.
+  // Mas como funcionou no Desktop (que gera UTC implicitamente), manteremos a lógica UTC.
+  // A diferença é que agora controlamos a string exata.
 
   try {
     const bookings = await db.booking.findMany({

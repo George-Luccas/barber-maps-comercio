@@ -49,9 +49,8 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
       
       try {
         setLoading(true);
-        // Passa a data selecionada (vinda por prop) para a server action
-        const dateObj = new Date(selectedDate + 'T12:00:00'); 
-        const data = await getBookings(barbershopId, dateObj);
+        // Passa a data selecionada (string YYYY-MM-DD) direto
+        const data = await getBookings(barbershopId, selectedDate);
         
         // Compara com data local
         const todayLocal = new Date();

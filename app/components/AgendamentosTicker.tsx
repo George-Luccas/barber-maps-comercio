@@ -26,11 +26,8 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
           const day = String(d.getDate()).padStart(2, '0');
           dateStr = `${year}-${month}-${day}`;
        }
-       
-       const dateObj = new Date(dateStr + 'T12:00:00');
-
        try {
-         const bookings = await getBookings(barbershopId, dateObj);
+         const bookings = await getBookings(barbershopId, dateStr);
          
          const formatted = bookings.map(b => ({
             id: b.id,
