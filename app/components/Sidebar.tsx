@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home } from 'lucide-react'
+import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles } from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
 
@@ -16,6 +16,7 @@ export default function Sidebar() {
   const menuItems = [
     { name: 'Início', icon: Home, href: '/' },
     { name: 'Financeiro', icon: DollarSign, href: '/financeiro' },
+    { name: 'Insights', icon: Sparkles, href: '/insights' },
     { name: 'Minha Barbearia', icon: Scissors, href: '/barbearia' },
     { name: 'Estilo', icon: Palette, href: '/galeria-estilos' },
   ]

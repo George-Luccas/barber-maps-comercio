@@ -12,13 +12,6 @@ const AppointmentsList = dynamic(() => import('@/app/components/AppointmentsList
 const AgendamentosTicker = dynamic(() => import('@/app/components/AgendamentosTicker'), { ssr: false });
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 
-import { getDashboardMetrics, getRevenueMix, getOccupancyHeatmap, DashboardMetrics } from "./barbearia/_actions/analytics";
-import { KPIGrid } from "./components/analytics/KPIGrid";
-import { RevenueMixChart } from "./components/analytics/RevenueMixChart";
-import { OccupancyHeatmap } from "./components/analytics/OccupancyHeatmap";
-import { seedMockData } from "./barbearia/_actions/seed-data"; 
-import { toast } from "sonner";
-
 export default function AdminDashboard() {
   const { data: session } = useSession();
   // Estado para a data selecionada (compartilhado entre Ticker e Lista)
@@ -31,12 +24,6 @@ export default function AdminDashboard() {
     return `${year}-${month}-${day}`;
   });
   
-  // Analytics States
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
-  const [revenueMix, setRevenueMix] = useState<any[]>([]);
-  const [heatmapData, setHeatmapData] = useState<any[]>([]);
-  const [analyticsLoading, setAnalyticsLoading] = useState(true);
-
   const [financeData, setFinanceData] = useState({ income: 0, dailyGoal: 500 });
   const [mounted, setMounted] = useState(false);
   const [stockItems, setStockItems] = useState<any[]>([]);
@@ -71,28 +58,6 @@ export default function AdminDashboard() {
     if (barbershopId) {
       loadDashboardData();
     }
-  }, [barbershopId]);
-
-  // Busca dados de Analytics
-  useEffect(() => {
-    async function loadAnalytics() {
-      if (!barbershopId) return;
-      try {
-        const [m, mix, heat] = await Promise.all([
-            getDashboardMetrics(barbershopId),
-            getRevenueMix(barbershopId),
-            getOccupancyHeatmap(barbershopId)
-        ]);
-        setMetrics(m);
-        setRevenueMix(mix);
-        setHeatmapData(heat);
-      } catch (error) {
-        console.error("Failed to load analytics", error);
-      } finally {
-        setAnalyticsLoading(false);
-      }
-    }
-    loadAnalytics();
   }, [barbershopId]);
 
   if (!mounted) return <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a]" />;
@@ -143,59 +108,35 @@ export default function AdminDashboard() {
     
           <main className="p-4 sm:p-8 space-y-8 flex-1">
              
-             {/* SECTION: SMART INSIGHTS (Novo) */}
-             <div className="space-y-4">
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="text-yellow-500" size={18} />
-                        <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Smart Insights</h2>
-                    </div>
-                    
-                    {/* Botão de Simulação Temporário */}
-                    <button 
-                        onClick={async () => {
-                            if(!confirm("Gerar dados de teste? Isso criará agendamentos passados.")) return;
-                            const toastId = toast.loading("Gerando dados...");
-                            try {
-                                await seedMockData(barbershopId);
-                                toast.success("Dados gerados! Recarregando...", { id: toastId });
-                                window.location.reload();
-                            } catch(e) {
-                                toast.error("Erro ao gerar dados", { id: toastId });
-                            }
-                        }}
-                        className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-yellow-500/20"
-                    >
-                        <Zap size={14} fill="black" />
-                        SIMULAR DADOS
-                    </button>
-                 </div>
-                 
-                 {analyticsLoading ? (
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                         {[1,2,3,4].map(i => <div key={i} className="h-32 bg-zinc-900/50 animate-pulse rounded-2xl" />)}
-                     </div>
-                 ) : metrics ? (
-                     <KPIGrid metrics={metrics} />
-                 ) : null}
-    
-                 {!analyticsLoading && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="h-[400px]">
-                           <RevenueMixChart data={revenueMix} />
-                        </div>
-                        <div className="h-[400px]">
-                           <OccupancyHeatmap data={heatmapData} />
-                        </div>
-                    </div>
-                 )}
-             </div>
-
-             <div className="h-px bg-zinc-800 w-full" />
-    
              {/* SECTION: OPERACIONAL */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
+               {/* CARD INSIGHTS (Novo) */}
+               <Link href="/insights" className="block group">
+                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl hover:border-yellow-500/30">
+                   <div className="absolute inset-0 bg-yellow-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                   
+                   <div className="relative z-10">
+                     <div className="flex justify-between items-start mb-4">
+                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-yellow-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-yellow-500/30">
+                         <Sparkles size={24} />
+                       </div>
+                       <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
+                          <span className="text-[9px] text-yellow-500 font-black uppercase">Analytics</span>
+                       </div>
+                     </div>
+    
+                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inteligência Estratégica</h3>
+                     <p className="text-3xl font-black text-white italic group-hover:text-yellow-500 transition-colors">Insights</p>
+                     
+                     <div className="flex items-center gap-2 mt-4 text-zinc-500 group-hover:text-yellow-500 transition-colors">
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Acessar Métricas</span>
+                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                     </div>
+                   </div>
+                 </div>
+               </Link>
+
                {/* CARD ESTOQUE */}
                <Link href="/estoque" className="block group">
                  <div 
