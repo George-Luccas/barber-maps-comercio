@@ -47,7 +47,8 @@ export default function AgendamentosTicker({ barbershopId, selectedDate }: Agend
   const tickerItems = [...items, ...items, ...items]; // Triplicar para garantir scroll suave em telas largas
 
   return (
-    <div className="w-full bg-zinc-900/50 border-y border-zinc-800 py-3 overflow-hidden flex items-center">
+    <div className="w-full bg-zinc-900/50 border-y border-zinc-800 py-3 overflow-hidden flex items-center relative">
+      <div className="absolute left-0 top-0 bg-red-500 text-[8px] px-1 text-white z-50">v2 LIVE</div>
       {/* Container da Animação */}
       <motion.div
         className="flex whitespace-nowrap gap-8"
