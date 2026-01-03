@@ -20,6 +20,7 @@ const ALERT_SOUND = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4L
 export default function AppointmentsList({ barbershopId }: { barbershopId?: string }) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
   
   // Refs para controle de notificação
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -28,7 +29,9 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
 
   // Inicializa o áudio
   useEffect(() => {
-    audioRef.current = new Audio(ALERT_SOUND);
+    if (typeof window !== "undefined") {
+        audioRef.current = new Audio(ALERT_SOUND);
+    }
   }, []);
 
   useEffect(() => {
@@ -38,12 +41,18 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
       if (!barbershopId) return;
       
       try {
-        const data = await getBookings(barbershopId);
+        setLoading(true);
+        // Passa a data selecionada para a server action
+        const dateObj = new Date(selectedDate + 'T12:00:00'); // Garante que não volta um dia por fuso
+        const data = await getBookings(barbershopId, dateObj);
         
-        // Verifica se houve novos agendamentos (aumentou a quantidade)
+        // Verifica se houve novos agendamentos (apenas se estivermos olhando para data atual, opcional)
+        // Aqui mantemos a lógica geral: se count aumentou, notifica.
+        // Mas idealmente só notificamos se a data for "hoje", mas deixaremos geral por enquanto ou checamos a data.
+        const isToday = selectedDate === new Date().toISOString().split('T')[0];
         const currentCount = data.length;
         
-        if (!firstLoadRef.current && currentCount > lastCountRef.current) {
+        if (isToday && !firstLoadRef.current && currentCount > lastCountRef.current) {
            // Toca som
            audioRef.current?.play().catch(e => console.log("Audio play failed (user interaction needed)", e));
            
@@ -57,7 +66,9 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
         }
 
         setAppointments(data);
-        lastCountRef.current = currentCount;
+        if (isToday) {
+            lastCountRef.current = currentCount;
+        }
         firstLoadRef.current = false;
         
       } catch (error) {
@@ -67,66 +78,86 @@ export default function AppointmentsList({ barbershopId }: { barbershopId?: stri
       }
     }
 
-    // Busca imediata ao montar
+    // Busca imediata ao montar ou trocar data
     fetchAppointments();
 
     // Polling a cada 30 segundos
     intervalId = setInterval(fetchAppointments, 30000);
 
     return () => clearInterval(intervalId);
-  }, [barbershopId]);
+  }, [barbershopId, selectedDate]);
 
-  if (loading) return <div className="p-4 text-zinc-500 animate-pulse">Sincronizando radar...</div>;
-
-  // Se não tiver nada
-  if (appointments.length === 0) {
-    return (
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 text-center">
-        <p className="text-zinc-500 uppercase text-xs font-bold tracking-widest">Nenhum agendamento encontrado para sua unidade</p>
-      </div>
-    );
-  }
+  // Se loading e não for a primeira carga (pra não piscar tanto) ou primeira carga
+  // if (loading && firstLoadRef.current) return <div className="p-4 text-zinc-500 animate-pulse">Sincronizando radar...</div>;
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 transition-all">
-      <div className="flex justify-between items-center mb-4">
-         <h2 className="text-lg md:text-xl font-bold text-yellow-500">Agenda de Hoje</h2>
-         <span className="text-[10px] text-zinc-500 uppercase font-black animate-pulse flex items-center gap-1">
-             <div className="w-2 h-2 bg-green-500 rounded-full" /> Ao Vivo
-         </span>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+         <div>
+            <h2 className="text-lg md:text-xl font-bold text-yellow-500">Agenda</h2>
+            <div className="flex items-center gap-2 mt-1">
+                <span className="text-[10px] text-zinc-500 uppercase font-black flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${selectedDate === new Date().toISOString().split('T')[0] ? 'bg-green-500 animate-pulse' : 'bg-zinc-600'}`} /> 
+                    {selectedDate === new Date().toISOString().split('T')[0] ? 'Visualizando Hoje' : 'Visualizando Histórico'}
+                </span>
+            </div>
+         </div>
+
+         {/* Seletor de Data Estilizado */}
+         <div className="relative group">
+            <input 
+                type="date" 
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="bg-black/40 border border-zinc-700 text-white rounded-lg px-4 py-2 text-sm uppercase font-bold tracking-wider outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:hover:scale-110"
+            />
+         </div>
       </div>
       
-      <div className="space-y-3">
-        {appointments.map((item) => (
-          <div 
-            key={item.id} 
-            className="flex items-center justify-between bg-zinc-800/50 p-3 rounded-lg border border-zinc-700/50 animate-in slide-in-from-left duration-300"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${
-                item.status === 'realizado' ? 'bg-green-500' : 
-                item.status === 'pendente' ? 'bg-yellow-500' : 'bg-blue-500'
-              }`} />
-              
-              <div>
-                <p className="font-medium text-sm md:text-base text-white leading-tight">
-                  {item.clientName}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {item.serviceName}
-                </p>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="text-sm font-bold text-yellow-500">{item.time}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">
-                {item.status}
-              </p>
-            </div>
+      {loading ? (
+          <div className="p-8 text-center animate-pulse text-zinc-500 mb-4">
+              Carregando agendamentos...
           </div>
-        ))}
-      </div>
+      ) : appointments.length === 0 ? (
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 text-center mb-4">
+            <p className="text-zinc-500 uppercase text-xs font-bold tracking-widest">Nenhum agendamento para esta data</p>
+        </div>
+      ) : (
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {appointments.map((item) => (
+            <div 
+                key={item.id} 
+                className="flex items-center justify-between bg-zinc-800/50 p-3 rounded-lg border border-zinc-700/50 hover:border-yellow-500/30 transition-colors"
+            >
+                <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${
+                    item.status === 'realizado' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 
+                    item.status === 'pendente' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' : 'bg-blue-500'
+                }`} />
+                
+                <div>
+                    <p className="font-medium text-sm md:text-base text-white leading-tight">
+                    {item.clientName}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                    {item.serviceName}
+                    </p>
+                </div>
+                </div>
+
+                <div className="text-right">
+                <p className="text-sm font-bold text-yellow-500">{item.time}</p>
+                <p className={`text-[10px] uppercase tracking-wider font-bold ${
+                    item.status === 'realizado' ? 'text-green-500' : 
+                    item.status === 'pendente' ? 'text-yellow-600' : 'text-blue-500'
+                }`}>
+                    {item.status}
+                </p>
+                </div>
+            </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
