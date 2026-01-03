@@ -166,6 +166,10 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             ))}
         </div>
       )}
+      {/* Debug Info Temporário */}
+      <div className="mt-4 p-2 bg-red-900/20 border border-red-500/20 rounded text-[10px] text-red-400 font-mono">
+        DEBUG: ID: {barbershopId || 'UNDEFINED'} | Date: {selectedDate} | Items: {appointments.length}
+      </div>
     </div>
   );
 }
