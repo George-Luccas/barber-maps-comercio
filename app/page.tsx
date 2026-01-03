@@ -12,6 +12,13 @@ const AppointmentsList = dynamic(() => import('@/app/components/AppointmentsList
 const AgendamentosTicker = dynamic(() => import('@/app/components/AgendamentosTicker'), { ssr: false });
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 
+import { getDashboardMetrics, getRevenueMix, getOccupancyHeatmap, DashboardMetrics } from "./barbearia/_actions/analytics";
+import { KPIGrid } from "./components/analytics/KPIGrid";
+import { RevenueMixChart } from "./components/analytics/RevenueMixChart";
+import { OccupancyHeatmap } from "./components/analytics/OccupancyHeatmap";
+import { seedMockData } from "./barbearia/_actions/seed-data"; 
+import { toast } from "sonner";
+
 export default function AdminDashboard() {
   const { data: session } = useSession();
   // Estado para a data selecionada (compartilhado entre Ticker e Lista)
@@ -23,6 +30,13 @@ export default function AdminDashboard() {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
+  
+  // Analytics States
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [revenueMix, setRevenueMix] = useState<any[]>([]);
+  const [heatmapData, setHeatmapData] = useState<any[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+
   const [financeData, setFinanceData] = useState({ income: 0, dailyGoal: 500 });
   const [mounted, setMounted] = useState(false);
   const [stockItems, setStockItems] = useState<any[]>([]);
@@ -65,178 +79,169 @@ export default function AdminDashboard() {
   const goalPercent = Math.min((financeData.income / financeData.dailyGoal) * 100, 100);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] text-zinc-900 dark:text-white font-sans relative transition-colors duration-300">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-200 dark:border-zinc-900 p-6 sm:p-8 bg-white/80 dark:bg-black/50 backdrop-blur-md gap-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
-            {/* LOGO (Mobile vs Desktop) */}
-            <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" />
+    <div className="min-h-screen bg-black/95 text-zinc-100 font-sans relative selection:bg-yellow-500/30">
+        {/* Background Image & Overlay */}
+        <div className="fixed inset-0 z-0">
+            <div className="absolute inset-0 bg-black/80 z-10" />
+            <img 
+                src="https://4kwallpapers.com/images/wallpapers/dark-background-abstract-background-network-3d-background-8192x5464-8324.jpg" 
+                alt="Background" 
+                className="w-full h-full object-cover opacity-40"
+            />
+        </div>
+
+      <div className="relative z-10 flex flex-col min-h-screen">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 p-6 sm:p-8 bg-black/50 backdrop-blur-md gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
+                {/* LOGO (Mobile vs Desktop) */}
+                <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" />
+                
+                <div className="flex sm:hidden items-center gap-2">
+                   <MapPin className="text-yellow-500" size={24} fill="currentColor" />
+                   <span className="text-2xl font-black text-yellow-500 uppercase tracking-tighter">Barber Maps</span>
+                </div>
+                
+                <div className="flex flex-col justify-center h-full pt-2 sm:pt-4 w-full">
+                   <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
+                   <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase border-l-4 border-yellow-500 pl-4 py-1 truncate">
+                     {session?.user?.name?.split(' ')[0] || "Mestre"} <span className="text-yellow-500">Barber</span>
+                   </h1>
+                </div>
+            </div>
             
-            {/* LOGO ALTERNATIVO MOBILE */}
-            <div className="flex sm:hidden items-center gap-2">
-               <span className="text-2xl font-black text-yellow-500 uppercase tracking-tighter">Barber Maps</span>
-               <MapPin className="text-yellow-500" size={24} fill="currentColor" />
+            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+               <button 
+                  onClick={async () => {
+                      if(!confirm("Gerar dados de teste? Isso criará agendamentos passados.")) return;
+                      const toastId = toast.loading("Gerando dados...");
+                      try {
+                          await seedMockData(barbershopId);
+                          toast.success("Dados gerados! Recarregando...", { id: toastId });
+                          window.location.reload();
+                      } catch(e) {
+                          toast.error("Erro ao gerar dados", { id: toastId });
+                      }
+                  }}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-xs text-white px-3 py-1 rounded-full border border-zinc-700 transition-colors"
+               >
+                  ⚡ Simular Dados
+               </button>
+               <ThemeToggle />
             </div>
-            
-            <div className="flex flex-col justify-center h-full pt-2 sm:pt-4 w-full">
-               <span className="text-zinc-500 dark:text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Painel Gerencial</span>
-               <h1 className="text-lg sm:text-xl font-black text-zinc-800 dark:text-zinc-100 tracking-tighter uppercase border-l-4 border-yellow-500 pl-4 py-1 truncate max-w-[250px] sm:max-w-none">
-                 {session?.user?.name?.split(' ')[0] || "Visitante"}
-               </h1>
-            </div>
-        </div>
-        
-        <div className="flex items-center gap-4 w-full md:w-auto justify-end">
-           <ThemeToggle />
-        </div>
-      </header>
-
-      <AgendamentosTicker 
-        barbershopId={barbershopId} 
-        selectedDate={selectedDate} 
-      />
-
-      <main className="p-8 pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          
-          {/* CARD FINANCEIRO */}
-          <Link href="/financeiro" className="block group">
-            <div className="relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full shadow-sm dark:shadow-none hover:shadow-xl dark:disk-shadow-none">
-              <div className="absolute inset-0 bg-green-500/10 dark:bg-green-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-green-600 dark:text-green-500 transition-all duration-500 group-hover:rotate-12">
-                    <DollarSign size={24} />
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                      <TrendingUp size={14} className="text-green-600 dark:text-green-500" />
-                      <span className="text-[9px] text-green-600 dark:text-green-500 font-black uppercase">{goalPercent.toFixed(0)}% da Meta</span>
-                  </div>
-                </div>
-                
-                <p className="text-zinc-400 dark:text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Falta para a Meta</p>
-                
-                <div className="flex items-baseline gap-1">
-                   {missingGoal > 0 ? (
-                      <h3 className="text-4xl font-black text-zinc-900 dark:text-white italic tracking-tight group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                        R$ {missingGoal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </h3>
-                   ) : (
-                      <h3 className="text-3xl font-black text-green-600 dark:text-green-500 italic tracking-tight animate-pulse">
-                        META BATIDA! 🚀
-                      </h3>
-                   )}
-                </div>
-
-                <div className="mt-4 w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500 transition-all duration-1000" 
-                      style={{ width: `${goalPercent}%` }}
-                    />
-                </div>
-              </div>
-            </div>
-          </Link>
-
-          {/* CARD MINHA BARBEARIA (NOVO) */}
-          <Link href="/barbearia" className="block group">
-            <div className="relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full shadow-sm dark:shadow-none hover:shadow-xl">
-              <div className="absolute inset-0 bg-yellow-500/10 dark:bg-yellow-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-yellow-500 transition-all duration-500 group-hover:rotate-12">
-                    <Store size={24} />
-                  </div>
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
-                      <span className="text-[9px] text-yellow-600 dark:text-yellow-500 font-black uppercase">Configurações</span>
-                  </div>
-                </div>
-                
-                <p className="text-zinc-400 dark:text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gestão</p>
-                <h3 className="text-3xl font-black text-zinc-900 dark:text-white italic tracking-tight group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">Minha Barbearia</h3>
-                
-                <div className="flex items-center gap-2 mt-6">
-                   <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-                      <ArrowRight size={14} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
-                   </div>
-                   <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Acessar Painel</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-
-          {/* CARD ESTOQUE */}
-          <Link href="/estoque" className="block group">
-            <div 
-              className={`relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full shadow-sm dark:shadow-none hover:shadow-xl ${
-                estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-zinc-200 dark:border-zinc-800'
-              }`}
-            >
-              {estoqueCritico && <div className="absolute inset-0 bg-red-500/5 blur-[40px] animate-pulse" />}
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500 dark:text-blue-400'}`}>
-                    <Package size={24} className={estoqueCritico ? 'animate-bounce' : 'group-hover:-rotate-12'} />
-                  </div>
-                  {estoqueCritico ? (
-                    <span className="text-[9px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/20">Reposição Urgente</span>
-                  ) : (
-                    <div className="bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-full">
-                       <span className="text-[9px] text-blue-600 dark:text-blue-400 font-black uppercase">Controle</span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-zinc-400 dark:text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
-                <h3 className="text-4xl font-black text-zinc-900 dark:text-white italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
-                <div className="flex items-center gap-2 mt-4">
-                  <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-1000 ${estoqueCritico ? 'w-[15%] bg-red-500' : 'w-[90%] bg-blue-500 dark:bg-blue-400'}`} />
-                  </div>
-                  <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-zinc-400 dark:text-zinc-500'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-
-          {/* CARD GALERIA DE ESTILOS */}
-          <Link href="/galeria-estilos" className="block group">
-            <div className="relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group shadow-sm dark:shadow-none hover:shadow-xl">
-              <div className="absolute inset-0 bg-yellow-500/10 dark:bg-yellow-500/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-purple-600 dark:text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
-                    <Sparkles size={24} />
-                  </div>
-                  <div className="bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-full animate-pulse">
-                     <span className="text-[9px] text-purple-500 dark:text-purple-400 font-black uppercase">Novo Recurso</span>
-                  </div>
-                </div>
-
-                <h3 className="text-zinc-400 dark:text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
-                <p className="text-3xl font-black text-zinc-900 dark:text-white italic group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
-                
-                <div className="flex items-center gap-2 mt-4">
-                   <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full w-[100%] bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
-                   </div>
-                   <span className="text-[10px] font-bold text-purple-600 dark:text-purple-500">Generativa</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        <div className="mt-10 bg-white/40 dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] p-4 sm:p-8 shadow-sm dark:shadow-none">
-          <h2 className="text-2xl font-black italic uppercase mb-8 text-zinc-900 dark:text-white">Timeline <span className="text-yellow-500">Radar</span></h2>
-          <AppointmentsList 
+          </header>
+    
+          <AgendamentosTicker 
             barbershopId={barbershopId} 
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
+            selectedDate={selectedDate} 
           />
-        </div>
-      </main>
+    
+          <main className="p-4 sm:p-8 space-y-8 flex-1">
+             
+             {/* SECTION: SMART INSIGHTS (Novo) */}
+             <div className="space-y-4">
+                 <div className="flex items-center gap-2">
+                     <Sparkles className="text-yellow-500" size={18} />
+                     <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Smart Insights</h2>
+                 </div>
+                 
+                 {analyticsLoading ? (
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                         {[1,2,3,4].map(i => <div key={i} className="h-32 bg-zinc-900/50 animate-pulse rounded-2xl" />)}
+                     </div>
+                 ) : metrics ? (
+                     <KPIGrid metrics={metrics} />
+                 ) : null}
+    
+                 {!analyticsLoading && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="h-[400px]">
+                           <RevenueMixChart data={revenueMix} />
+                        </div>
+                        <div className="h-[400px]">
+                           <OccupancyHeatmap data={heatmapData} />
+                        </div>
+                    </div>
+                 )}
+             </div>
+
+             <div className="h-px bg-zinc-800 w-full" />
+    
+             {/* SECTION: OPERACIONAL */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+               {/* CARD ESTOQUE */}
+               <Link href="/estoque" className="block group">
+                 <div 
+                   className={`relative overflow-hidden bg-zinc-900/60 border transition-all duration-500 hover:scale-[1.02] active:scale-95 p-6 rounded-[2rem] cursor-pointer h-full hover:shadow-xl ${
+                     estoqueCritico ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-zinc-800'
+                   }`}
+                 >
+                   {estoqueCritico && <div className="absolute inset-0 bg-red-500/5 blur-[40px] animate-pulse" />}
+                   <div className="relative z-10">
+                     <div className="flex justify-between items-start mb-4">
+                       <div className={`p-3 rounded-2xl bg-black/50 border border-zinc-800 transition-all duration-500 ${estoqueCritico ? 'text-red-500 border-red-500/30' : 'text-blue-500'}`}>
+                         <Package size={24} className={estoqueCritico ? 'animate-bounce' : 'group-hover:-rotate-12'} />
+                       </div>
+                       {estoqueCritico ? (
+                         <span className="text-[9px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/20">Reposição Urgente</span>
+                       ) : (
+                         <div className="bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-full">
+                            <span className="text-[9px] text-blue-400 font-black uppercase">Controle</span>
+                         </div>
+                       )}
+                     </div>
+                     <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-1">Gerenciador de Estoque</p>
+                     <h3 className="text-3xl font-black text-white italic tracking-tight">{estoqueCritico ? "Atenção" : "Em Dia"}</h3>
+                     <div className="flex items-center gap-2 mt-4">
+                       <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                         <div className={`h-full transition-all duration-1000 ${estoqueCritico ? 'w-[15%] bg-red-500' : 'w-[90%] bg-blue-500'}`} />
+                       </div>
+                       <span className={`text-[10px] font-bold ${estoqueCritico ? 'text-red-500' : 'text-zinc-500'}`}>{estoqueCritico ? "Crítico" : "Status"}</span>
+                     </div>
+                   </div>
+                 </div>
+               </Link>
+    
+               {/* CARD GALERIA DE ESTILOS */}
+               <Link href="/galeria-estilos" className="block group">
+                 <div className="relative overflow-hidden bg-zinc-900/60 border border-zinc-800 p-6 rounded-[2rem] transition-all duration-500 hover:scale-[1.02] active:scale-95 h-full group hover:shadow-xl">
+                   <div className="absolute inset-0 bg-purple-500/10 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                   
+                   <div className="relative z-10">
+                     <div className="flex justify-between items-start mb-4">
+                       <div className="p-3 rounded-2xl bg-black/50 border border-zinc-800 text-purple-500 transition-all duration-500 group-hover:rotate-12 group-hover:border-purple-500/30">
+                         <Sparkles size={24} />
+                       </div>
+                       <div className="bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-full animate-pulse">
+                          <span className="text-[9px] text-purple-400 font-black uppercase">Novo Recurso</span>
+                       </div>
+                     </div>
+    
+                     <h3 className="text-zinc-500 mb-1 font-bold uppercase text-[10px] tracking-widest">Inspiração IA</h3>
+                     <p className="text-3xl font-black text-white italic group-hover:text-purple-400 transition-colors">Galeria de Estilos</p>
+                     
+                     <div className="flex items-center gap-2 mt-4">
+                        <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                           <div className="h-full w-[100%] bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
+                        </div>
+                        <span className="text-[10px] font-bold text-purple-500">Generativa</span>
+                     </div>
+                   </div>
+                 </div>
+               </Link>
+             </div>
+    
+             {/* TIMELINE RADAR */}
+             <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] p-4 sm:p-8 backdrop-blur-sm">
+               <h2 className="text-2xl font-black italic uppercase mb-8 text-white">Timeline <span className="text-yellow-500">Radar</span></h2>
+               <AppointmentsList 
+                 barbershopId={barbershopId} 
+                 selectedDate={selectedDate}
+                 onDateChange={setSelectedDate}
+               />
+             </div>
+          </main>
+      </div>
     </div>
   );
 }
