@@ -17,12 +17,13 @@ export async function cancelBooking(bookingId: string) {
         id: bookingId,
       },
       data: {
-        cancelledAt: new Date(),
-      },
+          cancelledAt: new Date(),
+          cancellationReason: "Cancelado pela barbearia"
+      }
     });
 
+    revalidatePath("/barbearia");
     revalidatePath("/");
-    revalidatePath("/agenda");
     
     return { success: true };
   } catch (error) {

@@ -262,14 +262,16 @@ export default function DashboardClient({
                                                     <button 
                                                         onClick={async (e) => {
                                                             e.stopPropagation();
-                                                            if(confirm("Excluir agendamento?")) {
-                                                                const { deleteBooking } = await import("@/app/barbearia/_actions/delete-booking");
-                                                                const res = await deleteBooking(booking.id);
+                                                            if(confirm("Confirmar cancelamento?")) {
+                                                                const { cancelBooking } = await import("@/app/barbearia/_actions/cancel-booking");
+                                                                const res = await cancelBooking(booking.id);
                                                                 if(res.success) {
-                                                                    setBookings(prev => prev.filter(b => b.id !== booking.id));
-                                                                    toast.success("Excluído!");
+                                                                    setBookings(prev => prev.map(b => 
+                                                                        b.id === booking.id ? { ...b, status: 'cancelado' } : b
+                                                                    ));
+                                                                    toast.success("Cancelado!");
                                                                 } else {
-                                                                    toast.error("Erro ao excluir");
+                                                                    toast.error("Erro ao cancelar");
                                                                 }
                                                             }
                                                         }}

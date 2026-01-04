@@ -180,19 +180,21 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                     </div>
                     <button 
                         onClick={async () => {
-                             if(confirm("Deseja realmente excluir este agendamento?")) {
-                                 const { deleteBooking } = await import("@/app/barbearia/_actions/delete-booking");
-                                 const res = await deleteBooking(item.id);
+                             if(confirm("Deseja realmente CANCELAR este agendamento?")) {
+                                 const { cancelBooking } = await import("@/app/barbearia/_actions/cancel-booking");
+                                 const res = await cancelBooking(item.id);
                                  if(res.success) {
-                                     setAppointments(prev => prev.filter(a => a.id !== item.id));
-                                     toast.success("Agendamento excluído!");
+                                     setAppointments(prev => prev.map(a => 
+                                         a.id === item.id ? { ...a, status: 'cancelado' } : a
+                                     ));
+                                     toast.success("Agendamento cancelado!");
                                  } else {
-                                     toast.error("Erro ao excluir");
+                                     toast.error("Erro ao cancelar");
                                  }
                              }
                         }}
                         className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                        title="Excluir Agendamento"
+                        title="Cancelar Agendamento"
                     >
                         <Trash2 size={16} />
                     </button>

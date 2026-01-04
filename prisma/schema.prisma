@@ -91,6 +91,7 @@ model Booking {
   barberId          String?
   userName          String?
   displayTime       String?
+  cancellationReason String?          // Motivo do cancelamento (ex: "Cancelado pela barbearia")
   barber            Barber?           @relation(fields: [barberId], references: [id])
   Barbershop        Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   BarbershopService BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
