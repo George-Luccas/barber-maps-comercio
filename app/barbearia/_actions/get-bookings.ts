@@ -80,9 +80,6 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
             clientName = userMap.get(booking.userId);
         }
 
-        // DEBUG: Logar data crua para ver o que está vindo do banco
-        // console.log(`DEBUG [Agendamento ${booking.id}]: Raw Date: ${booking.date.toISOString()} | Local String: ${booking.date.toLocaleString()}`);
-
         // Ajuste manual para garantir horário correto (UTC-3) => O cliente reportou que AINDA está errado.
         // Se estava 09:00 e aparecia 10:00, e eu tirei 3h, deveria ter ido para 07:00?
         // Vamos tentar remover o ajuste manual e confiar APENAS no timeZone se o ambiente estiver limpo, 
@@ -93,12 +90,17 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
         // Se usarmos timeZone: 'America/Sao_Paulo', ele deve mostrar 09:00.
         // Se estava mostrando 10:00, é porque estava interpretando como UTC-2 (DST antiga?) ou o dado estava '13:00Z'.
         
-        // Vamos usar a API Intl para garantir conversão correta
-        const timeString = new Intl.DateTimeFormat('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'America/Sao_Paulo'
-        }).format(booking.date);
+        // NOVO: Se tiver 'displayTime' (string 'HH:mm') salvo, usa ele e IGNORA conversões de data!
+        let timeString = booking.displayTime;
+        
+        if (!timeString) {
+            // Fallback para conversão de data se não tiver o horário por escrito
+            timeString = new Intl.DateTimeFormat('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/Sao_Paulo'
+            }).format(booking.date);
+        }
 
         return {
             id: booking.id,

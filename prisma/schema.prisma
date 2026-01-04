@@ -102,6 +102,7 @@ model Booking {
   barberId          String?
   barber            Barber?           @relation(fields: [barberId], references: [id])
   userName          String?           // Nome do cliente denormalizado para facilitar exibição
+  displayTime       String?           // Horário por escrito para evitar erros de fuso
 }
 
 model account {
