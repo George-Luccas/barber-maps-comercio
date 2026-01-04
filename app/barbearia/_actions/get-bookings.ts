@@ -81,7 +81,11 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
             id: booking.id,
             clientName: clientName || "Cliente",
             serviceName: booking.BarbershopService?.name || "Serviço",
-            time: booking.date?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || "--:--",
+            time: booking.date?.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/Sao_Paulo' 
+            }) || "--:--",
             status: calculateStatus(booking)
         };
     });
