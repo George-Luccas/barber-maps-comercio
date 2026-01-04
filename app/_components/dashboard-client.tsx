@@ -107,7 +107,31 @@ export default function DashboardClient({
                    </h1>
                 </div>
             </div>
-            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-end">
+               <button 
+                   onClick={async () => {
+                       const newStatus = !isShopOpen;
+                       setShopOpen(newStatus); // Optimistic
+                       const res = await toggleShopStatus(barbershopId);
+                       if (!res.success) {
+                           setShopOpen(!newStatus); // Revert
+                           toast.error("Erro ao alterar status");
+                       } else {
+                           toast.success(newStatus ? "Barbearia ABERTA!" : "Barbearia FECHADA!");
+                       }
+                   }}
+                   className={`px-4 py-2 rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg flex items-center gap-2 ${isShopOpen ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}
+               >
+                   {isShopOpen ? (
+                       <>
+                          <Store size={14} /> <span className="hidden sm:inline">ABERTO</span>
+                       </>
+                   ) : (
+                       <>
+                          <Store size={14} /> <span className="hidden sm:inline">FECHADO</span>
+                       </>
+                   )}
+               </button>
                <ThemeToggle />
             </div>
           </header>
@@ -128,6 +152,33 @@ export default function DashboardClient({
                             <div className="flex-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 <AgendamentosTicker barbershopId={barbershopId} />
                             </div>
+                            
+                            {/* SHOP STATUS BUTTON (PRO DESKTOP) */}
+                            <button 
+                                onClick={async () => {
+                                    const newStatus = !isShopOpen;
+                                    setShopOpen(newStatus); // Optimistic
+                                    const res = await toggleShopStatus(barbershopId);
+                                    if (!res.success) {
+                                        setShopOpen(!newStatus); // Revert
+                                        toast.error("Erro ao alterar status");
+                                    } else {
+                                        toast.success(newStatus ? "Barbearia ABERTA!" : "Barbearia FECHADA!");
+                                    }
+                                }}
+                                className={`px-4 py-1.5 rounded-lg font-black uppercase tracking-widest text-[10px] transition-all shadow-lg flex items-center gap-2 border hover:scale-105 active:scale-95 ${isShopOpen ? 'bg-green-500/20 text-green-500 border-green-500/30' : 'bg-red-500/20 text-red-500 border-red-500/30'}`}
+                            >
+                                {isShopOpen ? (
+                                    <>
+                                    <Store size={12} /> ABERTO
+                                    </>
+                                ) : (
+                                    <>
+                                    <Store size={12} /> FECHADO
+                                    </>
+                                )}
+                            </button>
+
                             <div className="hidden md:flex items-center gap-3 text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
                                 <span>Status: Syncing</span>
                                 <div className="h-3 w-[1px] bg-muted/20" />
