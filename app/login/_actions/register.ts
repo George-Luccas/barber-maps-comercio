@@ -28,7 +28,7 @@ export async function registerUser(formData: FormData) {
     // 3. Criptografar a senha (Segurança Máxima)
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 4. Salvar no Banco de Dados
+    // 4. Salvar no Banco de Dados: Criar Usuário E Barbearia Inicial
     await db.user.create({
       data: {
         name,
@@ -37,6 +37,16 @@ export async function registerUser(formData: FormData) {
         password: hashedPassword,
         role: "BARBER",
         updatedAt: new Date(),
+        Barbershop: {
+          create: {
+            name: `${name} Barber Shop`,
+            address: "Endereço pendente",
+            description: "Bem-vindo à sua barbearia! Configure seus dados em 'Minha Barbearia'.",
+            imageUrl: "",
+            phones: [phone],
+            dailyGoal: 500.00
+          }
+        }
       }
     });
 
