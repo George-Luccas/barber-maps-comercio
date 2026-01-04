@@ -90,8 +90,21 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
         // Se usarmos timeZone: 'America/Sao_Paulo', ele deve mostrar 09:00.
         // Se estava mostrando 10:00, é porque estava interpretando como UTC-2 (DST antiga?) ou o dado estava '13:00Z'.
         
-        // NOVO: Se tiver 'displayTime' (string 'HH:mm') salvo, usa ele e IGNORA conversões de data!
+        // NOVO: Se tiver 'displayTime' (string 'HH:mm') salvo, usa ele.
+        // O app externo pode estar salvando "4 de janeiro... às 15:00". Precisamos extrair o horário.
         let timeString = booking.displayTime;
+        
+        if (timeString) {
+            // Tenta extrair HH:mm se vier uma string longa
+            // Procura por padrão de hora (ex: 15:00, 09:30)
+            const timeMatch = timeString.match(/(\d{2}:\d{2})/);
+            if (timeMatch) {
+                timeString = timeMatch[0];
+            } else {
+                // Se não achar padrão, mantém o que veio (fallback) ou trunca? 
+                // Assumindo que se tiver texto curto (ex: "Manhã"), mostra ele.
+            }
+        }
         
         if (!timeString) {
             // Fallback para conversão de data se não tiver o horário por escrito

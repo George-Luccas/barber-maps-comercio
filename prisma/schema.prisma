@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -9,36 +9,30 @@ datasource db {
 }
 
 model Barbershop {
-  id                String              @id @default(uuid())
-  name              String
-  address           String
-  description       String
-  imageUrl          String?
-  photos            String[]            @default([]) // Galeria de fotos
-  phones            String[]            @default([])
-  
-  // Seus 4 campos de horário mantidos conforme planejado
-  openingTime       String?
-  lunchStart        String?
-  lunchEnd          String?
-  closingTime       String?
-  isOpen            Boolean             @default(true)
-  
-  latitude          Float?
-  longitude         Float?
-
-  managerId         String?             @unique
-  user              user?               @relation(fields: [managerId], references: [id])
-  BarbershopService BarbershopService[]
-  Booking           Booking[]
-  StockItems StockItem[]
+  id                    String                 @id @default(uuid())
+  name                  String
+  address               String
+  description           String
+  imageUrl              String?
+  phones                String[]               @default([])
+  managerId             String?                @unique
+  closingTime           String?
+  lunchEnd              String?
+  lunchStart            String?
+  openingTime           String?
+  dailyGoal             Decimal                @default(500.00) @db.Decimal(10, 2)
+  photos                String[]               @default([])
+  latitude              Float?
+  longitude             Float?
+  isOpen                Boolean                @default(true)
+  aboutUs               String?
+  barbers               Barber[]
+  products              BarbershopProduct[]
+  BarbershopService     BarbershopService[]
+  Booking               Booking[]
   FinancialTransactions FinancialTransaction[]
-  
-  dailyGoal         Decimal             @default(500.00) @db.Decimal(10, 2)
-  aboutUs           String?             @db.Text
-  styles            Style[]             // Relação com a Galeria de Estilos
-  barbers           Barber[]
-  products          BarbershopProduct[] // Frigobar
+  StockItems            StockItem[]
+  styles                Style[]
 }
 
 model BarbershopProduct {
@@ -49,25 +43,25 @@ model BarbershopProduct {
   priceInCents Int
   quantity     Int        @default(0)
   barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
   @@index([barbershopId])
 }
 
 model Barber {
-  id           String     @id @default(uuid())
-  name         String
-  email        String?    
-  phone        String?
-  imageUrl     String?
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  bookings     Booking[]
+  id                    String                 @id @default(uuid())
+  name                  String
+  email                 String?
+  phone                 String?
+  imageUrl              String?
+  barbershopId          String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  barbershop            Barbershop             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings              Booking[]
   financialTransactions FinancialTransaction[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
 
   @@index([barbershopId])
 }
@@ -94,15 +88,12 @@ model Booking {
   cancelledAt       DateTime?         @db.Timestamptz(6)
   createdAt         DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime          @updatedAt @db.Timestamptz(6)
-  
-  // A relação garante que o agendamento pertença à barbearia específica da entidade
+  barberId          String?
+  userName          String?
+  displayTime       String?
+  barber            Barber?           @relation(fields: [barberId], references: [id])
   Barbershop        Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   BarbershopService BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  user              user              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberId          String?
-  barber            Barber?           @relation(fields: [barberId], references: [id])
-  userName          String?           // Nome do cliente denormalizado para facilitar exibição
-  displayTime       String?           // Horário por escrito para evitar erros de fuso
 }
 
 model account {
@@ -112,7 +103,6 @@ model account {
   userId     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  user       user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -124,28 +114,21 @@ model session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model user {
-  id            String      @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
-  email         String      @unique
-  emailVerified Boolean     @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
   password      String?
   phone         String?
-  role          UserRole    @default(BARBER)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  
-  // Relação 1:1 - Cada usuário 'BARBER' terá sua própria entidade Barbershop
-  Barbershop    Barbershop? 
-  Booking       Booking[]
-  account       account[]
-  session       session[]
+  role          UserRole @default(BARBER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model verification {
@@ -159,25 +142,55 @@ model verification {
   @@index([identifier])
 }
 
+model StockItem {
+  id           String     @id @default(uuid())
+  name         String
+  quantity     Int        @default(0)
+  minQuantity  Int        @default(5)
+  unit         String     @default("un")
+  barbershopId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+}
+
+model FinancialTransaction {
+  id            String          @id @default(uuid())
+  type          TransactionType
+  amount        Decimal         @db.Decimal(10, 2)
+  description   String
+  category      String?
+  paymentMethod PaymentMethod   @default(MONEY)
+  date          DateTime        @default(now())
+  barbershopId  String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  barberId      String?
+  barber        Barber?         @relation(fields: [barberId], references: [id])
+  barbershop    Barbershop      @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+  @@index([date])
+}
+
+model Style {
+  id           String     @id @default(uuid())
+  name         String
+  imageUrl     String
+  barbershopId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+}
+
 enum UserRole {
   CLIENT
   BARBER
   ADMIN
-}
-
-model StockItem {
-  id           String     @id @default(uuid())
-  name         String     // Ex: "Pomada Matte"
-  quantity     Int        @default(0)
-  minQuantity  Int        @default(5) // Quando chegar aqui, o card avisa
-  unit         String     @default("un") // un, pct, ml
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@index([barbershopId])
 }
 
 enum TransactionType {
@@ -190,38 +203,4 @@ enum PaymentMethod {
   CARD
   PIX
   OTHER
-}
-
-model FinancialTransaction {
-  id           String          @id @default(uuid())
-  type         TransactionType
-  amount       Decimal         @db.Decimal(10, 2)
-  description  String
-  category     String?         // Ex: "Corte", "Produto", "Aluguel"
-  paymentMethod PaymentMethod  @default(MONEY)
-  date         DateTime        @default(now())
-  
-  barbershopId String
-  barbershop   Barbershop      @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  
-  barberId     String?
-  barber       Barber?         @relation(fields: [barberId], references: [id])
-
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-
-  @@index([barbershopId])
-  @@index([date])
-}
-
-model Style {
-  id           String     @id @default(uuid())
-  name         String
-  imageUrl     String
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@index([barbershopId])
 }
