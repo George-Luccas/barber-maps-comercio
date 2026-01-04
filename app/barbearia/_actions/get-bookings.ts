@@ -16,8 +16,15 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
       targetDateStr = now.toISOString().split('T')[0]; 
   }
 
-  const startOfDay = new Date(`${targetDateStr}T00:00:00.000Z`);
-  const endOfDay = new Date(`${targetDateStr}T23:59:59.999Z`);
+  // Ajuste do intervalo para Fuso de Brasilia (UTC-3)
+  // O dia começa às 00:00:00 BRT -> 03:00:00 UTC
+  // O dia termina às 23:59:59 BRT -> 02:59:59 UTC do dia seguinte
+  const startOfDay = new Date(`${targetDateStr}T03:00:00.000Z`);
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(startOfDay.getHours() + 23);
+  endOfDay.setMinutes(59);
+  endOfDay.setSeconds(59);
+  endOfDay.setMilliseconds(999);
 
   try {
     // 1. Busca agendamentos (tenta incluir user, mas se falhar, ok)
