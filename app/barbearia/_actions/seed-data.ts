@@ -107,3 +107,23 @@ export async function seedMockData(barbershopId: string) {
 
   return { success: true, message: "Dados gerados com sucesso!" };
 }
+
+export async function clearData(barbershopId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  // Deleta agendamentos
+  await db.booking.deleteMany({
+    where: { barbershopId }
+  });
+
+  // Deleta transações financeiras geradas (opcional, mas bom para limpar tudo)
+  await db.financialTransaction.deleteMany({
+    where: { 
+      barbershopId,
+      description: { contains: "Venda:" } // Tenta apagar apenas as geradas pelo seed, ou apaga tudo se quiser
+    }
+  });
+
+  return { success: true };
+}

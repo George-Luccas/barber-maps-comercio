@@ -6,18 +6,20 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 // Actions
-import { getDashboardMetrics, getRevenueMix, getOccupancyHeatmap, DashboardMetrics } from "../barbearia/_actions/analytics";
-import { seedMockData } from "../barbearia/_actions/seed-data";
+import { getDashboardMetrics, getRevenueMix, getOccupancyHeatmap, getBarberPerformance, DashboardMetrics } from "../barbearia/_actions/analytics";
+import { seedMockData, clearData } from "../barbearia/_actions/seed-data";
 
 // Components
 import { KPIGrid } from "../components/analytics/KPIGrid";
 import { RevenueMixChart } from "../components/analytics/RevenueMixChart";
+import { BarberPerformanceChart } from "../components/analytics/BarberPerformanceChart";
 import { OccupancyHeatmap } from "../components/analytics/OccupancyHeatmap";
 
 export default function InsightsPage() {
   const { data: session } = useSession();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [revenueMix, setRevenueMix] = useState<any[]>([]);
+  const [performanceData, setPerformanceData] = useState<any[]>([]);
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -32,14 +34,16 @@ export default function InsightsPage() {
     if (!barbershopId) return;
     setLoading(true);
     try {
-      const [m, mix, heat] = await Promise.all([
+      const [m, mix, heat, perf] = await Promise.all([
         getDashboardMetrics(barbershopId),
         getRevenueMix(barbershopId),
-        getOccupancyHeatmap(barbershopId)
+        getOccupancyHeatmap(barbershopId),
+        getBarberPerformance(barbershopId)
       ]);
       setMetrics(m);
       setRevenueMix(mix);
       setHeatmapData(heat);
+      setPerformanceData(perf);
     } catch (error) {
       console.error("Failed to load analytics", error);
       toast.error("Erro ao carregar insights");
@@ -119,6 +123,24 @@ export default function InsightsPage() {
                 <Zap size={14} fill="currentColor" />
                 SIMULAR DADOS
             </button>
+
+            <button 
+                onClick={async () => {
+                    if(!confirm("Tem certeza? Isso apagará TODOS os agendamentos!")) return;
+                    const toastId = toast.loading("Limpando dados...");
+                    try {
+                        await clearData(barbershopId);
+                        toast.success("Dados limpos!", { id: toastId });
+                        loadAnalytics();
+                    } catch(e) {
+                         toast.error("Erro ao limpar dados", { id: toastId });
+                    }
+                }}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold px-4 py-2.5 rounded-xl border border-red-500/20 transition-all shadow-sm"
+            >
+                <Zap size={14} className="rotate-45" />
+                LIMPAR
+            </button>
           </div>
         </header>
 
@@ -138,6 +160,13 @@ export default function InsightsPage() {
                <KPIGrid metrics={metrics} />
                
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                   <div className="bg-card border border-border p-6 rounded-[2rem] backdrop-blur-sm shadow-sm">
+                       <h3 className="text-muted-foreground text-xs font-black uppercase tracking-widest mb-6">Desempenho da Equipe</h3>
+                       <div className="h-[350px]">
+                           <BarberPerformanceChart data={performanceData} />
+                       </div>
+                   </div>
+
                    <div className="bg-card border border-border p-6 rounded-[2rem] backdrop-blur-sm shadow-sm">
                        <h3 className="text-muted-foreground text-xs font-black uppercase tracking-widest mb-6">Mix de Faturamento</h3>
                        <div className="h-[350px]">

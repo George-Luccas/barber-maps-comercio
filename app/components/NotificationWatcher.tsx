@@ -16,7 +16,10 @@ export function NotificationWatcher() {
   
   // Guardamos o timestamp da última verificação.
   // Começa com "agora" para não notificar tudo que já existe ao abrir o app.
+  // Guardamos o timestamp da última verificação.
+  // Começa com "agora" para não notificar tudo que já existe ao abrir o app.
   const lastCheckTimeRef = useRef<Date>(new Date());
+  const errorCountRef = useRef(0);
   
   const barbershopId = (session?.user as any)?.barbershopId;
 
@@ -38,7 +41,12 @@ export function NotificationWatcher() {
         // Vamos atualizar só depois do sucesso, mas usamos o tempo DA CHAMADA para a próxima query
         const now = new Date(); 
 
+        if (errorCountRef.current > 3) return; // Stop polling if too many errors
+
         const newBookings = await checkNewBookings(barbershopId, lastCheck);
+        
+        // Reset error count on success
+        errorCountRef.current = 0;
 
         if (newBookings.length > 0) {
             // Toca o som uma vez
@@ -63,11 +71,15 @@ export function NotificationWatcher() {
 
       } catch (error) {
         console.error("Erro no watcher de notificações:", error);
+        errorCountRef.current += 1;
+        if (errorCountRef.current > 3) {
+            console.warn("Muitos erros consecutivos nas notificações. Pausando verificação.");
+        }
       }
     };
 
-    // Poll a cada 15 segundos (mais frequente que a lista)
-    const intervalId = setInterval(checkForNotifications, 15000); // 15s
+    // Poll a cada 60 segundos para evitar spam de erros se o servidor cair
+    const intervalId = setInterval(checkForNotifications, 60000); 
 
     return () => clearInterval(intervalId);
   }, [barbershopId]);

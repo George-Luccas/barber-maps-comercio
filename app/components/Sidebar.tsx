@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List } from 'lucide-react'
+import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List, User } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 import { usePathname } from 'next/navigation'
@@ -31,6 +31,7 @@ export default function Sidebar() {
     { name: 'Estoque', icon: Package, href: '/estoque' },
     { name: 'Insights', icon: Sparkles, href: '/insights' },
     { name: 'Minha Barbearia', icon: Scissors, href: '/barbearia' },
+    { name: 'Equipe', icon: User, href: '/barbeiros' },
     { name: 'Agendamentos', icon: Calendar, href: '/agenda' },
   ]
 
@@ -39,6 +40,7 @@ export default function Sidebar() {
     { name: 'Dashboard', icon: LayoutGrid, href: '/' },
     { name: 'Agenda', icon: Calendar, href: '/agenda' },
     { name: 'Analytics', icon: BarChart3, href: '/insights' },
+    { name: 'Equipe', icon: User, href: '/barbeiros' },
     { name: 'Insights', icon: Lightbulb, href: '/insights' },
     { name: 'Gerenciador', icon: Settings, href: '/barbearia' },
     { name: 'Estoques', icon: Package, href: '/estoque' },

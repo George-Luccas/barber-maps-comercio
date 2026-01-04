@@ -35,6 +35,23 @@ model Barbershop {
   
   dailyGoal         Decimal             @default(500.00) @db.Decimal(10, 2)
   styles            Style[]             // Relação com a Galeria de Estilos
+  barbers           Barber[]
+}
+
+model Barber {
+  id           String     @id @default(uuid())
+  name         String
+  email        String?    
+  phone        String?
+  imageUrl     String?
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+  financialTransactions FinancialTransaction[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([barbershopId])
 }
 
 model BarbershopService {
@@ -64,6 +81,8 @@ model Booking {
   Barbershop        Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   BarbershopService BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   user              user              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberId          String?
+  barber            Barber?           @relation(fields: [barberId], references: [id])
 }
 
 model account {
@@ -164,6 +183,9 @@ model FinancialTransaction {
   
   barbershopId String
   barbershop   Barbershop      @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  
+  barberId     String?
+  barber       Barber?         @relation(fields: [barberId], references: [id])
 
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt

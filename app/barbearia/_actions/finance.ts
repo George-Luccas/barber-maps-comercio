@@ -13,6 +13,7 @@ export async function addTransaction(data: {
   barbershopId: string;
   date?: Date;
   stockItemId?: string; // Novo parâmetro opcional
+  barberId?: string;
 }) {
   try {
     // Se houver item de estoque vinculado, baixamos 1 unidade
@@ -32,6 +33,7 @@ export async function addTransaction(data: {
         paymentMethod: data.paymentMethod,
         barbershopId: data.barbershopId,
         date: data.date || new Date(),
+        barberId: data.barberId
       }
     });
 

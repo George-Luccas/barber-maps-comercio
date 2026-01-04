@@ -251,3 +251,64 @@ export async function getWeeklyRevenue(barbershopId: string) {
 
   return days;
 }
+
+export async function getBarberPerformance(barbershopId: string) {
+  const session = await auth();
+  if (!session?.user) return [];
+
+  const now = new Date();
+  const start = startOfMonth(now);
+  const end = endOfMonth(now);
+
+  // 1. Buscar todos os barbeiros da barbearia
+  const barbers = await db.barber.findMany({
+    where: { barbershopId }
+  });
+
+  const performanceData = [];
+
+  // 2. Para cada barbeiro, buscar seus agendamentos
+  for (const barber of barbers) {
+    const bookings = await db.booking.findMany({
+      where: {
+        barbershopId,
+        barberId: barber.id,
+        date: { gte: start, lte: end }
+      },
+      include: { BarbershopService: true }
+    });
+
+    const revenue = bookings.reduce((acc, curr) => acc + (curr.BarbershopService?.priceInCents || 0), 0) / 100;
+    const cuts = bookings.length;
+
+    performanceData.push({
+      name: barber.name,
+      revenue,
+      cuts,
+      imageUrl: barber.imageUrl
+    });
+  }
+
+  // 3. Buscar agendamentos sem barbeiro (Opcional, ou atribuir a "Loja")
+  const unassignedBookings = await db.booking.findMany({
+    where: {
+      barbershopId,
+      barberId: null,
+      date: { gte: start, lte: end }
+    },
+    include: { BarbershopService: true }
+  });
+
+  if (unassignedBookings.length > 0) {
+    const revenue = unassignedBookings.reduce((acc, curr) => acc + (curr.BarbershopService?.priceInCents || 0), 0) / 100;
+    const cuts = unassignedBookings.length;
+    performanceData.push({
+      name: "Loja / Sem Atribuição",
+      revenue,
+      cuts,
+      imageUrl: null
+    });
+  }
+
+  return performanceData.sort((a, b) => b.revenue - a.revenue);
+}

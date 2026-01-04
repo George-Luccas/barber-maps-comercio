@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { addTransaction, getDailySummary, updateDailyGoal } from "@/app/barbearia/_actions/finance";
 import { getStockItems } from "@/app/barbearia/_actions/stock";
-import { getBarbershopServices } from "@/app/barbearia/_actions/service"; // Nova Importação
+import { getBarbershopServices } from "@/app/barbearia/_actions/service"; 
+import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import jsPDF from "jspdf";
 
 export default function FinancialManager() {
@@ -24,7 +25,8 @@ export default function FinancialManager() {
 
   // Listas de Seleção
   const [stockItems, setStockItems] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]); // Nova Lista
+  const [services, setServices] = useState<any[]>([]);
+  const [barbers, setBarbers] = useState<any[]>([]);
 
   // Formulário
   const [description, setDescription] = useState("");
@@ -34,7 +36,8 @@ export default function FinancialManager() {
   const [category, setCategory] = useState("Serviço");
   
   const [selectedStockId, setSelectedStockId] = useState(""); 
-  const [selectedServiceId, setSelectedServiceId] = useState(""); // Novo State
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [selectedBarberId, setSelectedBarberId] = useState("");
 
   const barbershopId = (session?.user as any)?.barbershopId;
 
@@ -73,6 +76,12 @@ export default function FinancialManager() {
         if (servRes.success) {
             setServices(servRes.services);
         }
+    }
+
+    // Carregar barbeiros
+    if (barbers.length === 0) {
+        const barbersList = await getBarbers(barbershopId);
+        setBarbers(barbersList);
     }
 
     setLoading(false);
@@ -133,14 +142,16 @@ export default function FinancialManager() {
       paymentMethod: paymentMethod as any,
       category,
       date: new Date(),
-      stockItemId: selectedStockId || undefined // Passa o ID se houver
+      stockItemId: selectedStockId || undefined,
+      barberId: selectedBarberId || undefined
     });
 
     // Limpar form
     setDescription("");
     setAmount("");
     setSelectedStockId(""); 
-    setSelectedServiceId(""); // Reset
+    setSelectedServiceId(""); 
+    setSelectedBarberId("");
     setLoading(false);
     
     // Recarregar dados
@@ -263,7 +274,7 @@ export default function FinancialManager() {
   return (
     <div className="flex flex-col gap-6 w-full font-sans p-4 md:p-8 transition-colors duration-500">
       {/* HEADER */}
-      <div className="max-w-4xl mx-auto w-full flex items-center justify-between mb-4">
+      <div className="max-w-4xl mx-auto w-full flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
         <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group">
           <div className="p-2 bg-card rounded-xl group-hover:bg-muted transition-all border border-border shadow-sm">
             <ArrowLeft size={20} />
@@ -315,10 +326,10 @@ export default function FinancialManager() {
                 style={{ width: `${progresso}%` }}
               />
             </div>
-            <div className="flex justify-between mt-3 items-center">
-              <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">{progresso.toFixed(0)}% Concluído</p>
+            <div className="flex justify-between mt-3 items-center flex-wrap gap-2">
+              <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest min-w-max">{progresso.toFixed(0)}% Concluído</p>
                {summary.income > 0 && (
-                <p className="text-[10px] font-black uppercase text-brand-primary flex items-center gap-1 tracking-widest">
+                <p className="text-[10px] font-black uppercase text-brand-primary flex items-center gap-1 tracking-widest min-w-max">
                   Faturado: R$ {summary.income.toFixed(2)}
                 </p>
                )}
@@ -387,6 +398,22 @@ export default function FinancialManager() {
                        </div>
                    </div>
                )}
+
+              {/* SELETOR DE BARBEIRO */}
+              <div>
+                  <select
+                      value={selectedBarberId}
+                      onChange={(e) => setSelectedBarberId(e.target.value)}
+                      className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none"
+                  >
+                      <option value="">-- Selecione o Profissional (Opcional) --</option>
+                      {barbers.map((b: any) => (
+                          <option key={b.id} value={b.id} className="bg-card text-foreground">
+                              {b.name}
+                          </option>
+                      ))}
+                  </select>
+              </div>
 
               <div>
                 <input 
@@ -482,7 +509,7 @@ export default function FinancialManager() {
               disabled={transactions.length === 0}
               className="flex items-center gap-2 px-6 py-4 bg-foreground text-background rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-lg hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed h-14"
             >
-              <Landmark size={16} /> Fechar Caixa e Imprimir
+              <Landmark size={16} /> <span className="hidden sm:inline">Fechar Caixa e Imprimir</span><span className="sm:hidden">Fechar Caixa</span>
             </button>
           </div>
 
