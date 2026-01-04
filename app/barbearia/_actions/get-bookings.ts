@@ -107,12 +107,19 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
         }
         
         if (!timeString) {
-            // Fallback para conversão de data se não tiver o horário por escrito
+            // Fallback: Dados antigos ou sem displayTime.
+            // O banco está salvando com +1h de diferença (ex: salvou 10:00 como 13:00Z, que vira 10:00 BRT).
+            // Se o cliente queria 09:00, salvou 13:00Z? (13-3=10).
+            // Para corrigir o erro da origem, vamos subtrair 1 hora da data antes de formatar.
+            
+            const correctedDate = new Date(booking.date);
+            correctedDate.setHours(correctedDate.getHours() - 1);
+
             timeString = new Intl.DateTimeFormat('pt-BR', {
                 hour: '2-digit',
                 minute: '2-digit',
                 timeZone: 'America/Sao_Paulo'
-            }).format(booking.date);
+            }).format(correctedDate);
         }
 
         return {
