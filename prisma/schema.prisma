@@ -22,6 +22,7 @@ model Barbershop {
   lunchStart        String?
   lunchEnd          String?
   closingTime       String?
+  isOpen            Boolean             @default(true)
   
   latitude          Float?
   longitude         Float?

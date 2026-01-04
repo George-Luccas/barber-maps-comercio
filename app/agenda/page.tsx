@@ -14,10 +14,13 @@ import {
   ArrowLeft,
   TrendingUp,
   Sparkles,
-  Scissors
+  Scissors,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
+import { cancelBooking } from "@/app/barbearia/_actions/cancel-booking";
+import { toast } from "sonner";
 
 export default function AgendaPage() {
   const { data: session } = useSession();
@@ -199,9 +202,31 @@ export default function AgendaPage() {
                       <span className="text-xl font-black italic text-foreground">R$ --</span>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-muted/50 text-muted-foreground group-hover:bg-brand-primary group-hover:text-primary-foreground transition-all">
-                      <ChevronRight size={20} />
                     </div>
+
+                    <div className="flex items-center gap-2">
+                         {booking.status !== 'realizado' && booking.status !== 'cancelado' && (
+                             <button 
+                                onClick={async (e) => {
+                                    e.stopPropagation();
+                                    if(!confirm("Deseja realmente cancelar este agendamento?")) return;
+                                    
+                                    const res = await cancelBooking(booking.id);
+                                    if(res.success) {
+                                        toast.success("Agendamento cancelado!");
+                                        loadBookings();
+                                    } else {
+                                        toast.error("Erro ao cancelar.");
+                                    }
+                                }}
+                                className="p-4 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all group/cancel"
+                             >
+                                <X size={20} />
+                             </button>
+                         )}
+                         <div className="p-4 rounded-2xl bg-muted/50 text-muted-foreground group-hover:bg-brand-primary group-hover:text-primary-foreground transition-all">
+                             <ChevronRight size={20} />
+                         </div>
                   </div>
                 </div>
               ))

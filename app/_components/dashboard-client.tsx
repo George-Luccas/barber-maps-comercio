@@ -6,7 +6,9 @@ import dynamic from "next/dynamic";
 import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User } from "lucide-react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getWeeklyRevenue } from "@/app/barbearia/_actions/analytics";
+import { toggleShopStatus } from "@/app/barbearia/_actions/shop-status";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
+import { toast } from "sonner";
 import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 import { useTheme } from "next-themes";
 
@@ -20,6 +22,7 @@ interface DashboardClientProps {
   initialFinanceData: { income: number; dailyGoal: number };
   initialBookings: any[];
   initialWeeklyRevenue: { day: string; amount: number }[];
+  initialShopStatus: boolean;
 }
 
 export default function DashboardClient({
@@ -28,9 +31,12 @@ export default function DashboardClient({
   initialStockItems,
   initialFinanceData,
   initialBookings,
-  initialWeeklyRevenue
+  initialWeeklyRevenue,
+  initialShopStatus
 }: DashboardClientProps) {
   const { theme } = useTheme();
+  
+  const [isShopOpen, setShopOpen] = useState(initialShopStatus);
   
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const d = new Date();

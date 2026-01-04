@@ -1,5 +1,6 @@
 
 import { auth } from "@/app/_lib/auth";
+import { db } from "@/app/_lib/prisma";
 import { getStockItems } from "./barbearia/_actions/stock"; 
 import { getDailySummary } from "./barbearia/_actions/finance";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
@@ -60,6 +61,13 @@ export default async function AdminDashboard() {
   const initialBookings = bookingsRes || [];
   const initialWeeklyRevenue = weeklyRevenueRes || [];
 
+  // Fetch shop status
+  const shop = await db.barbershop.findUnique({
+      where: { id: barbershopId },
+      select: { isOpen: true }
+  });
+  const initialShopStatus = shop?.isOpen ?? true;
+
   return (
     <DashboardClient 
         barbershopId={barbershopId}
@@ -68,6 +76,7 @@ export default async function AdminDashboard() {
         initialFinanceData={initialFinanceData}
         initialBookings={initialBookings}
         initialWeeklyRevenue={initialWeeklyRevenue}
+        initialShopStatus={initialShopStatus}
     />
   );
 }
