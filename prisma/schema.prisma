@@ -101,6 +101,7 @@ model Booking {
   user              user              @relation(fields: [userId], references: [id], onDelete: Cascade)
   barberId          String?
   barber            Barber?           @relation(fields: [barberId], references: [id])
+  userName          String?           // Nome do cliente denormalizado para facilitar exibição
 }
 
 model account {

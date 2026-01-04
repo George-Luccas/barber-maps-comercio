@@ -51,15 +51,11 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
     }
 
     // 2. Coletar IDs de usuários que estão faltando (nome indefinido ou user null)
-    // Se 'user' veio null ou vazio, precisaremos buscar no banco de Auth.
-    // O booking tem 'userId' (campo escalar) mesmo se a relação 'user' for null?
-    // User é optional na relação, mas userId deve existir no booking.
-    
-    // Type coercion para acessar userId se não estiver tipado no select padrão
-    const bookingsWithMissingUser = bookings.filter(b => !b.user || !b.user.name);
+    // Se o novo campo userName estiver preenchido, não precisamos buscar no AuthDB!
+    const bookingsWithMissingUser = bookings.filter(b => (!b.user || !b.user.name) && !b.userName);
     const missingUserIds = [...new Set(bookingsWithMissingUser.map(b => b.userId).filter(Boolean))] as string[];
 
-    // 3. Buscar usuários no banco de Auth
+    // 3. Buscar usuários no banco de Auth (apenas para os que não têm userName salvo)
     const userMap = new Map<string, string>(); // ID -> Name
     if (missingUserIds.length > 0) {
         try {
@@ -77,17 +73,32 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
 
     // 4. Mapear resultados juntando as informações
     return bookings.map(booking => {
-        let clientName = booking.user?.name;
+        // Prioridade: booking.userName > booking.user.name > AuthDB > "Cliente"
+        let clientName = booking.userName || booking.user?.name;
         
-        // Se não tem nome, tenta pegar do map
         if (!clientName && booking.userId) {
             clientName = userMap.get(booking.userId);
         }
 
-        // Ajuste manual para garantir horário correto (UTC-3)
-        const utcDate = new Date(booking.date);
-        utcDate.setHours(utcDate.getHours() - 3);
-        const timeString = utcDate.toISOString().substr(11, 5); // HH:mm
+        // DEBUG: Logar data crua para ver o que está vindo do banco
+        // console.log(`DEBUG [Agendamento ${booking.id}]: Raw Date: ${booking.date.toISOString()} | Local String: ${booking.date.toLocaleString()}`);
+
+        // Ajuste manual para garantir horário correto (UTC-3) => O cliente reportou que AINDA está errado.
+        // Se estava 09:00 e aparecia 10:00, e eu tirei 3h, deveria ter ido para 07:00?
+        // Vamos tentar remover o ajuste manual e confiar APENAS no timeZone se o ambiente estiver limpo, 
+        // ou investigar se o dado está salvo errado (ex: salvou 12:00 UTC achando que era 09:00, mas o display UTC-3 converte de novo).
+        
+        // REVERTENDO AJUSTE MANUAL E USANDO timezone 'America/Sao_Paulo' PURO
+        // Se o banco guarda '2026-01-04T12:00:00Z', isso é 09:00 no Brasil.
+        // Se usarmos timeZone: 'America/Sao_Paulo', ele deve mostrar 09:00.
+        // Se estava mostrando 10:00, é porque estava interpretando como UTC-2 (DST antiga?) ou o dado estava '13:00Z'.
+        
+        // Vamos usar a API Intl para garantir conversão correta
+        const timeString = new Intl.DateTimeFormat('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/Sao_Paulo'
+        }).format(booking.date);
 
         return {
             id: booking.id,
