@@ -7,7 +7,7 @@ export default async function DebugPage() {
   const bookings = await db.booking.findMany({
     take: 20,
     orderBy: { createdAt: 'desc' },
-    include: { user: true, BarbershopService: true }
+    include: { BarbershopService: true }
   });
 
   return (
@@ -17,7 +17,7 @@ export default async function DebugPage() {
         <thead>
           <tr className="border-b border-green-800">
             <th className="p-2 text-left">ID</th>
-            <th className="p-2 text-left">Nome Usuário</th>
+            <th className="p-2 text-left">Nome (userName/ID)</th>
             <th className="p-2 text-left">RAW displayTime (DB)</th>
             <th className="p-2 text-left">RAW Date (UTC ISO)</th>
             <th className="p-2 text-left">Parsed Time (Current Logic)</th>
@@ -46,7 +46,7 @@ export default async function DebugPage() {
              return (
               <tr key={b.id} className="border-b border-green-900 hover:bg-green-900/20">
                 <td className="p-2">{b.id.substring(0,6)}...</td>
-                <td className="p-2">{b.userName || b.user?.name || "N/A"}</td>
+                <td className="p-2">{b.userName || b.userId || "N/A"}</td>
                 <td className="p-2 border-l border-green-900 font-bold bg-green-950/30">
                     {b.displayTime === null ? "NULL" : `"${b.displayTime}"`}
                 </td>
