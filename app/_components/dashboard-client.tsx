@@ -284,9 +284,9 @@ export default function DashboardClient({
                 {/* BOTTOM ROW (Pro widgets) */}
                 <div className="lg:col-span-3 md:col-span-6 col-span-12">
                     <div className="bg-card border border-border rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-10 shadow-md flex flex-col min-h-[300px] md:min-h-[350px]">
-                        <h2 className="text-xl md:text-2xl font-black italic uppercase text-foreground mb-6 md:mb-10 flex items-center gap-4">
-                            <div className="p-2 md:p-3 bg-brand-primary/10 rounded-xl md:rounded-2xl text-brand-primary"><DollarSign size={20} /></div>
-                            Receita <span className="hidden xl:inline">Semanal</span>
+                        <h2 className="text-xl md:text-2xl font-black italic uppercase text-foreground mb-6 md:mb-10 flex items-center gap-4 flex-wrap">
+                            <div className="p-2 md:p-3 bg-brand-primary/10 rounded-xl md:rounded-2xl text-brand-primary shrink-0"><DollarSign size={20} /></div>
+                            <span className="break-words">Receita <span className="xl:inline">Semanal</span></span>
                         </h2>
                         <div className="flex-1 bg-muted/20 rounded-[2rem] md:rounded-[2.5rem] flex items-stretch justify-between p-6 md:p-8 gap-1 md:gap-3 min-h-[180px] md:min-h-[220px]">
                             {initialWeeklyRevenue.length > 0 ? initialWeeklyRevenue.map((data, i) => {
