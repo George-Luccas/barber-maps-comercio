@@ -27,6 +27,10 @@ export async function saveBarberServices(
       throw new Error("Usuário não encontrado. Faça login novamente.");
     }
 
+    // Sanitize inputs
+    const safeLatitude = (location?.latitude !== null && location?.latitude !== undefined && !isNaN(location.latitude)) ? location.latitude : null;
+    const safeLongitude = (location?.longitude !== null && location?.longitude !== undefined && !isNaN(location.longitude)) ? location.longitude : null;
+    
     // 1. Upsert da Barbearia
     const barbershop = await db.barbershop.upsert({
       where: { managerId: userId },
@@ -38,8 +42,8 @@ export async function saveBarberServices(
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
         closingTime: horarios.fechamento,
-        latitude: location?.latitude ?? null,
-        longitude: location?.longitude ?? null,
+        latitude: safeLatitude,
+        longitude: safeLongitude,
       },
       create: {
         name: barbershopName,
@@ -49,8 +53,8 @@ export async function saveBarberServices(
         lunchStart: horarios.almocoInicio || null,
         lunchEnd: horarios.almocoFim || null,
         closingTime: horarios.fechamento,
-        latitude: location?.latitude ?? null,
-        longitude: location?.longitude ?? null,
+        latitude: safeLatitude,
+        longitude: safeLongitude,
         address: "Endereço Pendente", 
         description: "Barbearia configurada pelo painel",
         managerId: userId,
@@ -64,15 +68,20 @@ export async function saveBarberServices(
 
     // 3. Criar novos serviços
     if (services.length > 0) {
-      await db.barbershopService.createMany({
-        data: services.map(s => ({
-          name: s.name,
-          priceInCents: Math.round(s.price * 100),
-          description: "Serviço profissional",
-          imageUrl: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=500",
-          barbershopId: barbershop.id
-        }))
-      });
+      // Filter out invalid services
+      const validServices = services.filter(s => s.name && !isNaN(s.price));
+      
+      if (validServices.length > 0) {
+        await db.barbershopService.createMany({
+          data: validServices.map(s => ({
+            name: s.name,
+            priceInCents: Math.round(s.price * 100),
+            description: "Serviço profissional",
+            imageUrl: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=500",
+            barbershopId: barbershop.id
+          }))
+        });
+      }
     }
 
     revalidatePath("/barbearia");
@@ -86,6 +95,6 @@ export async function saveBarberServices(
   } catch (error: any) {
     console.error("ERRO CRÍTICO NO SALVAMENTO:", error);
     const errorMessage = error?.message || "Erro desconhecido no banco de dados";
-    throw new Error(`Falha ao salvar no banco de dados: ${errorMessage}`);
+    return { success: false, error: errorMessage };
   }
 }

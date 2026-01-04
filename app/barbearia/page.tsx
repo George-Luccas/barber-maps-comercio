@@ -125,7 +125,7 @@ export default function MinhaBarbearia() {
     }));
 
     try {
-      await saveBarberServices(
+      const result = await saveBarberServices(
         payload, 
         nomeBarbearia, 
         imageUrl, 
@@ -136,10 +136,16 @@ export default function MinhaBarbearia() {
           longitude: longitude ? parseFloat(longitude.replace(",", ".")) : null
         }
       );
-      alert("✅ Configurações salvas com sucesso!");
-    } catch (error) {
+      
+      if (result && result.success) {
+          alert("✅ Configurações salvas com sucesso!");
+      } else {
+          // @ts-ignore
+          alert(`❌ Erro ao salvar: ${result?.error || "Desconhecido"}`);
+      }
+    } catch (error: any) {
       console.error(error);
-      alert("❌ Erro ao salvar as configurações.");
+      alert(`❌ Erro inesperado: ${error.message}`);
     } finally {
       setLoading(false);
     }
