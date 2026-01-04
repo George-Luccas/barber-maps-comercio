@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User } from "lucide-react";
+import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2 } from "lucide-react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getWeeklyRevenue } from "@/app/barbearia/_actions/analytics";
 import { toggleShopStatus } from "@/app/barbearia/_actions/shop-status";
@@ -259,6 +259,24 @@ export default function DashboardClient({
                                                     <div className={`text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] px-3 md:px-5 py-1.5 md:py-2 rounded-lg md:rounded-xl inline-block ${col.id === 'realizado' ? 'bg-green-500/10 text-green-500' : 'bg-brand-primary/10 text-brand-primary'}`}>
                                                         {col.label}
                                                     </div>
+                                                    <button 
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            if(confirm("Excluir agendamento?")) {
+                                                                const { deleteBooking } = await import("@/app/barbearia/_actions/delete-booking");
+                                                                const res = await deleteBooking(booking.id);
+                                                                if(res.success) {
+                                                                    setBookings(prev => prev.filter(b => b.id !== booking.id));
+                                                                    toast.success("Excluído!");
+                                                                } else {
+                                                                    toast.error("Erro ao excluir");
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="absolute top-4 right-4 p-2 text-muted-foreground/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </div>
                                             )) : (
                                                 <div className="flex-1 flex items-center justify-center border-2 md:border-4 border-dashed border-muted/10 rounded-[1.5rem] md:rounded-[2rem] py-8">

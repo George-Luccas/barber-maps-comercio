@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { toast } from "sonner";
-import { Bell } from "lucide-react";
+import { Bell, Trash2 } from "lucide-react";
 
 // 1. Criamos uma interface para o TypeScript não reclamar
 interface Appointment {
@@ -168,14 +168,34 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                 </div>
                 </div>
 
-                <div className="text-right">
-                <p className="text-sm font-black text-brand-primary">{item.time}</p>
-                <p className={`text-[10px] uppercase tracking-wider font-bold ${
-                    item.status === 'realizado' ? 'text-green-500' : 
-                    item.status === 'pendente' ? 'text-yellow-600 pro:text-brand-primary' : 'text-blue-500'
-                }`}>
-                    {item.status}
-                </p>
+                <div className="text-right flex items-center gap-4">
+                    <div>
+                        <p className="text-sm font-black text-brand-primary">{item.time}</p>
+                        <p className={`text-[10px] uppercase tracking-wider font-bold ${
+                            item.status === 'realizado' ? 'text-green-500' : 
+                            item.status === 'pendente' ? 'text-yellow-600 pro:text-brand-primary' : 'text-blue-500'
+                        }`}>
+                            {item.status}
+                        </p>
+                    </div>
+                    <button 
+                        onClick={async () => {
+                             if(confirm("Deseja realmente excluir este agendamento?")) {
+                                 const { deleteBooking } = await import("@/app/barbearia/_actions/delete-booking");
+                                 const res = await deleteBooking(item.id);
+                                 if(res.success) {
+                                     setAppointments(prev => prev.filter(a => a.id !== item.id));
+                                     toast.success("Agendamento excluído!");
+                                 } else {
+                                     toast.error("Erro ao excluir");
+                                 }
+                             }
+                        }}
+                        className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="Excluir Agendamento"
+                    >
+                        <Trash2 size={16} />
+                    </button>
                 </div>
             </div>
             ))}
