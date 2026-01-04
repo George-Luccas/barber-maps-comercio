@@ -115,7 +115,7 @@ export default function DashboardClient({
                        const res = await toggleShopStatus(barbershopId);
                        if (!res.success) {
                            setShopOpen(!newStatus); // Revert
-                           toast.error("Erro ao alterar status");
+                           toast.error(`Erro: ${res.message}`);
                        } else {
                            toast.success(newStatus ? "Barbearia ABERTA!" : "Barbearia FECHADA!");
                        }
@@ -161,7 +161,7 @@ export default function DashboardClient({
                                     const res = await toggleShopStatus(barbershopId);
                                     if (!res.success) {
                                         setShopOpen(!newStatus); // Revert
-                                        toast.error("Erro ao alterar status");
+                                        toast.error(`Erro: ${res.message}`);
                                     } else {
                                         toast.success(newStatus ? "Barbearia ABERTA!" : "Barbearia FECHADA!");
                                     }

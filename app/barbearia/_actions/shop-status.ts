@@ -33,8 +33,9 @@ export async function toggleShopStatus(barbershopId: string) {
     revalidatePath("/");
     
     return { success: true, newStatus };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao alterar status:", error);
-    return { success: false, message: "Erro ao alterar status" };
+    // Retorna a mensagem exata do erro para debug
+    return { success: false, message: error.message || "Erro desconhecido ao alterar status" };
   }
 }
