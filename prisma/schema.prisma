@@ -35,8 +35,25 @@ model Barbershop {
   FinancialTransactions FinancialTransaction[]
   
   dailyGoal         Decimal             @default(500.00) @db.Decimal(10, 2)
+  aboutUs           String?             @db.Text
   styles            Style[]             // Relação com a Galeria de Estilos
   barbers           Barber[]
+  products          BarbershopProduct[] // Frigobar
+}
+
+model BarbershopProduct {
+  id           String     @id @default(uuid())
+  name         String
+  description  String?
+  imageUrl     String?
+  priceInCents Int
+  quantity     Int        @default(0)
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([barbershopId])
 }
 
 model Barber {

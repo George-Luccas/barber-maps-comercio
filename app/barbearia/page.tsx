@@ -6,6 +6,7 @@ import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
 import { getBarbershopData } from "./_actions/get-barbershop";
+import { getBarbershopProducts, saveBarbershopProduct, deleteBarbershopProduct } from "./_actions/product-actions";
 
 // Sugestões para agilidade
 const SUGESTOES_SERVICOS = [
@@ -22,18 +23,24 @@ export default function MinhaBarbearia() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const [activeTab, setActiveTab] = useState<"geral" | "galeria">("geral");
+  const [activeTab, setActiveTab] = useState<"geral" | "galeria" | "sobre" | "frigobar">("geral");
   
   // Estados do Formulário
   const [nomeBarbearia, setNomeBarbearia] = useState("");
   const [imageUrl, setImageUrl] = useState(""); 
   const [photos, setPhotos] = useState<string[]>([]);
+  const [aboutUs, setAboutUs] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [barbershopId, setBarbershopId] = useState("");
   
   // Novo Estado de Serviços Dinâmicos
   const [servicos, setServicos] = useState<{id: string, name: string, price: number}[]>([]);
   const [novoServico, setNovoServico] = useState({ name: "", price: "" }); // Input temporário
+
+  // Estado do Frigobar
+  const [products, setProducts] = useState<{id: string, name: string, price: number, quantity: number}[]>([]);
+  const [newProduct, setNewProduct] = useState({ name: "", price: "", quantity: "" });
 
   // Estados dos Horários
   const [horarios, setHorarios] = useState({
@@ -47,9 +54,11 @@ export default function MinhaBarbearia() {
     async function loadData() {
       const data = await getBarbershopData() as any;
       if (data) {
+        setBarbershopId(data.id);
         setNomeBarbearia(data.name);
         setImageUrl(data.imageUrl || "");
         setPhotos(data.photos || []);
+        setAboutUs(data.aboutUs || "");
         if (data.latitude) setLatitude(data.latitude.toString());
         if (data.longitude) setLongitude(data.longitude.toString());
         
@@ -61,7 +70,6 @@ export default function MinhaBarbearia() {
              price: s.priceInCents / 100
           })));
         } else {
-           // Se não tiver nada, inicia vazio (sem pré-selecionar)
            setServicos([]);
         }
 
@@ -69,12 +77,67 @@ export default function MinhaBarbearia() {
         if(data.closingTime) setHorarios(h => ({ ...h, fechamento: data.closingTime || "" }));
         if(data.lunchStart) setHorarios(h => ({ ...h, almocoInicio: data.lunchStart || "" }));
         if(data.lunchEnd) setHorarios(h => ({ ...h, almocoFim: data.lunchEnd || "" }));
+        
+        // Load products
+        const productsRes = await getBarbershopProducts(data.id);
+        if (productsRes.success && productsRes.products) {
+            setProducts(productsRes.products.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price: p.priceInCents / 100,
+                quantity: p.quantity
+            })));
+        }
       }
       setFetching(false);
       setMounted(true);
     }
     loadData();
   }, []);
+
+  const handleAddProduct = async () => {
+    if (!newProduct.name.trim()) return alert("Nome do produto obrigatório");
+    if (!newProduct.price) return alert("Preço obrigatório");
+    if (!barbershopId) return alert("Erro: Barbearia não identificada");
+
+    const price = parseFloat(newProduct.price.replace(",", "."));
+    const quantity = parseInt(newProduct.quantity) || 0;
+
+    const res = await saveBarbershopProduct({
+        name: newProduct.name,
+        price,
+        quantity,
+        barbershopId
+    });
+
+    if (res.success) {
+        alert("Produto adicionado!");
+        setNewProduct({ name: "", price: "", quantity: "" });
+        // Reload products
+        const productsRes = await getBarbershopProducts(barbershopId);
+        if (productsRes.success && productsRes.products) {
+            setProducts(productsRes.products.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price: p.priceInCents / 100,
+                quantity: p.quantity
+            })));
+        }
+    } else {
+        alert(`Erro ao adicionar: ${res.error}`);
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if(confirm("Excluir este produto?")) {
+        const res = await deleteBarbershopProduct(id);
+        if (res.success) {
+            setProducts(prev => prev.filter(p => p.id !== id));
+        } else {
+            alert("Erro ao excluir produto");
+        }
+    }
+  };
 
   const handleAddService = () => {
     if (!novoServico.name.trim()) return alert("Digite o nome do serviço");
@@ -134,7 +197,8 @@ export default function MinhaBarbearia() {
         {
           latitude: latitude ? parseFloat(latitude.replace(",", ".")) : null,
           longitude: longitude ? parseFloat(longitude.replace(",", ".")) : null
-        }
+        },
+        aboutUs
       );
       
       if (result && result.success) {
@@ -179,6 +243,18 @@ export default function MinhaBarbearia() {
                 className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "geral" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
              >
                 Geral
+             </button>
+             <button 
+                onClick={() => setActiveTab("sobre")}
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "sobre" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
+             >
+                Sobre nós
+             </button>
+             <button 
+                onClick={() => setActiveTab("frigobar")}
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "frigobar" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
+             >
+                Frigobar
              </button>
              <button 
                 onClick={() => setActiveTab("galeria")}
@@ -439,13 +515,103 @@ export default function MinhaBarbearia() {
           </div>
         )}
 
-        <button 
-          onClick={handleSave}
-          disabled={loading}
-          className="w-full bg-brand-primary text-primary-foreground font-black py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand-primary/20 transition-all active:scale-95 text-[10px] uppercase tracking-[0.2em] mb-10 h-14"
-        >
-          {loading ? <Loader2 className="animate-spin" /> : "SALVAR ALTERAÇÕES"}
-        </button>
+        {activeTab === "sobre" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm space-y-4">
+                     <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <Store size={16} className="text-brand-primary" /> Sobre a Barbearia
+                     </label>
+                     <p className="text-xs text-muted-foreground">Conte um pouco sobre a história da sua barbearia, seus valores e o que a torna especial.</p>
+                     
+                     <textarea
+                        value={aboutUs}
+                        onChange={(e) => setAboutUs(e.target.value)}
+                        className="w-full h-48 bg-muted border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all text-sm text-foreground resize-none"
+                        placeholder="Ex: Fundada em 2020, nossa barbearia..."
+                     />
+                </div>
+            </div>
+        )}
+
+        {activeTab === "frigobar" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm space-y-6">
+                     <div className="flex justify-between items-center">
+                        <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                            <Clock size={16} className="text-brand-primary" /> Itens do Frigobar
+                        </label>
+                        <span className="text-[10px] font-black bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full">{products.length} Itens</span>
+                     </div>
+
+                     {/* Form */}
+                     <div className="bg-muted/30 p-4 rounded-xl space-y-3">
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Adicionar Novo Item</p>
+                        <div className="flex flex-wrap gap-2">
+                            <input 
+                                type="text"
+                                placeholder="Nome (Ex: Coca-Cola)"
+                                value={newProduct.name}
+                                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                                className="flex-1 min-w-[150px] bg-background border border-border rounded-lg p-2 text-xs font-bold"
+                            />
+                            <input 
+                                type="number"
+                                placeholder="Preço"
+                                value={newProduct.price}
+                                onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                                className="w-24 bg-background border border-border rounded-lg p-2 text-xs font-bold"
+                            />
+                            <input 
+                                type="number"
+                                placeholder="Qtd"
+                                value={newProduct.quantity}
+                                onChange={(e) => setNewProduct({...newProduct, quantity: e.target.value})}
+                                className="w-20 bg-background border border-border rounded-lg p-2 text-xs font-bold"
+                            />
+                            <button 
+                                onClick={handleAddProduct}
+                                className="bg-brand-primary text-primary-foreground px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider hover:opacity-90"
+                            >
+                                Adicionar
+                            </button>
+                        </div>
+                     </div>
+
+                     {/* Lista */}
+                     <div className="space-y-3">
+                        {products.length > 0 ? products.map(product => (
+                            <div key={product.id} className="flex items-center justify-between p-3 bg-background border border-border rounded-xl">
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-sm uppercase">{product.name}</span>
+                                    <span className="text-xs text-muted-foreground">{product.quantity} un • R$ {product.price.toFixed(2)}</span>
+                                </div>
+                                <button 
+                                    onClick={() => handleDeleteProduct(product.id)}
+                                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        )) : (
+                            <div className="text-center py-8 text-muted-foreground/50 text-xs uppercase font-black tracking-widest">
+                                Nenhum item no frigobar
+                            </div>
+                        )}
+                     </div>
+                </div>
+            </div>
+        )}
+
+        {/* Botão SALVAR apenas se NÃO for Frigobar (já salva direto) ou se quiser salvar o About US na aba Sobre */}
+        {activeTab !== 'frigobar' && (
+             <button 
+              onClick={handleSave}
+              disabled={loading}
+              className="w-full bg-brand-primary text-primary-foreground font-black py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand-primary/20 transition-all active:scale-95 text-[10px] uppercase tracking-[0.2em] mb-10 h-14"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : "SALVAR ALTERAÇÕES"}
+            </button>
+        )}
       </div>
     </div>
   );

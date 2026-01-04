@@ -10,7 +10,8 @@ export async function saveBarberServices(
   imageUrl: string,
   horarios: { abertura: string, almocoInicio: string, almocoFim: string, fechamento: string },
   photos: string[] = [],
-  location?: { latitude: number | null, longitude: number | null }
+  location?: { latitude: number | null, longitude: number | null },
+  aboutUs?: string
 ) {
   try {
     const session = await auth();
@@ -44,6 +45,7 @@ export async function saveBarberServices(
         closingTime: horarios.fechamento,
         latitude: safeLatitude,
         longitude: safeLongitude,
+        aboutUs: aboutUs || null,
       },
       create: {
         name: barbershopName,
@@ -55,6 +57,7 @@ export async function saveBarberServices(
         closingTime: horarios.fechamento,
         latitude: safeLatitude,
         longitude: safeLongitude,
+        aboutUs: aboutUs || null,
         address: "Endereço Pendente", 
         description: "Barbearia configurada pelo painel",
         managerId: userId,
