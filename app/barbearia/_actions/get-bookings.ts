@@ -81,11 +81,17 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
             id: booking.id,
             clientName: clientName || "Cliente",
             serviceName: booking.BarbershopService?.name || "Serviço",
-            time: booking.date?.toLocaleTimeString('pt-BR', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                timeZone: 'America/Sao_Paulo' 
-            }) || "--:--",
+        // Ajuste manual para garantir horário correto (UTC-3)
+        // Se timeZone 'America/Sao_Paulo' está dando 10:00 para 12:00 UTC (apenas -2h), forçamos -3h.
+        const utcDate = new Date(booking.date);
+        utcDate.setHours(utcDate.getHours() - 3);
+        const timeString = utcDate.toISOString().substr(11, 5); // HH:mm
+
+        return {
+            id: booking.id,
+            clientName: clientName || "Cliente",
+            serviceName: booking.BarbershopService?.name || "Serviço",
+            time: timeString,
             status: calculateStatus(booking)
         };
     });
