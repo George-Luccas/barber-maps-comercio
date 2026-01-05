@@ -1,11 +1,12 @@
 import { auth } from "@/app/_lib/auth";
 import { getBarbers } from "./_actions/barber-actions";
+import { getBarberAnalytics } from "./_actions/get-analytics";
 import { Sidebar } from "@/app/components/Sidebar";
 import Link from 'next/link';
 import { redirect } from "next/navigation";
 import { Plus, User, Trash2, Edit2, Shield, Mail, Phone, ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import { BarbersList } from "./_components/barbers-list";
+import { BarbersManager } from "./_components/barbers-manager";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,10 @@ export default async function BarbersPage() {
     );
   }
 
-  const barbers = await getBarbers(barbershop.id);
+  const [barbers, analytics] = await Promise.all([
+      getBarbers(barbershop.id),
+      getBarberAnalytics(barbershop.id)
+  ]);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -63,15 +67,19 @@ export default async function BarbersPage() {
                 Meus <span className="text-brand-primary">Barbeiros</span>
               </h1>
               <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                Gestão da Equipe
+                Gestão da Equipe e Desempenho
               </p>
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 scrollbar-hide">
-            <BarbersList initialBarbers={barbers} barbershopId={barbershop.id} />
+        <div className="flex-1 overflow-hidden p-6 md:p-10">
+            <BarbersManager 
+                initialBarbers={barbers} 
+                initialAnalytics={analytics} 
+                barbershopId={barbershop.id} 
+            />
         </div>
       </main>
     </div>
