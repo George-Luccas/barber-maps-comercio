@@ -26,6 +26,7 @@ model Barbershop {
   longitude             Float?
   isOpen                Boolean                @default(true)
   aboutUs               String?
+  manager               user?                  @relation(fields: [managerId], references: [id])
   barbers               Barber[]
   products              BarbershopProduct[]
   BarbershopService     BarbershopService[]
@@ -130,6 +131,7 @@ model user {
   role          UserRole @default(BARBER)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  Barbershop    Barbershop?
 }
 
 model verification {
