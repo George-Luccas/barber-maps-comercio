@@ -58,7 +58,7 @@ export default function Sidebar() {
   return (
     <>
       {/* MOBILE TOGGLE (Hidden on Pro Desktop) */}
-      <div className={`fixed top-6 left-4 md:top-20 md:left-0 h-auto w-12 flex flex-col items-center z-[100] ${isPro ? 'md:hidden' : ''}`}>
+      <div className={`fixed top-6 right-4 md:top-20 md:left-0 h-auto w-12 flex flex-col items-center z-[100] ${isPro ? 'md:hidden' : ''}`}>
         {!isOpen && (
           <button 
             onClick={() => setIsOpen(true)}

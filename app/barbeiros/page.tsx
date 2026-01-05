@@ -1,7 +1,7 @@
 import { auth } from "@/app/_lib/auth";
 import { getBarbers } from "./_actions/barber-actions";
 import { getBarberAnalytics } from "./_actions/get-analytics";
-import { Sidebar } from "@/app/components/Sidebar";
+import Sidebar from "@/app/components/Sidebar";
 import Link from 'next/link';
 import { redirect } from "next/navigation";
 import { Plus, User, Trash2, Edit2, Shield, Mail, Phone, ArrowLeft } from "lucide-react";
