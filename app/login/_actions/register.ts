@@ -28,11 +28,11 @@ export async function registerUser(formData: FormData) {
     // 3. Criptografar a senha (Segurança Máxima)
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 4. Salvar no Banco de Dados: Criar Usuário E Barbearia Inicial
-    // OBS: Como o schema está desacoplado (sem relação User-Barbershop definida no Prisma),
-    // precisamos criar em duas etapas separadas.
-    
-    const newUser = await db.user.create({
+    // 4. Salvar no Banco de Dados: Criar Usuário E Barbearia de forma ATÔMICA
+    // Com a relação restaurada no schema, podemos usar Nested Write do Prisma.
+    // Isso garante que se a barbearia falhar, o usuário não é criado.
+
+    await db.user.create({
       data: {
         name,
         email,
@@ -40,22 +40,18 @@ export async function registerUser(formData: FormData) {
         password: hashedPassword,
         role: "BARBER",
         updatedAt: new Date(),
-      }
-    });
-
-    if (newUser) {
-        await db.barbershop.create({
-          data: {
+        Barbershop: {
+          create: {
             name: `${name} Barber Shop`,
             address: "Endereço pendente",
             description: "Bem-vindo à sua barbearia! Configure seus dados em 'Minha Barbearia'.",
             imageUrl: "",
             phones: [phone],
-            dailyGoal: 500.00,
-            managerId: newUser.id // Vincula manualmente via ID
+            dailyGoal: 500.00
           }
-        });
-    }
+        }
+      }
+    });
 
     revalidatePath("/");
     return { success: true };
