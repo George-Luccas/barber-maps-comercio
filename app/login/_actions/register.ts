@@ -29,7 +29,10 @@ export async function registerUser(formData: FormData) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 4. Salvar no Banco de Dados: Criar Usuário E Barbearia Inicial
-    await db.user.create({
+    // OBS: Como o schema está desacoplado (sem relação User-Barbershop definida no Prisma),
+    // precisamos criar em duas etapas separadas.
+    
+    const newUser = await db.user.create({
       data: {
         name,
         email,
@@ -37,18 +40,22 @@ export async function registerUser(formData: FormData) {
         password: hashedPassword,
         role: "BARBER",
         updatedAt: new Date(),
-        Barbershop: {
-          create: {
+      }
+    });
+
+    if (newUser) {
+        await db.barbershop.create({
+          data: {
             name: `${name} Barber Shop`,
             address: "Endereço pendente",
             description: "Bem-vindo à sua barbearia! Configure seus dados em 'Minha Barbearia'.",
             imageUrl: "",
             phones: [phone],
-            dailyGoal: 500.00
+            dailyGoal: 500.00,
+            managerId: newUser.id // Vincula manualmente via ID
           }
-        }
-      }
-    });
+        });
+    }
 
     revalidatePath("/");
     return { success: true };
