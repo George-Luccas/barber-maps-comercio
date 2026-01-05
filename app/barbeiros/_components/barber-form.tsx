@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB (Server Action Limit)
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const formSchema = z.object({
@@ -115,8 +115,10 @@ export function BarberForm({ barber, barbershopId, open, onOpenChange }: BarberF
             {form.formState.errors.name && <p className="text-xs text-red-500">{form.formState.errors.name.message}</p>}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-4">
              <label className="text-sm font-medium text-foreground">Foto do Perfil</label>
+             
+             {/* Upload Area */}
              <div 
                 className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:bg-muted/30 transition-colors cursor-pointer relative overflow-hidden group"
                 onPaste={handlePaste}
@@ -147,8 +149,18 @@ export function BarberForm({ barber, barbershopId, open, onOpenChange }: BarberF
 
                 <div className="text-center">
                     <p className="text-sm font-bold text-foreground">Clique para enviar ou Cole (Ctrl+V)</p>
-                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG ou WebP (Max 5MB)</p>
+                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG ou WebP (Max 1MB)</p>
                 </div>
+             </div>
+
+             {/* Explicit URL Input */}
+             <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Ou cole a URL da imagem:</label>
+                <input 
+                    {...form.register("imageUrl")}
+                    placeholder="https://exemplo.com/foto.jpg"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground"
+                />
              </div>
           </div>
 
