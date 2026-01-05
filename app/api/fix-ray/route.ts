@@ -8,36 +8,19 @@ export async function GET() {
   try {
     const email = "rayfelipeoliveira.87@gmail.com";
     
-    // 1. Check User (in main DB)
-    const user = await db.user.findUnique({ 
-        where: { email },
-        include: { Barbershop: true }
+    // 1. DELETE User (in main DB)
+    // Isso vai cascatear para barbearia (se existir) e outros dados devido ao onDelete: Cascade ou comportamento prisma
+    
+    const user = await db.user.delete({ 
+        where: { email }
     });
     
-    if (!user) {
-        return NextResponse.json({ success: false, message: "Usuário Ray não encontrado no banco de produção!" });
-    }
-
-    if (user.Barbershop) {
-        return NextResponse.json({ success: true, message: `O usuário já tem barbearia: ${user.Barbershop.name}` });
-    }
-
-    // 2. Create Barbershop
-    await db.barbershop.create({
-        data: {
-            name: "Ray Barber Shop",
-            address: "Endereço pendente",
-            description: "Bem-vindo à sua barbearia!",
-            imageUrl: "",
-            phones: ["65981227718"],
-            dailyGoal: 500.00,
-            managerId: user.id
-        }
-    });
-
-    return NextResponse.json({ success: true, message: "Barbearia criada com sucesso para Ray!" });
+    return NextResponse.json({ success: true, message: `Usuário Ray (${email}) EXCLUÍDO com sucesso! Pode criar de novo.` });
 
   } catch (error: any) {
+    if (error.code === 'P2025') {
+         return NextResponse.json({ success: true, message: "Usuário Ray já não existia." });
+    }
     return NextResponse.json({ success: false, error: error.message, stack: error.stack });
   }
 }
