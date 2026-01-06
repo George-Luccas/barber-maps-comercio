@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
+import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { toast } from "sonner";
-import { Bell, Trash2 } from "lucide-react";
+import { Bell, Trash2, Users, User } from "lucide-react";
 
 // 1. Criamos uma interface para o TypeScript não reclamar
 interface Appointment {
@@ -11,6 +12,7 @@ interface Appointment {
   serviceName: string;
   time: string;
   status: string;
+  barberId?: string;
 }
 
 // Som de notificação (Ding simples)
@@ -24,6 +26,8 @@ interface AppointmentsListProps {
 
 export default function AppointmentsList({ barbershopId, selectedDate, onDateChange }: AppointmentsListProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [barbers, setBarbers] = useState<{id: string, name: string}[]>([]);
+  const [activeBarberId, setActiveBarberId] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   if (!barbershopId) {
@@ -51,7 +55,16 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
     if (typeof window !== "undefined") {
         audioRef.current = new Audio(ALERT_SOUND);
     }
-  }, []);
+    
+    // Carrega barbeiros da barbearia
+    async function fetchBarbers() {
+        if (barbershopId) {
+            const data = await getBarbers(barbershopId);
+            setBarbers(data);
+        }
+    }
+    fetchBarbers();
+  }, [barbershopId]);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -136,6 +149,35 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             />
          </div>
       </div>
+
+      {/* ABAS DE BARBEIROS (Só mostra se tiver mais de 1 barbeiro ou pelo menos 1) */}
+      {barbers.length > 0 && (
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+            <button
+                onClick={() => setActiveBarberId("all")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                    activeBarberId === "all" 
+                    ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" 
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+            >
+                <Users size={14} /> Geral
+            </button>
+            {barbers.map(barber => (
+                <button
+                    key={barber.id}
+                    onClick={() => setActiveBarberId(barber.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                        activeBarberId === barber.id 
+                        ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" 
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                >
+                    <User size={14} /> {barber.name.split(' ')[0]}
+                </button>
+            ))}
+        </div>
+      )}
       
       {loading ? (
           <div className="p-8 text-center animate-pulse text-muted-foreground mb-4">
@@ -147,7 +189,9 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
         </div>
       ) : (
         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-            {appointments.map((item) => (
+            {appointments
+                .filter(item => activeBarberId === "all" || item.barberId === activeBarberId)
+                .map((item) => (
             <div 
                 key={item.id} 
                 className="flex items-center justify-between bg-background/50 p-4 rounded-lg border border-border hover:border-brand-primary/30 transition-colors shadow-sm"
