@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2 } from "lucide-react";
+import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2, Users } from "lucide-react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
+import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { getWeeklyRevenue } from "@/app/barbearia/_actions/analytics";
 import { toggleShopStatus } from "@/app/barbearia/_actions/shop-status";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
@@ -47,6 +48,18 @@ export default function DashboardClient({
   });
   
   const [bookings, setBookings] = useState<any[]>(initialBookings);
+  const [barbers, setBarbers] = useState<{id: string, name: string}[]>([]);
+  const [activeBarberId, setActiveBarberId] = useState<string>("all");
+
+  useEffect(() => {
+    async function fetchBarbers() {
+        if (barbershopId) {
+            const data = await getBarbers(barbershopId);
+            setBarbers(data);
+        }
+    }
+    fetchBarbers();
+  }, [barbershopId]);
   // We can treat initialWeekyRevenue and stock as static for now or re-fetch if needed.
   // For simplicity and speed, we only re-fetch bookings on date change.
   // Ideally, stock and finance updates are pushed or re-fetched on actions, but let's stick to the previous logic.
@@ -225,6 +238,36 @@ export default function DashboardClient({
                                     </div>
                                 </div>
                             </div>
+
+                             {/* ABAS DE BARBEIROS (Só mostra se tiver mais de 1 barbeiro ou pelo menos 1) */}
+                            {barbers.length > 0 && (
+                                <div className="flex items-center gap-2 mt-6 overflow-x-auto pb-2 scrollbar-hide">
+                                    <button
+                                        onClick={() => setActiveBarberId("all")}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                                            activeBarberId === "all" 
+                                            ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" 
+                                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                        }`}
+                                    >
+                                        <Users size={14} /> Geral
+                                    </button>
+                                    {barbers.map(barber => (
+                                        <button
+                                            key={barber.id}
+                                            onClick={() => setActiveBarberId(barber.id)}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                                                activeBarberId === barber.id 
+                                                ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" 
+                                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                            }`}
+                                        >
+                                            <User size={14} /> {barber.name.split(' ')[0]}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 flex-1">
@@ -234,7 +277,9 @@ export default function DashboardClient({
                                 { id: 'realizado', label: 'Concluído' },
                                 { id: 'cancelado', label: 'Cancelado' }
                             ].map((col) => {
-                                const columnBookings = bookings.filter(b => b.status === col.id);
+                                const columnBookings = bookings
+                                    .filter(b => activeBarberId === "all" || b.barberId === activeBarberId)
+                                    .filter(b => b.status === col.id);
                                 return (
                                     <div key={col.id} className="flex flex-col gap-4 md:gap-8">
                                         <div className="flex items-center justify-between px-3 md:px-4">
