@@ -15,19 +15,24 @@ export default async function AdminDashboard() {
     redirect("/login");
   }
 
-  const barbershopId = (session.user as any).barbershopId;
-  const userFirstName = session.user.name ? session.user.name.split(' ')[0] : "Mestre";
+  // 1. Verify if user really exists in DB (Security check for deleted users with active session)
+  const dbUser = await db.user.findUnique({
+    where: { id: session.user.id },
+    include: { Barbershop: true }
+  });
+
+  if (!dbUser) {
+    // User deleted but session cookie persists
+    redirect("/api/auth/signout"); // Force logout
+  }
+
+  const barbershopId = dbUser.Barbershop?.id;
+  const userFirstName = dbUser.name.split(' ')[0];
 
   if (!barbershopId) {
-    // If authenticated but no barbershop connected, maybe redirect to onboarding or show empty state?
-    // For now, let's assuming redirection or handling is essentially same as empty.
-    // But getting here means something is wrong with session or onboarding.
-    // The original code handled it by doing nothing.
-    return (
-        <div className="min-h-screen flex items-center justify-center text-foreground">
-            <p>Erro: Barbearia não encontrada para este usuário.</p>
-        </div>
-    );
+    // Authenticated user but NO barbershop (Should not happen with atomic register, but safe to redirect)
+    // Could redirect to onboarding, but for now force re-login/check
+    redirect("/api/auth/signout");
   }
 
   // Pre-calculate today's date for initial view
