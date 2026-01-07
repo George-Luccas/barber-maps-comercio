@@ -18,10 +18,17 @@ export default async function AdminDashboard() {
   }
 
   // 1. Verify if user really exists in DB (Security check for deleted users with active session)
-  const dbUser = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { Barbershop: true }
-  });
+  let dbUser = null;
+  try {
+    dbUser = await db.user.findUnique({
+        where: { id: session.user.id },
+        include: { Barbershop: true }
+    });
+  } catch (error) {
+    console.error("Critical Error fetching user in dashboard:", error);
+    // If we can't fetch the user, we can't trust the session. Safest is to force logout.
+    return <ForceLogout />;
+  }
 
   if (!dbUser) {
     // User deleted but session cookie persists -> Render Client Component to Clear Cookie
