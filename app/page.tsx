@@ -22,17 +22,18 @@ export default async function AdminDashboard() {
   });
 
   if (!dbUser) {
-    // User deleted but session cookie persists
-    redirect("/api/auth/signout"); // Force logout
+    // User deleted but session cookie persists -> Render Client Component to Clear Cookie
+    const ForceLogout = (await import("@/app/components/ForceLogout")).default;
+    return <ForceLogout />;
   }
 
   const barbershopId = dbUser.Barbershop?.id;
   const userFirstName = dbUser.name.split(' ')[0];
 
   if (!barbershopId) {
-    // Authenticated user but NO barbershop (Should not happen with atomic register, but safe to redirect)
-    // Could redirect to onboarding, but for now force re-login/check
-    redirect("/api/auth/signout");
+    // Authenticated user but NO barbershop -> Force Logout
+    const ForceLogout = (await import("@/app/components/ForceLogout")).default;
+    return <ForceLogout />;
   }
 
   // Pre-calculate today's date for initial view
