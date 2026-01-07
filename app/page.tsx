@@ -8,6 +8,8 @@ import { getWeeklyRevenue } from "./barbearia/_actions/analytics";
 import DashboardClient from "./_components/dashboard-client";
 import { redirect } from "next/navigation";
 
+import ForceLogout from "@/app/components/ForceLogout";
+
 export default async function AdminDashboard() {
   const session = await auth();
   
@@ -23,7 +25,6 @@ export default async function AdminDashboard() {
 
   if (!dbUser) {
     // User deleted but session cookie persists -> Render Client Component to Clear Cookie
-    const ForceLogout = (await import("@/app/components/ForceLogout")).default;
     return <ForceLogout />;
   }
 
@@ -32,7 +33,6 @@ export default async function AdminDashboard() {
 
   if (!barbershopId) {
     // Authenticated user but NO barbershop -> Force Logout
-    const ForceLogout = (await import("@/app/components/ForceLogout")).default;
     return <ForceLogout />;
   }
 
