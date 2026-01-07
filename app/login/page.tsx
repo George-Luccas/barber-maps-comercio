@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Lock, Mail, Phone, User, ArrowRight } from 'lucide-react'
+import { Lock, Mail, Phone, User, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { registerUser } from "./_actions/register" // Vamos criar esse arquivo em seguida
@@ -9,6 +9,7 @@ import { registerUser } from "./_actions/register" // Vamos criar esse arquivo e
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -101,7 +102,20 @@ export default function LoginPage() {
 
           <div className="relative group">
             <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
-            <input name="password" type="password" placeholder="SENHA" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
+            <input 
+              name="password" 
+              type={showPassword ? "text" : "password"} 
+              placeholder="SENHA" 
+              required 
+              className="w-full bg-card border-2 border-border p-6 pl-14 pr-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" 
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand-primary transition-colors focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+            </button>
           </div>
 
           <button 
