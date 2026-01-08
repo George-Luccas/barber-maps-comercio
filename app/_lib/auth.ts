@@ -50,6 +50,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                include: { Barbershop: true }
             });
             
+            if (dbUser) {
+                token.role = dbUser.role; // Passa a ROLE para o token
+            }
             if (dbUser?.Barbershop) {
                 token.barbershopId = dbUser.Barbershop.id;
             }
@@ -64,6 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token?.sub && session.user) {
         session.user.id = token.sub;
         session.user.barbershopId = token.barbershopId as string;
+        session.user.role = token.role as string; // Passa a ROLE para a sessão
       }
       return session;
     },

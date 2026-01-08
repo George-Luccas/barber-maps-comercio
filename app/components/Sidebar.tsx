@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List, User } from 'lucide-react'
+import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List, User, ShieldCheck } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 import { usePathname } from 'next/navigation'
@@ -53,7 +53,19 @@ export default function Sidebar() {
     { name: 'Menus seleis', icon: List, href: '#' },
   ]
 
-  const itemsToRender = isPro ? proMenuItems : standardMenuItems
+  /* ... imports ... */
+  const { data: session } = useSession() // Hook to access session
+
+  // Admin Check
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+
+  // Admin Menu Item
+  const adminItem = { name: 'Painel Admin', icon: ShieldCheck, href: '/admin' }
+
+  // Modify render logic to include adminItem if isAdmin
+  const itemsToRender = isPro 
+      ? (isAdmin ? [adminItem, ...proMenuItems] : proMenuItems)
+      : (isAdmin ? [adminItem, ...standardMenuItems] : standardMenuItems)
 
   return (
     <>
