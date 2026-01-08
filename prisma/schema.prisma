@@ -26,6 +26,7 @@ model Barbershop {
   longitude             Float?
   isOpen                Boolean                @default(true)
   aboutUs               String?
+  manager               User?                  @relation(fields: [managerId], references: [id])
   barbers               Barber[]
   products              BarbershopProduct[]
   BarbershopService     BarbershopService[]
@@ -140,6 +141,58 @@ model Style {
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
   @@index([barbershopId])
+}
+
+model Account {
+  id         String   @id @default(uuid())
+  accountId  String
+  providerId String
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+
+  @@index([userId])
+  @@map("session")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  password      String?
+  phone         String?
+  role          UserRole @default(BARBER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  Barbershop    Barbershop?
+
+  @@map("user")
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
 
 model Notification {
