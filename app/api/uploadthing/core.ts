@@ -4,7 +4,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   // Define o endpoint "imageUploader" que usamos no botão da página
-  imageUploader: f({ image: { maxFileSize: "4MB" } })
+  imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 10 } })
     .onUploadComplete(async ({ file }) => {
       console.log("Upload completo. URL:", file.url);
       return { url: file.url };
