@@ -43,6 +43,10 @@ export default async function AdminDashboard() {
     return <ForceLogout />;
   }
 
+  if (dbUser.Barbershop?.isSuspended) {
+      redirect("/suspended");
+  }
+
   // Pre-calculate today's date for initial view
   const d = new Date();
   const year = d.getFullYear();

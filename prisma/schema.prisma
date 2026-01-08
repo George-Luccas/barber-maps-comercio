@@ -25,6 +25,7 @@ model Barbershop {
   latitude              Float?
   longitude             Float?
   isOpen                Boolean                @default(true)
+  isSuspended           Boolean                @default(false)
   aboutUs               String?
   manager               User?                  @relation(fields: [managerId], references: [id])
   barbers               Barber[]
