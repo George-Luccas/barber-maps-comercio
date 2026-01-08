@@ -55,6 +55,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             if (dbUser?.Barbershop) {
                 token.barbershopId = dbUser.Barbershop.id;
+                token.isSuspended = dbUser.Barbershop.isSuspended; // Add suspension status
             }
         } catch (error) {
             console.error("Erro no callback JWT:", error);
@@ -67,7 +68,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token?.sub && session.user) {
         session.user.id = token.sub;
         session.user.barbershopId = token.barbershopId as string;
-        session.user.role = token.role as string; // Passa a ROLE para a sessão
+        session.user.role = token.role as string;
+        session.user.isSuspended = token.isSuspended as boolean; // Pass to session
       }
       return session;
     },

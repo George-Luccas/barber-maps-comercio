@@ -18,10 +18,14 @@ export default function Sidebar() {
   const { data: session } = useSession() // Hook moved to top
 
   useEffect(() => {
+  useEffect(() => {
     setMounted(true)
   }, [])
 
   if (pathname === '/login') return null
+
+  // If suspended, HIDE sidebar completely
+  if ((session?.user as any)?.isSuspended) return null;
 
   const isPro = theme === 'pro' && mounted
 
