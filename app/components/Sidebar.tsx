@@ -15,6 +15,7 @@ export default function Sidebar() {
   const [mounted, setMounted] = useState(false)
   const { theme } = useTheme()
   const pathname = usePathname()
+  const { data: session } = useSession() // Hook moved to top
 
   useEffect(() => {
     setMounted(true)
@@ -23,6 +24,9 @@ export default function Sidebar() {
   if (pathname === '/login') return null
 
   const isPro = theme === 'pro' && mounted
+
+  // Admin Check
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   // Itens padrão para Light/Dark
   const standardMenuItems = [
@@ -54,10 +58,6 @@ export default function Sidebar() {
   ]
 
   /* ... imports ... */
-  const { data: session } = useSession() // Hook to access session
-
-  // Admin Check
-  const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   // Admin Menu Item
   const adminItem = { name: 'Painel Admin', icon: ShieldCheck, href: '/admin' }
