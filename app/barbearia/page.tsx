@@ -470,15 +470,16 @@ export default function MinhaBarbearia() {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                   {photos.map((photo, index) => (
-                    <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border transition-all hover:border-brand-primary/30">
-                       <img src={photo} alt={`Foto ${index}`} className="w-full h-full object-cover" />
-                       <button 
-                         onClick={() => handleRemovePhoto(photo)}
-                         className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-400 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all scale-90 hover:scale-100 shadow-lg"
-                       >
-                         <Trash2 size={16} />
-                       </button>
-                    </div>
+                     <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border transition-all hover:border-brand-primary/30">
+                        <img src={photo} alt={`Foto ${index}`} className="w-full h-full object-cover" />
+                        <button 
+                          onClick={() => handleRemovePhoto(photo)}
+                          className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg z-10 transition-colors"
+                          title="Excluir foto"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                     </div>
                   ))}
                   
                   {/* Placeholder para upload grid */}
@@ -509,7 +510,7 @@ export default function MinhaBarbearia() {
                 </div>
                 
                 <p className="text-[10px] text-muted-foreground text-center uppercase font-black tracking-widest leading-relaxed">
-                   Adicione fotos do interior, equipe e resultados para atrair mais clientes.
+                   Adicione fotos do interior, equipe e resultados. Para trocar uma foto, exclua a antiga e adicione a nova.
                 </p>
              </div>
           </div>
