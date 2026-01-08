@@ -18,7 +18,6 @@ export default function Sidebar() {
   const { data: session } = useSession() // Hook moved to top
 
   useEffect(() => {
-  useEffect(() => {
     setMounted(true)
   }, [])
 
