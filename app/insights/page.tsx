@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Sparkles, Zap, ArrowLeft, RefreshCw } from "lucide-react";
+import { Sparkles, ArrowLeft, RefreshCw, Zap } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
 // Actions
+// Actions
 import { getDashboardMetrics, getRevenueMix, getOccupancyHeatmap, getBarberPerformance, DashboardMetrics } from "../barbearia/_actions/analytics";
-import { seedMockData, clearData } from "../barbearia/_actions/seed-data";
 
 // Components
 import { KPIGrid } from "../components/analytics/KPIGrid";
@@ -105,42 +105,6 @@ export default function InsightsPage() {
                 <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
                 ATUALIZAR
             </button>
-
-            <button 
-                onClick={async () => {
-                    if(!confirm("Gerar dados de teste? Isso criará agendamentos passados.")) return;
-                    const toastId = toast.loading("Gerando dados...");
-                    try {
-                        await seedMockData(barbershopId);
-                        toast.success("Dados gerados!", { id: toastId });
-                        loadAnalytics();
-                    } catch(e) {
-                        toast.error("Erro ao gerar dados", { id: toastId });
-                    }
-                }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-primary hover:opacity-80 text-primary-foreground text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-lg shadow-brand-primary/20"
-            >
-                <Zap size={14} fill="currentColor" />
-                SIMULAR DADOS
-            </button>
-
-            <button 
-                onClick={async () => {
-                    if(!confirm("Tem certeza? Isso apagará TODOS os agendamentos!")) return;
-                    const toastId = toast.loading("Limpando dados...");
-                    try {
-                        await clearData(barbershopId);
-                        toast.success("Dados limpos!", { id: toastId });
-                        loadAnalytics();
-                    } catch(e) {
-                         toast.error("Erro ao limpar dados", { id: toastId });
-                    }
-                }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold px-4 py-2.5 rounded-xl border border-red-500/20 transition-all shadow-sm"
-            >
-                <Zap size={14} className="rotate-45" />
-                LIMPAR
-            </button>
           </div>
         </header>
 
@@ -186,7 +150,7 @@ export default function InsightsPage() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Zap size={48} className="text-muted mb-4" />
                 <h3 className="text-xl font-bold text-muted-foreground uppercase tracking-tighter">Sem dados para exibir</h3>
-                <p className="text-muted-foreground text-sm mt-2">Clique em simular dados para popular o painel.</p>
+                <p className="text-muted-foreground text-sm mt-2">Comece a agendar para visualizar os insights.</p>
             </div>
         )}
       </div>
