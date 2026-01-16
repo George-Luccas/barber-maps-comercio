@@ -46,6 +46,8 @@ export async function saveBarberServices(
         latitude: safeLatitude,
         longitude: safeLongitude,
         aboutUs: aboutUs || null,
+        city: city || null,
+        state: state || null,
       },
       create: {
         name: barbershopName,

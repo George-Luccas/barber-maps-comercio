@@ -32,6 +32,8 @@ export default function MinhaBarbearia() {
   const [aboutUs, setAboutUs] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [barbershopId, setBarbershopId] = useState("");
   
   // Novo Estado de Serviços Dinâmicos
@@ -61,6 +63,8 @@ export default function MinhaBarbearia() {
         setAboutUs(data.aboutUs || "");
         if (data.latitude) setLatitude(data.latitude.toString());
         if (data.longitude) setLongitude(data.longitude.toString());
+        if (data.city) setCity(data.city);
+        if (data.state) setState(data.state);
         
         // Carrega serviços existentes
         if (data.BarbershopService && data.BarbershopService.length > 0) {
@@ -198,7 +202,9 @@ export default function MinhaBarbearia() {
           latitude: latitude ? parseFloat(latitude.replace(",", ".")) : null,
           longitude: longitude ? parseFloat(longitude.replace(",", ".")) : null
         },
-        aboutUs
+        aboutUs,
+        city,
+        state
       );
       
       if (result && result.success) {
@@ -347,6 +353,35 @@ export default function MinhaBarbearia() {
                   onChange={(e) => setLongitude(e.target.value)}
                   className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground"
                   placeholder="-46.6333"
+                />
+              </div>
+            </div>
+
+            {/* CIDADE E ESTADO */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-brand-primary" /> Cidade
+                </label>
+                <input 
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground uppercase"
+                  placeholder="SAO PAULO"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} className="text-brand-primary" /> Estado (UF)
+                </label>
+                <input 
+                  type="text"
+                  maxLength={2}
+                  value={state}
+                  onChange={(e) => setState(e.target.value.toUpperCase())}
+                  className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground uppercase"
+                  placeholder="SP"
                 />
               </div>
             </div>
