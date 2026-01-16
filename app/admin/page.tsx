@@ -112,6 +112,59 @@ export default function AdminPage() {
                         );
                     })}
                 </div>
+
+                {/* RELATÓRIO DE DESCONTOS */}
+                <DiscountReportSection />
+            </div>
+        </div>
+    );
+}
+
+function DiscountReportSection() {
+    const [stats, setStats] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        import("./_actions/admin-actions").then(mod => {
+            mod.getDiscountStats().then(res => {
+                if (res.success) setStats(res.stats || []);
+                setLoading(false);
+            });
+        });
+    }, []);
+
+    if (loading) return <div className="p-4 text-center text-muted-foreground">Carregando estatísticas...</div>;
+
+    return (
+        <div className="space-y-4">
+            <header className="flex items-center gap-2">
+                <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+                     <Users size={20} />
+                </div>
+                <div>
+                    <h2 className="text-xl font-black uppercase tracking-tighter">Relatório de <span className="text-yellow-500">Descontos</span></h2>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Utilização por Barbearia</p>
+                </div>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {stats.length > 0 ? stats.map((stat) => (
+                    <div key={stat.id} className="bg-card border border-border p-6 rounded-2xl flex items-center justify-between shadow-sm">
+                        <div className="flex flex-col">
+                            <span className="font-bold text-sm uppercase">{stat.name}</span>
+                            <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Descontos Aplicados</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 font-black text-xl">
+                                 {stat.discountCount}
+                             </div>
+                        </div>
+                    </div>
+                )) : (
+                    <div className="col-span-full p-8 text-center border-2 border-dashed border-border rounded-2xl">
+                        <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">Nenhum desconto registrado ainda</p>
+                    </div>
+                )}
             </div>
         </div>
     );

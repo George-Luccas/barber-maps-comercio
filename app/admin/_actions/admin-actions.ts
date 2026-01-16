@@ -62,3 +62,45 @@ export async function toggleBarbershopSuspension(barbershopId: string) {
         return { success: false, error: error.message };
     }
 }
+
+export async function getDiscountStats() {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const stats = await db.barbershop.findMany({
+            select: {
+                id: true,
+                name: true,
+                _count: {
+                    select: {
+                        Booking: {
+                            where: {
+                                isWelcomeDiscount: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                name: 'asc'
+            }
+        });
+
+        // Format for UI
+        const formattedStats = stats.map(shop => ({
+            id: shop.id,
+            name: shop.name,
+            // @ts-ignore: Prisma types might correspond to old schema until generation
+            discountCount: shop._count?.Booking || 0
+        })).sort((a, b) => b.discountCount - a.discountCount); // Most discounts first
+
+        return { success: true, stats: formattedStats };
+
+    } catch (error: any) {
+        console.error("Erro ao buscar estatisticas de desconto:", error);
+        return { success: false, error: error.message };
+    }
+}

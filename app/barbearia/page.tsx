@@ -394,11 +394,32 @@ export default function MinhaBarbearia() {
                 {servicos.map((servico) => (
                   <div 
                     key={servico.id} 
-                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-card/40 group hover:border-brand-primary/30 transition-all shadow-sm"
+                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-card/40 group hover:border-brand-primary/30 transition-all shadow-sm gap-4"
                   >
-                    <div className="flex flex-col">
-                       <span className="text-foreground font-black uppercase text-xs tracking-wider">{servico.name}</span>
-                       <span className="text-brand-primary text-xs font-black">R$ {servico.price.toFixed(2)}</span>
+                    <div className="flex flex-1 gap-2">
+                       <input 
+                          type="text"
+                          value={servico.name}
+                          onChange={(e) => {
+                            const newName = e.target.value;
+                            setServicos(prev => prev.map(s => s.id === servico.id ? { ...s, name: newName } : s));
+                          }}
+                          className="flex-1 bg-transparent border-b border-transparent focus:border-brand-primary outline-none text-foreground font-black uppercase text-xs tracking-wider transition-all placeholder:text-muted-foreground/50"
+                          placeholder="Nome do Serviço"
+                       />
+                       <div className="flex items-center gap-1 group/price">
+                          <span className="text-brand-primary text-xs font-black">R$</span>
+                          <input 
+                            type="number"
+                            value={servico.price}
+                            onChange={(e) => {
+                                const newPrice = parseFloat(e.target.value);
+                                setServicos(prev => prev.map(s => s.id === servico.id ? { ...s, price: isNaN(newPrice) ? 0 : newPrice } : s));
+                            }}
+                            className="w-20 bg-transparent border-b border-transparent focus:border-brand-primary outline-none text-brand-primary text-xs font-black transition-all"
+                            placeholder="0.00"
+                          />
+                       </div>
                     </div>
                     <button 
                        onClick={() => handleRemoveService(servico.id)}
@@ -444,7 +465,9 @@ export default function MinhaBarbearia() {
 
                  {/* SUGESTÕES RÁPIDAS */}
                  <div className="flex flex-wrap gap-2 mt-2">
-                    {SUGESTOES_SERVICOS.map((sugestao) => (
+                    {SUGESTOES_SERVICOS
+                      .filter(sugestao => !servicos.some(s => s.name === sugestao.nome))
+                      .map((sugestao) => (
                        <button
                           key={sugestao.nome}
                           onClick={() => addSugestao(sugestao)}
