@@ -11,7 +11,9 @@ export async function saveBarberServices(
   horarios: { abertura: string, almocoInicio: string, almocoFim: string, fechamento: string },
   photos: string[] = [],
   location?: { latitude: number | null, longitude: number | null },
-  aboutUs?: string
+  aboutUs?: string,
+  city?: string,
+  state?: string
 ) {
   try {
     const session = await auth();
@@ -63,6 +65,8 @@ export async function saveBarberServices(
         address: "Endereço Pendente", 
         description: "Barbearia configurada pelo painel",
         managerId: userId,
+        city: city || null,
+        state: state || null,
       },
     });
 
