@@ -15,26 +15,27 @@ model Barbershop {
   description           String
   imageUrl              String?
   phones                String[]               @default([])
-  managerId             String?                @unique
-  closingTime           String?
-  lunchEnd              String?
-  lunchStart            String?
-  openingTime           String?
-  dailyGoal             Decimal                @default(500.00) @db.Decimal(10, 2)
-  photos                String[]               @default([])
-  latitude              Float?
-  longitude             Float?
-  isOpen                Boolean                @default(true)
   aboutUs               String?
   city                  String?
-  state                 String?
+  closingTime           String?
+  dailyGoal             Decimal                @default(500.00) @db.Decimal(10, 2)
+  isOpen                Boolean                @default(true)
   isSuspended           Boolean                @default(false)
+  latitude              Float?
+  longitude             Float?
+  lunchEnd              String?
+  lunchStart            String?
+  managerId             String?                @unique
+  openingTime           String?
+  photos                String[]               @default([])
+  state                 String?
   barbers               Barber[]
   manager               User?                  @relation(fields: [managerId], references: [id])
   products              BarbershopProduct[]
   BarbershopService     BarbershopService[]
   Booking               Booking[]
   FinancialTransactions FinancialTransaction[]
+  LoyaltyCard           LoyaltyCard[]
   StockItems            StockItem[]
   styles                Style[]
 }
@@ -78,6 +79,7 @@ model BarbershopService {
   priceInCents Int
   barbershopId String
   deletedAt    DateTime?
+  points       Int        @default(10)
   Barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   Booking      Booking[]
 }
@@ -93,9 +95,10 @@ model Booking {
   createdAt         DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime          @updatedAt @db.Timestamptz(6)
   barberId          String?
-  userName          String?
   isSubscription    Boolean           @default(false)
   isWelcomeDiscount Boolean           @default(false)
+  status            BookingStatus     @default(CONFIRMED)
+  userName          String?
   barber            Barber?           @relation(fields: [barberId], references: [id])
   Barbershop        Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   BarbershopService BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
@@ -148,14 +151,21 @@ model Style {
 }
 
 model Account {
-  id         String   @id @default(uuid())
-  accountId  String
-  providerId String
-  userId     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  accessToken           String?
+  accessTokenExpiresAt  DateTime?
+  idToken               String?
+  password              String?
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
   @@map("account")
 }
 
@@ -166,23 +176,33 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
+  ipAddress String?
+  userAgent String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("session")
 }
 
 model User {
-  id            String      @id @default(uuid())
-  name          String
-  email         String      @unique
-  emailVerified Boolean     @default(false)
-  image         String?
-  password      String?
-  phone         String?
-  role          UserRole    @default(BARBER)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  Barbershop    Barbershop?
+  id                     String             @id @default(uuid())
+  name                   String
+  email                  String             @unique
+  emailVerified          Boolean            @default(false)
+  image                  String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  password               String?
+  phone                  String?
+  phoneExportedAt        DateTime?
+  role                   UserRole           @default(BARBER)
+  welcomeDiscountClaimed Boolean            @default(false)
+  welcomeDiscountUsed    Boolean            @default(false)
+  Barbershop             Barbershop?
+  LoyaltyCard            LoyaltyCard[]
+  PlatformFeedback       PlatformFeedback[]
+  account                Account[]
+  session                Session[]
 
   @@map("user")
 }
@@ -241,6 +261,43 @@ model UsageLog {
   Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 }
 
+model LoyaltyCard {
+  id                  String      @id
+  userId              String
+  barbershopId        String
+  completedCuts       Int         @default(0)
+  freeCuts            Int         @default(0)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime
+  currentPoints       Int         @default(0)
+  tier                LoyaltyTier @default(BRONZE)
+  totalLifetimePoints Int         @default(0)
+  Barbershop          Barbershop  @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  user                User        @relation(fields: [userId], references: [id])
+
+  @@unique([userId, barbershopId])
+}
+
+model PlatformFeedback {
+  id        String       @id
+  userId    String?
+  type      FeedbackType @default(OTHER)
+  message   String
+  createdAt DateTime     @default(now())
+  user      User?        @relation(fields: [userId], references: [id])
+}
+
+model Promotion {
+  id          String   @id
+  title       String
+  description String?
+  imageUrl    String
+  linkUrl     String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
 enum UserRole {
   CLIENT
   BARBER
@@ -263,4 +320,24 @@ enum SubscriptionStatus {
   ACTIVE
   PAST_DUE
   CANCELED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum FeedbackType {
+  BUG
+  SUGGESTION
+  COMPLAIMENT
+  OTHER
+}
+
+enum LoyaltyTier {
+  BRONZE
+  SILVER
+  GOLD
 }
