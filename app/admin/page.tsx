@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { getAdminDashboardData, toggleBarbershopSuspension } from "./_actions/admin-actions";
 import Link from "next/link";
-import { ChevronLeft, Loader2, ShieldAlert, Store, User, Users } from "lucide-react";
+import { ChevronLeft, Loader2, ShieldAlert, Store, User, Users, Download } from "lucide-react";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { getClients } from "../clientes/_actions/client-actions";
 
 export default function AdminPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -37,6 +41,45 @@ export default function AdminPage() {
         }
     }
 
+    const handleExportClients = async () => {
+        const loadingToast = toast.loading("Gerando PDF...");
+        const res = await getClients();
+        toast.dismiss(loadingToast);
+
+        if (res.success && res.clients) {
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.setTextColor(234, 179, 8); 
+            doc.text("BARBER MAPS - LISTA DE CLIENTES (ADMIN)", 20, 20);
+
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 28);
+            
+            const tableData = res.clients.map(c => [
+                c.name,
+                c.phone,
+                c.instagram || "-",
+                c.tier,
+                c.totalCuts
+            ]);
+
+            autoTable(doc, {
+                startY: 35,
+                head: [['Nome', 'Telefone', 'Instagram', 'Nível', 'Cortes']],
+                body: tableData as any,
+                headStyles: { fillColor: [234, 179, 8], textColor: [0, 0, 0], fontStyle: 'bold' },
+                styles: { fontSize: 9 },
+                alternateRowStyles: { fillColor: [245, 245, 245] }
+            });
+
+            doc.save(`clientes_admin_${new Date().toISOString().split('T')[0]}.pdf`);
+            toast.success("PDF Gerado com sucesso!");
+        } else {
+            toast.error("Erro ao buscar clientes: " + (res.error || "Erro desconhecido"));
+        }
+    };
+
     if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
 
     if (error) return (
@@ -60,6 +103,16 @@ export default function AdminPage() {
                         <ChevronLeft size={16} /> Voltar
                     </Link>
                 </header>
+
+                <div className="flex justify-end">
+                     <button 
+                        onClick={handleExportClients}
+                        className="flex items-center gap-2 bg-brand-primary text-black px-6 py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform"
+                     >
+                        <Download size={18} />
+                        Exportar Clientes (PDF)
+                     </button>
+                </div>
 
                 <div className="grid gap-6">
                     {users.map(user => {

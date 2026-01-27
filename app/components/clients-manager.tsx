@@ -1,18 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { getClients } from "@/app/clientes/_actions/client-actions";
 import { quickRegister } from "@/app/barbearia/lancamento/_actions/launch-actions";
-import { Loader2, Download, Search, UserPlus, X, Check } from "lucide-react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { Loader2, Search, UserPlus, X, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ClientsManager() {
-  const { data: session } = useSession();
-  const isAdmin = (session?.user as any)?.role === "ADMIN";
-
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [term, setTerm] = useState("");
@@ -84,33 +78,7 @@ export default function ClientsManager() {
   const exportPDF = () => {
     const doc = new jsPDF();
 
-    doc.setFontSize(22);
-    doc.setTextColor(234, 179, 8); // Brand primary color (approx)
-    doc.text("BARBER MAPS - LISTA DE CLIENTES", 20, 20);
 
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 28);
-    
-    const tableData = filteredClients.map(c => [
-        c.name,
-        c.phone,
-        c.instagram || "-",
-        c.tier,
-        c.totalCuts
-    ]);
-
-    autoTable(doc, {
-        startY: 35,
-        head: [['Nome', 'Telefone', 'Instagram', 'Nível', 'Cortes']],
-        body: tableData,
-        headStyles: { fillColor: [234, 179, 8], textColor: [0, 0, 0], fontStyle: 'bold' },
-        styles: { fontSize: 9 },
-        alternateRowStyles: { fillColor: [245, 245, 245] }
-    });
-
-    doc.save("clientes.pdf");
-  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -135,16 +103,6 @@ export default function ClientsManager() {
                 <UserPlus size={16} />
                 Novo Cliente
             </button>
-            {isAdmin && (
-                <button 
-                    onClick={exportPDF}
-                    disabled={loading || filteredClients.length === 0}
-                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground px-4 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-muted transition-colors disabled:opacity-50"
-                >
-                    <Download size={16} />
-                    PDF
-                </button>
-            )}
         </div>
       </div>
 
