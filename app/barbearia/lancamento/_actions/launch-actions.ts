@@ -32,7 +32,7 @@ export async function searchClients(term: string) {
   return users;
 }
 
-export async function quickRegister(data: { name: string; phone: string; email?: string }) {
+export async function quickRegister(data: { name: string; phone: string; instagram?: string }) {
   const session = await auth();
   if (!session?.user) return { error: "Não autorizado" };
 
@@ -42,30 +42,28 @@ export async function quickRegister(data: { name: string; phone: string; email?:
       return { error: "Nome e telefone são obrigatórios" };
     }
 
-    // Check if phone or email already exists
+    // Check if phone already exists
     const existingUser = await db.user.findFirst({
         where: {
             OR: [
-                { phone: data.phone },
-                ...(data.email ? [{ email: data.email }] : [])
+                { phone: data.phone }
             ]
         }
     });
 
     if (existingUser) {
-        return { error: "Usuário já existe com este telefone ou email", user: existingUser };
+        return { error: "Usuário já existe com este telefone", user: existingUser };
     }
 
-    // Generate a placeholder email if not provided, as email is unique constraint in schema normally?
-    // Checking schema: email String @unique. So we MUST provide an email.
-    // If user doesn't provide one, we generate a fake one based on phone.
-    const emailToUse = data.email || `${data.phone.replace(/\D/g, '')}@sememail.com`;
+    // Generate a placeholder email based on phone since we don't ask for email anymore
+    const emailToUse = `${data.phone.replace(/\D/g, '')}@sememail.com`;
 
     const newUser = await db.user.create({
       data: {
         name: data.name,
         phone: data.phone,
         email: emailToUse,
+        instagram: data.instagram,
         role: "CLIENT",
         password: "", // No password for quick registered users
         source: "BARBER_MAPS_COMERCIO",

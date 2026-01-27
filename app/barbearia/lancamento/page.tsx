@@ -48,7 +48,15 @@ export default function LancamentoPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [newClientName, setNewClientName] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
-  const [newClientEmail, setNewClientEmail] = useState("");
+  const [newClientInstagram, setNewClientInstagram] = useState("");
+
+  const formatPhone = (value: string) => {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2")
+      .replace(/(-\d{4})\d+?$/, "$1");
+  };
 
   // Carregamento inicial
   useEffect(() => {
@@ -87,17 +95,21 @@ export default function LancamentoPage() {
       const res = await quickRegister({
           name: newClientName,
           phone: newClientPhone,
-          email: newClientEmail || undefined
+          instagram: newClientInstagram || undefined
       });
 
       if (res.error) {
           toast.error(res.error);
       } else if (res.user) {
           toast.success("Cliente cadastrado!");
-          setSelectedClient(res.user as Client);
+          setSelectedClient(res.user as any); // Cast for safety
           setIsRegistering(false);
           setTerm("");
           setSearchResults([]);
+          // Limpar form
+          setNewClientName("");
+          setNewClientPhone("");
+          setNewClientInstagram("");
       }
   };
 
@@ -149,7 +161,7 @@ export default function LancamentoPage() {
                             <div>
                                 <h3 className="text-2xl font-black uppercase text-brand-primary">{selectedClient.name}</h3>
                                 <p className="text-sm font-bold opacity-70">{selectedClient.phone || "Sem telefone"}</p>
-                                <p className="text-xs opacity-50">{selectedClient.email || "Sem email"}</p>
+                                <p className="text-xs opacity-50">{selectedClient.email && !selectedClient.email.includes("@sememail.com") ? selectedClient.email : "Instagram: " + ((selectedClient as any).instagram || "Não informado")}</p>
                             </div>
                             <button 
                                 onClick={() => setSelectedClient(null)}
@@ -223,13 +235,14 @@ export default function LancamentoPage() {
                                         placeholder="Telefone (WhatsApp) *"
                                         className="p-4 bg-muted/50 rounded-xl border border-border outline-none focus:border-brand-primary uppercase font-bold text-sm"
                                         value={newClientPhone}
-                                        onChange={(e) => setNewClientPhone(e.target.value)}
+                                        onChange={(e) => setNewClientPhone(formatPhone(e.target.value))}
+                                        maxLength={15}
                                     />
                                     <input 
-                                        placeholder="Email (Opcional)"
+                                        placeholder="Instagram (Ex: @cliente)"
                                         className="p-4 bg-muted/50 rounded-xl border border-border outline-none focus:border-brand-primary font-bold text-sm"
-                                        value={newClientEmail}
-                                        onChange={(e) => setNewClientEmail(e.target.value)}
+                                        value={newClientInstagram}
+                                        onChange={(e) => setNewClientInstagram(e.target.value)}
                                     />
                                     <div className="flex gap-2 mt-2">
                                         <button 
