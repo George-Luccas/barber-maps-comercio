@@ -114,7 +114,7 @@ export default function LancamentoPage() {
   };
 
   const handleLaunch = async () => {
-      if (!selectedClient || !selectedServiceId || !selectedBarberId || !barbershopId) return;
+      if (!selectedClient || !selectedServiceId || !barbershopId) return;
 
       const confirm = window.confirm(`Confirmar lançamento para ${selectedClient.name}?`);
       if (!confirm) return;
@@ -307,7 +307,7 @@ export default function LancamentoPage() {
 
                         <button
                             onClick={handleLaunch}
-                            disabled={!selectedClient || !selectedServiceId || !selectedBarberId}
+                            disabled={!selectedClient || !selectedServiceId}
                             className="w-full py-5 rounded-2xl bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black italic uppercase tracking-widest text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95 mt-4"
                         >
                             <Check size={24} />

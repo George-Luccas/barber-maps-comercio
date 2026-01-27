@@ -80,7 +80,7 @@ export async function quickRegister(data: { name: string; phone: string; instagr
 export async function launchService(data: { 
     userId: string; 
     serviceId: string; 
-    barberId: string; 
+    barberId?: string; 
     date?: Date; 
     barbershopId: string 
 }) {
