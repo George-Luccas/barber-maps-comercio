@@ -75,10 +75,6 @@ export default function ClientsManager() {
     }
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-
-
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
