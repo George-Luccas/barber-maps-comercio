@@ -8,6 +8,7 @@ import { addTransaction, getDailySummary, updateDailyGoal } from "@/app/barbeari
 import { getStockItems } from "@/app/barbearia/_actions/stock";
 import { getBarbershopServices } from "@/app/barbearia/_actions/service"; 
 import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
+import { searchClients } from "@/app/barbearia/lancamento/_actions/launch-actions";
 import jsPDF from "jspdf";
 
 export default function FinancialManager() {
@@ -38,6 +39,12 @@ export default function FinancialManager() {
   const [selectedStockId, setSelectedStockId] = useState(""); 
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [selectedBarberId, setSelectedBarberId] = useState("");
+
+  // Estados para Lançamento de Serviço Integrado
+  const [isServiceLaunch, setIsServiceLaunch] = useState(false);
+  const [clientTerm, setClientTerm] = useState("");
+  const [clientResults, setClientResults] = useState<any[]>([]);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
 
   const barbershopId = (session?.user as any)?.barbershopId;
 
@@ -91,6 +98,23 @@ export default function FinancialManager() {
     loadData();
   }, [barbershopId, selectedDate]);
 
+  // Busca de clientes para o lançamento
+  useEffect(() => {
+    if (clientTerm.length < 3) {
+        setClientResults([]);
+        return;
+    }
+    const timeout = setTimeout(async () => {
+        try {
+            const results = await searchClients(clientTerm);
+            setClientResults(results);
+        } catch (error) {
+            console.error(error);
+        }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [clientTerm]);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -143,7 +167,9 @@ export default function FinancialManager() {
       category,
       date: new Date(),
       stockItemId: selectedStockId || undefined,
-      barberId: selectedBarberId || undefined
+      barberId: selectedBarberId || undefined,
+      clientId: selectedClient?.id,
+      serviceId: selectedServiceId || undefined
     });
 
     // Limpar form
@@ -152,6 +178,9 @@ export default function FinancialManager() {
     setSelectedStockId(""); 
     setSelectedServiceId(""); 
     setSelectedBarberId("");
+    setIsServiceLaunch(false);
+    setSelectedClient(null);
+    setClientTerm("");
     setLoading(false);
     
     // Recarregar dados
@@ -368,40 +397,124 @@ export default function FinancialManager() {
 
                {/* SELETOR DE PRODUTO OU SERVIÇO (Somente para Entrada) */}
                {type === "INCOME" && (
-                   <div className="grid grid-cols-2 gap-4">
-                       {/* SELETOR DE SERVIÇOS */}
-                         <div className="relative col-span-2 md:col-span-1">
-                             <select
-                                 value={selectedServiceId}
-                                 onChange={handleServiceChange}
-                                 className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
-                             >
-                                 <option value="">-- Serviço --</option>
-                                 {services.map(s => (
-                                     <option key={s.id} value={s.id} className="bg-card text-foreground">
-                                         {s.name}
-                                     </option>
-                                 ))}
-                             </select>
-                             <Scissors size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
-                         </div>
-
-                        {/* SELETOR DE PRODUTOS */}
-                        <div className="relative col-span-2 md:col-span-1">
-                           <select
-                               value={selectedStockId}
-                               onChange={handleStockChange}
-                               className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
-                           >
-                               <option value="">-- Produto --</option>
-                               {stockItems.map(item => (
-                                   <option key={item.id} value={item.id} className="bg-card text-foreground">
-                                       {item.name} ({item.quantity})
-                                   </option>
-                               ))}
-                           </select>
-                           <Package size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
+                   <div className="space-y-4">
+                       {/* TOGGLE: VINCULAR A SERVIÇO */}
+                       <div className="flex items-center gap-2 p-3 bg-muted/50 border border-border rounded-xl">
+                          <input 
+                             type="checkbox" 
+                             id="serviceLaunch"
+                             checked={isServiceLaunch}
+                             onChange={(e) => {
+                                 setIsServiceLaunch(e.target.checked);
+                                 if (!e.target.checked) {
+                                     setSelectedClient(null);
+                                     setClientTerm("");
+                                 }
+                             }}
+                             className="w-5 h-5 accent-brand-primary cursor-pointer"
+                          />
+                          <label htmlFor="serviceLaunch" className="text-sm font-bold uppercase cursor-pointer select-none">
+                             Vincular a Cliente/Agendamento?
+                          </label>
                        </div>
+
+                       {isServiceLaunch ? (
+                           // MODO: LANÇAMENTO DE SERVIÇO COMPLETO
+                           <div className="space-y-4">
+                               {/* 1. BUSCA DE CLIENTE */}
+                               {selectedClient ? (
+                                   <div className="flex items-center justify-between p-3 bg-brand-primary/10 border border-brand-primary/20 rounded-xl">
+                                       <div>
+                                           <p className="text-[10px] font-black uppercase text-brand-primary">Cliente Selecionado</p>
+                                           <p className="font-bold text-sm">{selectedClient.name}</p>
+                                       </div>
+                                       <button type="button" onClick={() => setSelectedClient(null)} className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg">
+                                           <Trash2 size={16} />
+                                       </button>
+                                   </div>
+                               ) : (
+                                   <div className="relative">
+                                       <input 
+                                           type="text" 
+                                           placeholder="Buscar Cliente (Nome/Tel)..."
+                                           value={clientTerm}
+                                           onChange={(e) => setClientTerm(e.target.value)}
+                                           className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:border-brand-primary outline-none transition-all uppercase font-bold"
+                                       />
+                                       {clientResults.length > 0 && (
+                                           <div className="absolute top-full left-0 w-full bg-card border border-border rounded-xl shadow-xl mt-1 z-50 max-h-40 overflow-y-auto">
+                                               {clientResults.map(c => (
+                                                   <button
+                                                       key={c.id}
+                                                       type="button"
+                                                       onClick={() => {
+                                                            setSelectedClient(c);
+                                                            setClientTerm("");
+                                                            setClientResults([]);
+                                                       }}
+                                                       className="w-full text-left p-3 hover:bg-muted font-bold text-xs uppercase border-b border-border/50 last:border-0"
+                                                   >
+                                                       {c.name} <span className="text-muted-foreground ml-2">{c.phone}</span>
+                                                   </button>
+                                               ))}
+                                           </div>
+                                       )}
+                                   </div>
+                               )}
+
+                               {/* 2. SELEÇÃO DE SERVIÇO */}
+                               <div className="relative">
+                                    <select
+                                        value={selectedServiceId}
+                                        onChange={handleServiceChange}
+                                        className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
+                                    >
+                                        <option value="">-- Selecione o Serviço --</option>
+                                        {services.map(s => (
+                                            <option key={s.id} value={s.id} className="bg-card text-foreground">
+                                                {s.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Scissors size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
+                                </div>
+                           </div>
+                       ) : (
+                           // MODO: LANÇAMENTO SIMPLES (PRODUTO OU SERVIÇO AVULSO)
+                           <div className="grid grid-cols-2 gap-4">
+                                <div className="relative col-span-2 md:col-span-1">
+                                    <select
+                                        value={selectedServiceId}
+                                        onChange={handleServiceChange}
+                                        className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
+                                    >
+                                        <option value="">-- Serviço Avulso --</option>
+                                        {services.map(s => (
+                                            <option key={s.id} value={s.id} className="bg-card text-foreground">
+                                                {s.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Scissors size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
+                                </div>
+
+                                <div className="relative col-span-2 md:col-span-1">
+                                   <select
+                                       value={selectedStockId}
+                                       onChange={handleStockChange}
+                                       className="w-full bg-muted border border-border rounded-xl p-4 text-[10px] focus:border-brand-primary outline-none transition-all text-foreground font-black uppercase tracking-widest appearance-none truncate"
+                                   >
+                                       <option value="">-- Produto --</option>
+                                       {stockItems.map(item => (
+                                           <option key={item.id} value={item.id} className="bg-card text-foreground">
+                                               {item.name} ({item.quantity})
+                                           </option>
+                                       ))}
+                                   </select>
+                                   <Package size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"/>
+                               </div>
+                           </div>
+                       )}
                    </div>
                )}
 

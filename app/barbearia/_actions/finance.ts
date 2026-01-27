@@ -3,6 +3,7 @@
 import { db } from "@/app/_lib/prisma";
 import { revalidatePath } from "next/cache";
 import { TransactionType, PaymentMethod } from "@prisma/client";
+import { launchService } from "../lancamento/_actions/launch-actions";
 
 export async function addTransaction(data: {
   type: TransactionType;
@@ -14,8 +15,21 @@ export async function addTransaction(data: {
   date?: Date;
   stockItemId?: string; // Novo parâmetro opcional
   barberId?: string;
+  clientId?: string;
+  serviceId?: string;
 }) {
   try {
+    // Se for um lançamento de serviço (tem cliente e serviço)
+    if (data.clientId && data.serviceId && data.barbershopId) {
+       await launchService({
+           userId: data.clientId,
+           serviceId: data.serviceId,
+           barbershopId: data.barbershopId,
+           barberId: data.barberId,
+           date: data.date || new Date()
+       });
+    }
+
     // Se houver item de estoque vinculado, baixamos 1 unidade
     if (data.stockItemId) {
       await db.stockItem.update({
