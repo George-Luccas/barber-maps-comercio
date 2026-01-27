@@ -241,10 +241,7 @@ export default function MinhaBarbearia() {
           <div>
             <h1 className="text-3xl font-black italic uppercase tracking-tighter italic">Gestão <span className="text-brand-primary">Barbearia</span></h1>
             <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest">Identidade Visual e Informações</p>
-            <Link href="/barbearia/lancamento" className="mt-4 inline-flex items-center gap-2 bg-brand-primary text-primary-foreground px-6 py-3 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform">
-                <Store size={18} />
-                Acessar Balcão (Lançamentos)
-            </Link>
+
           </div>
           
           <div className="flex bg-card p-1 rounded-xl border border-border">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PlusCircle, Target, Landmark, ArrowUpCircle, ArrowLeft, Calendar, TrendingUp, TrendingDown, DollarSign, Trash2, Eye, EyeOff, Package, Scissors } from "lucide-react";
+import { PlusCircle, Target, Landmark, ArrowUpCircle, ArrowLeft, Calendar, TrendingUp, TrendingDown, DollarSign, Trash2, Eye, EyeOff, Package, Scissors, Store } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { addTransaction, getDailySummary, updateDailyGoal } from "@/app/barbearia/_actions/finance";
@@ -281,9 +281,15 @@ export default function FinancialManager() {
           </div>
           <span className="font-bold uppercase text-xs tracking-widest hidden md:block">Voltar ao Painel</span>
         </Link>
-        <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter leading-none italic">
-          Livro <span className="text-brand-primary">Caixa</span>
-        </h1>
+        <div className="flex flex-col items-end gap-2">
+            <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter leading-none italic">
+              Livro <span className="text-brand-primary">Caixa</span>
+            </h1>
+             <Link href="/barbearia/lancamento" className="inline-flex items-center gap-2 bg-brand-primary text-black px-4 py-2 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform">
+                <Store size={14} />
+                Acessar Balcão
+            </Link>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8">

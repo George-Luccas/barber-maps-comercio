@@ -68,6 +68,7 @@ export async function quickRegister(data: { name: string; phone: string; email?:
         email: emailToUse,
         role: "CLIENT",
         password: "", // No password for quick registered users
+        source: "BARBER_MAPS_COMERCIO",
       },
     });
 
@@ -127,12 +128,14 @@ export async function launchService(data: {
     if (!loyaltyCard) {
         loyaltyCard = await db.loyaltyCard.create({
             data: {
+                id: crypto.randomUUID(),
                 userId: data.userId,
                 barbershopId: data.barbershopId,
                 completedCuts: 0,
                 currentPoints: 0,
                 totalLifetimePoints: 0,
-                tier: "BRONZE"
+                tier: "BRONZE",
+                updatedAt: new Date()
             }
         });
     }
