@@ -13,19 +13,22 @@ export async function getAdminDashboardData() {
 
     try {
         const users = await db.user.findMany({
-            include: {
-                Barbershop: {
-                    include: {
-                        barbers: true,
-                    }
-                }
-            },
             orderBy: {
                 createdAt: 'desc'
             }
         });
 
-        return { success: true, users };
+        const barbershops = await db.barbershop.findMany({
+            include: {
+                manager: true,
+                barbers: true
+            },
+            orderBy: {
+                name: 'asc'
+            }
+        });
+
+        return { success: true, users, barbershops };
     } catch (error: any) {
         console.error("Erro ao buscar dados do admin:", error);
         return { success: false, error: error.message };
