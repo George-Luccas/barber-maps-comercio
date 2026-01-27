@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { getClients } from "@/app/clientes/_actions/client-actions";
 import { quickRegister } from "@/app/barbearia/lancamento/_actions/launch-actions";
 import { Loader2, Download, Search, UserPlus, X, Check } from "lucide-react";
@@ -9,6 +10,9 @@ import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 
 export default function ClientsManager() {
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === "ADMIN";
+
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [term, setTerm] = useState("");
@@ -131,14 +135,16 @@ export default function ClientsManager() {
                 <UserPlus size={16} />
                 Novo Cliente
             </button>
-            <button 
-                onClick={exportPDF}
-                disabled={loading || filteredClients.length === 0}
-                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground px-4 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-muted transition-colors disabled:opacity-50"
-            >
-                <Download size={16} />
-                PDF
-            </button>
+            {isAdmin && (
+                <button 
+                    onClick={exportPDF}
+                    disabled={loading || filteredClients.length === 0}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground px-4 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-muted transition-colors disabled:opacity-50"
+                >
+                    <Download size={16} />
+                    PDF
+                </button>
+            )}
         </div>
       </div>
 
