@@ -38,6 +38,7 @@ export default function Sidebar() {
     { name: 'Estoque', icon: Package, href: '/estoque' },
     { name: 'Insights', icon: Sparkles, href: '/insights' },
     { name: 'Minha Barbearia', icon: Scissors, href: '/barbearia' },
+    { name: 'Meus Clientes', icon: User, href: '/clientes' },
     { name: 'Equipe', icon: User, href: '/barbeiros' },
     { name: 'Agendamentos', icon: Calendar, href: '/agenda' },
   ]
@@ -48,6 +49,7 @@ export default function Sidebar() {
     { name: 'Agenda', icon: Calendar, href: '/agenda' },
     { name: 'Analytics', icon: BarChart3, href: '/insights' },
     { name: 'Equipe', icon: User, href: '/barbeiros' },
+    { name: 'Clientes', icon: User, href: '/clientes' },
     { name: 'Insights', icon: Lightbulb, href: '/insights' },
     { name: 'Gerenciador', icon: Settings, href: '/barbearia' },
     { name: 'Estoques', icon: Package, href: '/estoque' },
