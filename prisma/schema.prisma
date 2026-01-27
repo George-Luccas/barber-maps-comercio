@@ -196,6 +196,7 @@ model User {
   phone                  String?
   phoneExportedAt        DateTime?
   role                   UserRole           @default(BARBER)
+  source                 String?            @default("BARBER_MAPS_COMERCIO")
   welcomeDiscountClaimed Boolean            @default(false)
   welcomeDiscountUsed    Boolean            @default(false)
   Barbershop             Barbershop?
@@ -273,7 +274,7 @@ model LoyaltyCard {
   tier                LoyaltyTier @default(BRONZE)
   totalLifetimePoints Int         @default(0)
   Barbershop          Barbershop  @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  user                User        @relation(fields: [userId], references: [id])
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, barbershopId])
 }
