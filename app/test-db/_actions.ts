@@ -52,8 +52,25 @@ export async function resetDatabase() {
     // Por último o usuário
     await db.user.deleteMany({});
     
+
     return { success: true, message: "Banco de dados limpo com sucesso!" };
   } catch (error: any) {
     return { success: false, error: error.message };
+  }
+}
+
+export async function getRecentBookings() {
+  try {
+
+    const bookings = await db.booking.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        BarbershopService: true,
+      }
+    });
+    return bookings;
+  } catch (error) {
+    return [];
   }
 }

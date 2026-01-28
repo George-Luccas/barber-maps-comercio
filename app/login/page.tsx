@@ -90,7 +90,15 @@ export default function LoginPage() {
 
           <div className="relative group">
             <Mail size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
-            <input name="email" type="email" placeholder="EMAIL" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
+            <input 
+              name="email" 
+              type="email" 
+              placeholder="EMAIL" 
+              required 
+              autoCapitalize="none"
+              onInput={(e) => e.currentTarget.value = e.currentTarget.value.toLowerCase()}
+              className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest lowercase-input" 
+            />
           </div>
 
           {!isLogin && (

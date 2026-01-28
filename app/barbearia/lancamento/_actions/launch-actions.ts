@@ -1,8 +1,10 @@
 "use server";
 
 import { db } from "@/app/_lib/prisma";
+
 import { auth } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
+import { calculateServicePoints } from "@/app/_utils/loyalty";
 
 export async function searchClients(term: string) {
   const session = await auth();
@@ -112,54 +114,66 @@ export async function launchService(data: {
         }
     });
 
-    // 2. Update LoyaltyCard
-    // First, find or create
-    let loyaltyCard = await db.loyaltyCard.findUnique({
-        where: {
-            userId_barbershopId: {
-                userId: data.userId,
-                barbershopId: data.barbershopId
-            }
-        }
-    });
 
-    if (!loyaltyCard) {
-        loyaltyCard = await db.loyaltyCard.create({
+    // 2. Update LoyaltyCard (ONLY IF NOT A SHADOW USER)
+    
+    // Check if user is a "shadow" user (placeholder email)
+    const user = await db.user.findUnique({
+        where: { id: data.userId }
+    });
+    
+    const isShadowUser = user?.email.endsWith("@sememail.com");
+
+    if (!isShadowUser) {
+        // First, find or create
+        let loyaltyCard = await db.loyaltyCard.findUnique({
+            where: {
+                userId_barbershopId: {
+                    userId: data.userId,
+                    barbershopId: data.barbershopId
+                }
+            }
+        });
+
+        if (!loyaltyCard) {
+            loyaltyCard = await db.loyaltyCard.create({
+                data: {
+                    id: crypto.randomUUID(),
+                    userId: data.userId,
+                    barbershopId: data.barbershopId,
+                    completedCuts: 0,
+                    currentPoints: 0,
+                    totalLifetimePoints: 0,
+                    tier: "BRONZE",
+                    updatedAt: new Date()
+                }
+            });
+        }
+
+
+        // Calculate new values
+        const points = calculateServicePoints(service.name, service.points || 10);
+        const newCompletedCuts = loyaltyCard.completedCuts + 1;
+        const newCurrentPoints = loyaltyCard.currentPoints + points;
+        const newTotalPoints = loyaltyCard.totalLifetimePoints + points;
+
+        // Recalculate Tier
+        let newTier: "BRONZE" | "SILVER" | "GOLD" = "BRONZE";
+        if (newTotalPoints >= 1000) newTier = "GOLD";
+        else if (newTotalPoints >= 300) newTier = "SILVER";
+
+        // Update Loyalty Card
+        await db.loyaltyCard.update({
+            where: { id: loyaltyCard.id },
             data: {
-                id: crypto.randomUUID(),
-                userId: data.userId,
-                barbershopId: data.barbershopId,
-                completedCuts: 0,
-                currentPoints: 0,
-                totalLifetimePoints: 0,
-                tier: "BRONZE",
+                completedCuts: newCompletedCuts,
+                currentPoints: newCurrentPoints,
+                totalLifetimePoints: newTotalPoints,
+                tier: newTier,
                 updatedAt: new Date()
             }
         });
     }
-
-    // Calculate new values
-    const points = service.points || 10; // Default 10 if null
-    const newCompletedCuts = loyaltyCard.completedCuts + 1;
-    const newCurrentPoints = loyaltyCard.currentPoints + points;
-    const newTotalPoints = loyaltyCard.totalLifetimePoints + points;
-
-    // Recalculate Tier
-    let newTier: "BRONZE" | "SILVER" | "GOLD" = "BRONZE";
-    if (newTotalPoints >= 1000) newTier = "GOLD";
-    else if (newTotalPoints >= 300) newTier = "SILVER";
-
-    // Update Loyalty Card
-    await db.loyaltyCard.update({
-        where: { id: loyaltyCard.id },
-        data: {
-            completedCuts: newCompletedCuts,
-            currentPoints: newCurrentPoints,
-            totalLifetimePoints: newTotalPoints,
-            tier: newTier,
-            updatedAt: new Date()
-        }
-    });
 
     revalidatePath("/barbearia/lancamento");
     revalidatePath("/agenda");

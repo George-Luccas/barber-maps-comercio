@@ -5,10 +5,10 @@ import bcrypt from "bcryptjs"
 import { revalidatePath } from "next/cache"
 
 export async function registerUser(formData: FormData) {
-  const name = formData.get("name") as string
-  const email = formData.get("email") as string
-  const phone = formData.get("phone") as string
-  const password = formData.get("password") as string
+  const name = (formData.get("name") as string).trim()
+  const email = (formData.get("email") as string).trim().toLowerCase()
+  const phone = (formData.get("phone") as string).trim()
+  const password = (formData.get("password") as string).trim()
 
   try {
     // 1. Validação básica
