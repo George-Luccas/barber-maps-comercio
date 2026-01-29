@@ -127,18 +127,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* ESQUECI MINHA SENHA */}
-          {isLogin && (
-             <div className="flex justify-end pt-2 relative z-[9999]">
-               <button 
-                 type="button"
-                 onClick={() => window.location.assign('/forgot-password')}
-                 className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors cursor-pointer p-4 pointer-events-auto bg-transparent border-none outline-none"
-               >
-                 RECUPERAR SENHA
-               </button>
-             </div>
-          )}
+
 
           <button 
             disabled={loading}
@@ -153,6 +142,18 @@ export default function LoginPage() {
             </div>
           </button>
         </form>
+
+        {/* ESQUECI MINHA SENHA - REMOVIDO DO FORM PARA EVITAR CONFLITOS */}
+        {isLogin && (
+            <div className="flex justify-end mt-4 relative z-[9999]">
+            <a 
+                href="/forgot-password" 
+                className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors cursor-pointer p-2 block"
+            >
+                RECUPERAR SENHA
+            </a>
+            </div>
+        )}
 
         <p className="mt-8 text-center text-muted-foreground text-xs font-black uppercase tracking-[0.2em] italic">
           {isLogin ? 'NÃO TEM CONTA?' : 'JÁ POSSUI CONTA?'} 
