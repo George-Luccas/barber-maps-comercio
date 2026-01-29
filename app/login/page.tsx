@@ -129,10 +129,14 @@ export default function LoginPage() {
 
           {/* ESQUECI MINHA SENHA */}
           {isLogin && (
-             <div className="flex justify-end pt-2 relative z-50">
-               <a href="/forgot-password" className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors cursor-pointer p-2 block">
+             <div className="flex justify-end pt-2 relative z-[9999]">
+               <button 
+                 type="button"
+                 onClick={() => window.location.assign('/forgot-password')}
+                 className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors cursor-pointer p-4 pointer-events-auto bg-transparent border-none outline-none"
+               >
                  RECUPERAR SENHA
-               </a>
+               </button>
              </div>
           )}
 
