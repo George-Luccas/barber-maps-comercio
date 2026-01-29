@@ -70,12 +70,23 @@ export async function saveBarberServices(
       },
     });
 
-    // 2. Limpar serviços antigos
+    // 2. Buscar serviços antigos para preservar descrições
+    const oldServices = await db.barbershopService.findMany({
+      where: { barbershopId: barbershop.id },
+      select: { name: true, description: true }
+    });
+
+    const descriptionMap = new Map<string, string>();
+    oldServices.forEach(s => {
+      descriptionMap.set(s.name, s.description);
+    });
+
+    // 3. Limpar serviços antigos
     await db.barbershopService.deleteMany({
       where: { barbershopId: barbershop.id }
     });
 
-    // 3. Criar novos serviços
+    // 4. Criar novos serviços
     if (services.length > 0) {
       // Filter out invalid services
       const validServices = services.filter(s => s.name && !isNaN(s.price));
@@ -85,8 +96,9 @@ export async function saveBarberServices(
           data: validServices.map(s => ({
             name: s.name,
             priceInCents: Math.round(s.price * 100),
-            description: "Serviço profissional",
-            imageUrl: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=500",
+            // Preserva a descrição se o serviço já existia, senão usa padrão
+            description: descriptionMap.get(s.name) || "Serviço profissional", 
+            imageUrl: "",
             barbershopId: barbershop.id
           }))
         });
