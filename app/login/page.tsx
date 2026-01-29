@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Lock, Mail, Phone, User, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { registerUser } from "./_actions/register" // Vamos criar esse arquivo em seguida
 
 export default function LoginPage() {
@@ -125,6 +126,15 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
             </button>
           </div>
+
+          {/* ESQUECI MINHA SENHA */}
+          {isLogin && (
+             <div className="flex justify-end pt-2">
+               <Link href="/forgot-password" className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors">
+                 Esqueci minha senha
+               </Link>
+             </div>
+          )}
 
           <button 
             disabled={loading}

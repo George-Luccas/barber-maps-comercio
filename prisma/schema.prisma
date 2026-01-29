@@ -344,6 +344,8 @@ enum LoyaltyTier {
   GOLD
 }
 
+
+
 model City {
   id        String   @id @default(uuid())
   name      String   @unique
@@ -352,4 +354,14 @@ model City {
   updatedAt DateTime @updatedAt
   
   @@map("city")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@map("password_reset_token")
 }
