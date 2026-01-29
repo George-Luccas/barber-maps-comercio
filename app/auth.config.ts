@@ -13,7 +13,7 @@ export const authConfig = {
       
       const isOnSuspendedPage = nextUrl.pathname === '/suspended';
       const isOnLoginPage = nextUrl.pathname.startsWith('/login');
-      const isPublicPath = ["/login", "/register", "/landing", "/test-db", "/api"].some(p => nextUrl.pathname.startsWith(p));
+      const isPublicPath = ["/login", "/register", "/landing", "/test-db", "/api", "/forgot-password", "/reset-password"].some(p => nextUrl.pathname.startsWith(p));
 
       // 1. If suspended, FORCE redirect to /suspended (unless already there)
       if (isSuspended && !isOnSuspendedPage) {
