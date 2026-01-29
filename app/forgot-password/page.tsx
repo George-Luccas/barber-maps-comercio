@@ -23,12 +23,14 @@ export default function ForgotPasswordPage() {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) throw new Error("Erro ao enviar");
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || "Erro ao enviar");
 
       setSent(true);
       toast.success("Se o e-mail existir, você receberá um link de recuperação.");
-    } catch (error) {
-      toast.error("Ocorreu um erro. Tente novamente mais tarde.");
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

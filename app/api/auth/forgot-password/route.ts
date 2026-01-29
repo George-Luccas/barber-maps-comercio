@@ -29,13 +29,14 @@ export async function POST(req: Request) {
       data: { email, token, expiresAt },
     });
 
-    const link = `${process.env.NEXT_PUBLIC_APP_URL || process.env.URL || "http://localhost:3000"}/reset-password?token=${token}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || process.env.URL || "http://localhost:3000";
+    const link = `${baseUrl}/reset-password?token=${token}`;
 
     await sendEmail(email, link);
 
     return NextResponse.json({ ok: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro no forgot-password:", error);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Erro interno ao enviar email" }, { status: 500 });
   }
 }
