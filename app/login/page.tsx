@@ -129,9 +129,9 @@ export default function LoginPage() {
 
           {/* ESQUECI MINHA SENHA */}
           {isLogin && (
-             <div className="flex justify-end pt-2">
-               <Link href="/forgot-password" className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors">
-                 Esqueci minha senha
+             <div className="flex justify-end pt-2 relative z-50">
+               <Link href="/forgot-password" className="text-xs font-black text-brand-primary hover:text-foreground uppercase tracking-widest transition-colors cursor-pointer p-2">
+                 RECUPERAR SENHA
                </Link>
              </div>
           )}
