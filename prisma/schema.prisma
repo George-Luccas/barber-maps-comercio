@@ -343,3 +343,13 @@ enum LoyaltyTier {
   SILVER
   GOLD
 }
+
+model City {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  state     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("city")
+}

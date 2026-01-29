@@ -1,0 +1,21 @@
+export const CITIES = [
+  "Cuiabá",
+  "Várzea Grande",
+  "Rondonópolis",
+  "Sinop",
+  "Tangará da Serra",
+  "Primavera do Leste",
+  "Sorriso",
+  "Lucas do Rio Verde",
+  "Barra do Garças",
+  "Cáceres",
+  "Nova Mutum",
+  "Campo Novo do Parecis",
+  "Brasília",
+  "São Paulo",
+  "Rio de Janeiro",
+  "Curitiba",
+  "Belo Horizonte",
+  "Goiânia",
+  "Campo Grande"
+].sort();

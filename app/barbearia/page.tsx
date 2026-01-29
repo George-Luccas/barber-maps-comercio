@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
 import { getBarbershopData } from "./_actions/get-barbershop";
 import { getBarbershopProducts, saveBarbershopProduct, deleteBarbershopProduct } from "./_actions/product-actions";
+import { getCities, addCity } from "../_actions/city-actions";
 
 // Sugestões para agilidade
 const SUGESTOES_SERVICOS = [
@@ -43,6 +44,11 @@ export default function MinhaBarbearia() {
   // Estado do Frigobar
   const [products, setProducts] = useState<{id: string, name: string, price: number, quantity: number}[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", price: "", quantity: "" });
+
+  // Estados de Cidades
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [isAddingCity, setIsAddingCity] = useState(false);
+  const [newCityName, setNewCityName] = useState("");
 
   // Estados dos Horários
   const [horarios, setHorarios] = useState({
@@ -92,12 +98,31 @@ export default function MinhaBarbearia() {
                 quantity: p.quantity
             })));
         }
+
+        // Carregar cidades
+        const citiesList = await getCities();
+        setAvailableCities(citiesList);
       }
       setFetching(false);
       setMounted(true);
     }
     loadData();
   }, []);
+
+  const handleAddCity = async () => {
+      if (!newCityName.trim()) return alert("Digite o nome da cidade");
+      
+      const res = await addCity(newCityName);
+      if (res.success && res.city) {
+          setAvailableCities(prev => [...prev, res.city!].sort());
+          setCity(res.city!);
+          setIsAddingCity(false);
+          setNewCityName("");
+          alert("Cidade adicionada!");
+      } else {
+          alert("Erro ao adicionar cidade: " + res.error);
+      }
+  };
 
   const handleAddProduct = async () => {
     if (!newProduct.name.trim()) return alert("Nome do produto obrigatório");
@@ -364,13 +389,56 @@ export default function MinhaBarbearia() {
                 <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                   <MapPin size={14} className="text-brand-primary" /> Cidade
                 </label>
-                <input 
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground uppercase"
-                  placeholder="SAO PAULO"
-                />
+                  <div className="relative">
+                    <select 
+                      value={city.toUpperCase()}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === "OTHER_NEW_CITY") {
+                              setIsAddingCity(true);
+                          } else {
+                              setCity(val);
+                          }
+                      }}
+                      className="w-full bg-card border border-border rounded-xl p-4 pr-10 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground uppercase appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled className="text-muted-foreground">Selecione uma cidade</option>
+                      {availableCities.map((c) => (
+                        <option key={c} value={c.toUpperCase()}>{c.toUpperCase()}</option>
+                      ))}
+                      <option value="OTHER_NEW_CITY" className="text-brand-primary font-bold">+ ADICIONAR OUTRA CIDADE</option>
+                      
+                      {/* Preserva a cidade atual se não estiver na lista (e não estiver vazia) */}
+                      {city && !availableCities.map(c => c.toUpperCase()).includes(city.toUpperCase()) && (
+                         <option value={city.toUpperCase()}>{city.toUpperCase()}</option>
+                      )}
+                    </select>
+                    <div className="absolute top-1/2 -translate-y-1/2 right-4 text-muted-foreground pointer-events-none">
+                      <ChevronDown size={20} />
+                    </div>
+                  </div>
+
+                  {/* Modal/Input Simples para nova cidade */}
+                  {isAddingCity && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                          <div className="bg-card border border-border p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+                              <h3 className="font-black italic uppercase text-lg">Adicionar Cidade</h3>
+                              <p className="text-xs text-muted-foreground">O nome será adicionado à lista para todos os usuários.</p>
+                              <input 
+                                autoFocus
+                                type="text"
+                                value={newCityName}
+                                onChange={(e) => setNewCityName(e.target.value)}
+                                placeholder="Nome da cidade (Ex: ITAPEMA)"
+                                className="w-full bg-muted border border-border rounded-xl p-3 focus:border-brand-primary outline-none text-sm font-bold uppercase"
+                              />
+                              <div className="flex gap-2 justify-end">
+                                  <button onClick={() => setIsAddingCity(false)} className="px-4 py-2 text-xs font-bold uppercase text-muted-foreground hover:text-foreground">Cancelar</button>
+                                  <button onClick={handleAddCity} className="px-4 py-2 bg-brand-primary text-primary-foreground text-xs font-bold uppercase rounded-xl hover:opacity-90">Salvar</button>
+                              </div>
+                          </div>
+                      </div>
+                  )}
               </div>
               <div className="space-y-2">
                 <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
