@@ -21,6 +21,7 @@ export default function LoginPage() {
     const data = Object.fromEntries(formData)
 
     try {
+      if (isLogin) {
         // DEBUG: Manual fetch to see the error
         console.log("Debug: Manual Login Fetch");
         
