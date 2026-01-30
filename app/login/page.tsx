@@ -22,25 +22,56 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        // LÓGICA DE LOGIN
-        const result = await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          redirect: false,
-        })
+        // LÓGICA DE LOGIN MANUAL DEBUG
+        console.log("Debug: Iniciando login manual...");
 
-        if (result?.error) {
-          console.error("Login Result Error:", result);
-            // Tenta extrair mensagem amigável
-            if (result.error.includes("code")) {
-                 alert("Credenciais inválidas ou erro no servidor.");
-            } else {
-                 alert("Erro ao entrar: " + result.error);
-            }
-        } else {
-          router.push("/");
-          router.refresh();
+        // 1. Obter CSRF Token
+        const csrfRes = await fetch("/api/auth/csrf");
+        const csrfJson = await csrfRes.json();
+        const csrfToken = csrfJson.csrfToken;
+
+        console.log("CSRF Token obtido:", csrfToken);
+
+        // 2. Fazer POST de credenciais
+        const params = new URLSearchParams();
+        params.append("email", data.email as string);
+        params.append("password", data.password as string);
+        params.append("csrfToken", csrfToken);
+        params.append("json", "true");
+
+        const res = await fetch("/api/auth/callback/credentials", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: params
+        });
+
+        const text = await res.text();
+        console.log(`Login Status: ${res.status}`);
+        console.log(`Login Raw Body: ${text}`);
+
+        if (!res.ok) {
+            // Tenta mostrar o erro real da resposta HTML/Texto
+            // Se for 405 Method Not Allowed, vai aparecer no alert.
+            alert(`Erro do Servidor (${res.status}):\n\n${text.slice(0, 200)}`);
+            throw new Error(`Erro server: ${res.status}`);
         }
+
+        // Se sucesso (pode ser URL ou JSON)
+        try {
+            const json = JSON.parse(text);
+            if (json.url) {
+                window.location.href = json.url;
+                return;
+            }
+        } catch(e) { 
+            // Se não for JSON, mas deu ok, redireciona home
+            console.log("Resposta OK mas não-JSON, redirecionando..."); 
+        }
+
+        window.location.href = "/";
+        return;
       } else {
         // LÓGICA DE CADASTRO (Server Action)
         const res = await registerUser(formData);
