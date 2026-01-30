@@ -1,13 +1,12 @@
 import { handlers } from "@/app/_lib/auth"
 
 // export const { GET, POST } = handlers
-export const GET = handlers.GET
+export async function GET(req: Request) {
+    return handlers.GET(req);
+}
 
-// PROVA DE INFRAESTRUTURA:
-// Se isso retornar 200, o problema é DENTRO do NextAuth.
-// Se retornar 405, o problema é na ROTA/VERCEL.
 export async function POST(req: Request) {
-    return Response.json({ message: "INFRAESTRUTURA PROBE: OK" });
+    return handlers.POST(req);
 }
 
 export const runtime = "nodejs"
