@@ -22,7 +22,12 @@ export default async function AdminDashboard() {
   try {
     dbUser = await db.user.findUnique({
         where: { id: session.user.id },
-        include: { Barbershop: true }
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            Barbershop: true // Select the relation
+        }
     });
   } catch (error) {
     console.error("Critical Error fetching user in dashboard:", error);
