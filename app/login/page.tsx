@@ -18,6 +18,8 @@ export default function LoginPage() {
     setLoading(true)
     
     const formData = new FormData(event.currentTarget)
+    const data = Object.fromEntries(formData)
+
     try {
       if (isLogin) {
         // LÓGICA DE LOGIN
