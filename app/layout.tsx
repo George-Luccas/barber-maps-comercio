@@ -13,6 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "BarberMaps - Admin",
   description: "Gerenciamento de Barbearia",
+  manifest: "/manifest.json",
 };
 
 export const dynamic = "force-dynamic";

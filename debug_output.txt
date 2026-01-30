@@ -1,0 +1,13 @@
+Searching for user with email: georgeluccas300@gmail.com
+Found 1 user(s):
+- ID: wwW9AQrMrqEIkj6WFpk0U8DV7ZxfW4Gp, Email: georgeluccas300@gmail.com, Provider: undefined, CreatedAt: Wed Jan 28 2026 22:16:19 GMT-0400 (Horário Padrão do Amazonas)
+  -> Barbershop: NONE
+---
+Searching for ALL Barbershops to see if one looks like it belongs to George:
+- Shop ID: e4a83342-41a5-4a5c-81e7-3df51822b89b, Name: Barbearia Rio Verde, ManagerID: null
+- Shop ID: 5c6eb950-953c-4e1a-a744-c85dbbd9e856, Name: Cuiabá Barber Club, ManagerID: null
+- Shop ID: 6d564f06-ddba-424d-ad25-6ef4f1d01469, Name: Floripa Cuts, ManagerID: null
+- Shop ID: dbfac0c0-31da-4eff-9a0c-aa187653b006, Name: Xomano Barber Shop, ManagerID: 3df6e52d-1ed2-4e09-8622-5697fac02a9e
+- Shop ID: a75d8d82-49f8-4189-bd3a-d8a14c9a56d4, Name: abc Barber Shop, ManagerID: aec0e705-6dc4-4748-acc2-46ec6ef0b4c0
+- Shop ID: 8c881a16-3c34-4a54-b284-a333b54db75e, Name: george luccas Barber Shop, ManagerID: null
+- Shop ID: 14fa38f0-9174-4c7c-aa2e-c884ae4d2d73, Name: RYAN Barber Shop, ManagerID: 7c46b370-0377-4160-826f-2cb8ca8c79b9
