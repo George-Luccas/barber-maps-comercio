@@ -7,7 +7,7 @@ import { authConfig } from "@/app/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(db),
+  // adapter: PrismaAdapter(db),
   providers: [
     Credentials({
       credentials: {
@@ -35,7 +35,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (!isValid) return null;
 
-            return user;
+            // return user; 
+            // Retornamos um objeto simples para evitar erros de serialização (Dates, Decimals)
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                role: user.role,
+            };
         } catch (error) {
             console.error("Erro na autorização:", error);
             return null;
