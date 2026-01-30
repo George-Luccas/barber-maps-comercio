@@ -244,5 +244,16 @@
     @apply backdrop-blur-xl bg-card border border-brand-secondary/20 shadow-2xl;
     background-image: radial-gradient(circle at top left, rgba(56, 189, 248, 0.05), transparent);
   }
+
+  @keyframes spin-y-pause {
+    0% { transform: rotateY(0deg); }
+    20% { transform: rotateY(360deg); }
+    100% { transform: rotateY(360deg); }
+  }
+
+  .animate-spin-y-10s {
+    animation: spin-y-pause 10s ease-in-out infinite;
+    transform-style: preserve-3d;
+  }
 }
 
