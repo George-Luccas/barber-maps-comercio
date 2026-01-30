@@ -38,7 +38,6 @@ export async function registerUser(formData: FormData) {
         email,
         password: hashedPassword,
         role: email === "georgeluccas300@gmail.com" ? "ADMIN" : "BARBER",
-        source: "BARBER_MAPS_COMERCIO",
         updatedAt: new Date(),
         Barbershop: {
           create: {

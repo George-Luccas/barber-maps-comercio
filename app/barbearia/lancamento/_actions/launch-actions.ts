@@ -67,7 +67,6 @@ export async function quickRegister(data: { name: string; phone: string }) {
         email: emailToUse,
         role: "CLIENT",
         password: "", // No password for quick registered users
-        source: "BARBER_MAPS_COMERCIO",
       },
     });
 

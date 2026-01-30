@@ -24,8 +24,7 @@ export async function getClients() {
                  name: true,
                  phone: true,
                  email: true,
-                 role: true,
-                 source: true
+                 role: true
              }
         }
       },
