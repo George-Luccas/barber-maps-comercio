@@ -21,25 +21,37 @@ export default function LoginPage() {
     const data = Object.fromEntries(formData)
 
     try {
-      if (isLogin) {
-        // LÓGICA DE LOGIN
-      const text = await res.text();
-      console.log("Login Status:", res.status);
-      console.log("Login Response:", text);
+        // DEBUG: Manual fetch to see the error
+        console.log("Debug: Manual Login Fetch");
+        
+        // 1. Get CSRF Token
+        const csrfRes = await fetch("/api/auth/csrf");
+        const csrfData = await csrfRes.json();
+        
+        // 2. Post Credentials
+        const res = await fetch("/api/auth/callback/credentials", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                ...data,
+                csrfToken: csrfData.csrfToken,
+                json: "true"
+            })
+        });
 
-      let data;
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        throw new Error(`Erro desconhecido (${res.status}): Resposta não é JSON valid.`);
-      }
+        const text = await res.text();
+        console.log("Login Raw Response:", text);
+        console.log("Login Status:", res.status);
 
-      if (!res.ok) {
-        throw new Error(data.error || text || "Erro ao fazer login");
-      }
+        if (!res.ok) {
+            throw new Error(`Erro ${res.status}: ${text.slice(0, 100)}`);
+        }
 
-      router.push("/");
-      router.refresh();
+        // Se passar, recarrega
+        window.location.href = "/";
+        return;
       } else {
         // LÓGICA DE CADASTRO (Server Action)
         const res = await registerUser(formData);
