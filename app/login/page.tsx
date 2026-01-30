@@ -23,18 +23,23 @@ export default function LoginPage() {
     try {
       if (isLogin) {
         // LÓGICA DE LOGIN
-        const result = await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          redirect: false,
-        })
+      const text = await res.text();
+      console.log("Login Status:", res.status);
+      console.log("Login Response:", text);
 
-        if (result?.error) {
-          alert("Email ou senha inválidos!")
-        } else {
-          router.push("/") // Manda para o Dashboard
-          router.refresh()
-        }
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        throw new Error(`Erro desconhecido (${res.status}): Resposta não é JSON valid.`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || text || "Erro ao fazer login");
+      }
+
+      router.push("/");
+      router.refresh();
       } else {
         // LÓGICA DE CADASTRO (Server Action)
         const res = await registerUser(formData);
