@@ -27,7 +27,13 @@ export async function getAdminDashboardData() {
 
         const barbershops = await db.barbershop.findMany({
             include: {
-                manager: true,
+                manager: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                },
                 barbers: true
             },
             orderBy: {
