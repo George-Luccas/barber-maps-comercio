@@ -1,0 +1,5 @@
+Checking email: georgeluccas300@gmail.com
+RESULT: USER_FOUND | ID: BZgh9BcL1dz2vArv5CjztWOzqZMHAzLq
+RESULT: BARBERSHOP_MISSING
+Attempting to restore barbershop...
+RESULT: BARBERSHOP_RESTORED | ID: 099d3846-2648-41be-bde3-8bcdfc741a0c

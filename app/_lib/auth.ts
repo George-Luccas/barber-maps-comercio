@@ -68,6 +68,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const dbUser = await db.user.findUnique({
                where: { email: user.email! },
                select: { 
+                   id: true,
+                   name: true,
+                   phone: true,
                    role: true,
                    Barbershop: {
                        select: {
@@ -84,6 +87,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (dbUser?.Barbershop) {
                 token.barbershopId = dbUser.Barbershop.id;
                 token.isSuspended = dbUser.Barbershop.isSuspended; // Add suspension status
+            } else if (dbUser && (dbUser.role === 'BARBER' || dbUser.role === 'ADMIN')) {
+                // AUTO-RECOVERY: Se for Barbeiro/Admin e não tiver barbearia, cria uma automaticamente.
+                console.warn(`[AUTH] Usuário ${user.email} sem barbearia. Criando automaticamente...`);
+                try {
+                    const newShop = await db.barbershop.create({
+                        data: {
+                            name: `${dbUser.name || 'Minha'} Barbearia`,
+                            managerId: dbUser.id,
+                            phones: dbUser.phone ? [dbUser.phone] : ["(00) 00000-0000"],
+                            description: "Barbearia gerada automaticamente.",
+                            address: "Endereço Pendente"
+                        }
+                    });
+                    console.log(`[AUTH] Barbearia criada: ${newShop.id}`);
+                    token.barbershopId = newShop.id;
+                    token.isSuspended = false;
+                } catch (createError) {
+                    console.error("[AUTH] Erro ao criar barbearia automática:", createError);
+                }
             }
         } catch (error) {
             console.error("Erro no callback JWT:", error);
