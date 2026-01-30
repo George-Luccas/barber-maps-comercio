@@ -130,7 +130,7 @@ export default function Sidebar() {
               </div>
             ) : (
               <>
-                <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain" />
+                <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain animate-spin-y-10s" />
                 <button onClick={() => setIsOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground transition-colors">
                   <X size={24} />
                 </button>
