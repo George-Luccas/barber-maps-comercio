@@ -1,10 +1,10 @@
 import { handlers } from "@/app/_lib/auth"
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     return await handlers.GET(req);
   } catch (error: any) {
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     return await handlers.POST(req);
   } catch (error: any) {
