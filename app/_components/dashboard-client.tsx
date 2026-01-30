@@ -108,7 +108,7 @@ export default function DashboardClient({
           {/* Header (Hidden only on Pro Desktop) */}
           <header className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-border p-6 sm:p-8 bg-card/50 backdrop-blur-md gap-4 ${isPro ? 'md:hidden' : ''}`}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
-                {!isPro && <img src="/logo.png" alt="Barber Maps Logo" className="hidden sm:block h-28 w-auto object-contain animate-spin-y-10s" />}
+                {!isPro && <img src="/logo.png" alt="Barber Maps Logo" className="h-28 w-auto object-contain animate-spin-y-10s" />}
                 <div className="flex sm:hidden items-center gap-2">
                    <MapPin className="text-brand-primary" size={24} fill="currentColor" />
                    <span className="text-2xl font-black text-brand-primary uppercase tracking-tighter">Barber Maps</span>
