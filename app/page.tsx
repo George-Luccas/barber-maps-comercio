@@ -39,8 +39,8 @@ export default async function AdminDashboard() {
   const userFirstName = dbUser.name.split(' ')[0];
 
   if (!barbershopId) {
-    // Authenticated user but NO barbershop -> Force Logout
-    return <ForceLogout />;
+    // Authenticated user but NO barbershop -> Redirect to Onboarding
+    redirect("/onboarding");
   }
 
   if (dbUser.Barbershop?.isSuspended) {
