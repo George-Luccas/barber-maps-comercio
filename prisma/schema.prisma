@@ -196,7 +196,6 @@ model User {
   phone                  String?
   phoneExportedAt        DateTime?
   role                   UserRole           @default(BARBER)
-  instagram              String?
   source                 String?            @default("BARBER_MAPS_COMERCIO")
   welcomeDiscountClaimed Boolean            @default(false)
   welcomeDiscountUsed    Boolean            @default(false)

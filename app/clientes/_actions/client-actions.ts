@@ -24,7 +24,6 @@ export async function getClients() {
                  name: true,
                  phone: true,
                  email: true,
-                 instagram: true,
                  role: true,
                  source: true
              }
@@ -42,7 +41,6 @@ export async function getClients() {
         name: card.user.name,
         phone: card.user.phone,
         email: card.user.email,
-        instagram: card.user.instagram,
         totalCuts: card.completedCuts,
         tier: card.tier,
         currentPoints: card.currentPoints

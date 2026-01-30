@@ -34,7 +34,7 @@ export async function searchClients(term: string) {
   return users;
 }
 
-export async function quickRegister(data: { name: string; phone: string; instagram?: string }) {
+export async function quickRegister(data: { name: string; phone: string }) {
   const session = await auth();
   if (!session?.user) return { error: "Não autorizado" };
 
@@ -65,7 +65,6 @@ export async function quickRegister(data: { name: string; phone: string; instagr
         name: data.name,
         phone: data.phone,
         email: emailToUse,
-        instagram: data.instagram,
         role: "CLIENT",
         password: "", // No password for quick registered users
         source: "BARBER_MAPS_COMERCIO",

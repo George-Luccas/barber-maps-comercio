@@ -25,8 +25,7 @@ export default function ClientsPage() {
 
   const filteredClients = clients.filter(c => 
     c.name.toLowerCase().includes(term.toLowerCase()) || 
-    c.phone.includes(term) ||
-    (c.instagram && c.instagram.toLowerCase().includes(term.toLowerCase()))
+    c.phone.includes(term)
   );
 
   const exportPDF = () => {
@@ -43,14 +42,13 @@ export default function ClientsPage() {
     const tableData = filteredClients.map(c => [
         c.name,
         c.phone,
-        c.instagram || "-",
         c.tier,
         c.totalCuts
     ]);
 
     autoTable(doc, {
         startY: 35,
-        head: [['Nome', 'Telefone', 'Instagram', 'Nível', 'Cortes']],
+        head: [['Nome', 'Telefone', 'Nível', 'Cortes']],
         body: tableData,
         headStyles: { fillColor: [234, 179, 8], textColor: [0, 0, 0], fontStyle: 'bold' },
         styles: { fontSize: 9 },
@@ -94,7 +92,7 @@ export default function ClientsPage() {
             <Search className="text-muted-foreground" size={20} />
             <input 
                 type="text"
-                placeholder="Buscar por nome, telefone ou instagram..."
+                placeholder="Buscar por nome ou telefone..."
                 className="bg-transparent w-full outline-none font-bold uppercase text-sm placeholder:text-muted-foreground/50"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
@@ -132,9 +130,8 @@ export default function ClientsPage() {
                                                  {client.name.charAt(0).toUpperCase()}
                                              </div>
                                              <div>
-                                                 <p className="font-bold text-sm uppercase">{client.name}</p>
-                                                 {client.instagram && <p className="text-[10px] text-brand-primary font-bold">{client.instagram}</p>}
-                                             </div>
+                                                  <p className="font-bold text-sm uppercase">{client.name}</p>
+                                              </div>
                                          </div>
                                      </td>
                                      <td className="py-4">

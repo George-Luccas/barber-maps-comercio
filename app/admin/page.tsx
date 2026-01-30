@@ -62,14 +62,13 @@ export default function AdminPage() {
             const tableData = res.clients.map(c => [
                 c.name,
                 c.phone,
-                c.instagram || "-",
                 c.tier,
                 c.totalCuts
             ]);
 
             autoTable(doc, {
                 startY: 35,
-                head: [['Nome', 'Telefone', 'Instagram', 'Nível', 'Cortes']],
+                head: [['Nome', 'Telefone', 'Nível', 'Cortes']],
                 body: tableData as any,
                 headStyles: { fillColor: [234, 179, 8], textColor: [0, 0, 0], fontStyle: 'bold' },
                 styles: { fontSize: 9 },

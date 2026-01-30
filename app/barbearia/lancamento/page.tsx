@@ -48,7 +48,7 @@ export default function LancamentoPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [newClientName, setNewClientName] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
-  const [newClientInstagram, setNewClientInstagram] = useState("");
+
 
   const formatPhone = (value: string) => {
     return value
@@ -94,8 +94,7 @@ export default function LancamentoPage() {
       
       const res = await quickRegister({
           name: newClientName,
-          phone: newClientPhone,
-          instagram: newClientInstagram || undefined
+          phone: newClientPhone
       });
 
       if (res.error) {
@@ -109,7 +108,6 @@ export default function LancamentoPage() {
           // Limpar form
           setNewClientName("");
           setNewClientPhone("");
-          setNewClientInstagram("");
       }
   };
 
@@ -161,7 +159,7 @@ export default function LancamentoPage() {
                             <div>
                                 <h3 className="text-2xl font-black uppercase text-brand-primary">{selectedClient.name}</h3>
                                 <p className="text-sm font-bold opacity-70">{selectedClient.phone || "Sem telefone"}</p>
-                                <p className="text-xs opacity-50">{selectedClient.email && !selectedClient.email.includes("@sememail.com") ? selectedClient.email : "Instagram: " + ((selectedClient as any).instagram || "Não informado")}</p>
+                                <p className="text-xs opacity-50">{selectedClient.email && !selectedClient.email.includes("@sememail.com") ? selectedClient.email : "Sem email"}</p>
                             </div>
                             <button 
                                 onClick={() => setSelectedClient(null)}
@@ -238,12 +236,7 @@ export default function LancamentoPage() {
                                         onChange={(e) => setNewClientPhone(formatPhone(e.target.value))}
                                         maxLength={15}
                                     />
-                                    <input 
-                                        placeholder="Instagram (Ex: @cliente)"
-                                        className="p-4 bg-muted/50 rounded-xl border border-border outline-none focus:border-brand-primary font-bold text-sm"
-                                        value={newClientInstagram}
-                                        onChange={(e) => setNewClientInstagram(e.target.value)}
-                                    />
+
                                     <div className="flex gap-2 mt-2">
                                         <button 
                                             onClick={() => setIsRegistering(false)}

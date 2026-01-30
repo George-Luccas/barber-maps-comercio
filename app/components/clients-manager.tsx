@@ -15,7 +15,7 @@ export default function ClientsManager() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [newClientName, setNewClientName] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
-  const [newClientInstagram, setNewClientInstagram] = useState("");
+
 
   const loadClients = async () => {
     setLoading(true);
@@ -32,8 +32,7 @@ export default function ClientsManager() {
 
   const filteredClients = clients.filter(c => 
     c.name.toLowerCase().includes(term.toLowerCase()) || 
-    c.phone.includes(term) ||
-    (c.instagram && c.instagram.toLowerCase().includes(term.toLowerCase()))
+    c.phone.includes(term)
   );
 
   const formatPhone = (value: string) => {
@@ -55,8 +54,7 @@ export default function ClientsManager() {
 
     const res = await quickRegister({
         name: newClientName,
-        phone: newClientPhone,
-        instagram: newClientInstagram || undefined
+        phone: newClientPhone
     });
 
     toast.dismiss(loadingToast);
@@ -69,7 +67,6 @@ export default function ClientsManager() {
         // Limpar form
         setNewClientName("");
         setNewClientPhone("");
-        setNewClientInstagram("");
         // Recarregar lista
         loadClients();
     }
@@ -128,12 +125,6 @@ export default function ClientsManager() {
                         onChange={(e) => setNewClientPhone(formatPhone(e.target.value))}
                         maxLength={15}
                     />
-                    <input 
-                        placeholder="Instagram (Ex: @cliente)"
-                        className="p-4 bg-card rounded-xl border border-border outline-none focus:border-brand-primary font-bold text-xs"
-                        value={newClientInstagram}
-                        onChange={(e) => setNewClientInstagram(e.target.value)}
-                    />
                </div>
                
                <div className="flex justify-end mt-4">
@@ -154,7 +145,7 @@ export default function ClientsManager() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input 
                 type="text"
-                placeholder="Buscar por nome, telefone ou instagram..."
+                placeholder="Buscar por nome ou telefone..."
                 className="w-full bg-muted/30 border border-border pl-12 pr-4 py-4 rounded-xl outline-none focus:border-brand-primary transition-all font-bold uppercase text-xs"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
@@ -193,7 +184,6 @@ export default function ClientsManager() {
                                              </div>
                                              <div>
                                                  <p className="font-bold text-xs uppercase">{client.name}</p>
-                                                 {client.instagram && <p className="text-[9px] text-brand-primary font-bold">{client.instagram}</p>}
                                              </div>
                                          </div>
                                      </td>
