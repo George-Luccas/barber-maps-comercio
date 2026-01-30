@@ -58,7 +58,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         try {
             // Quando o usuário faz login, buscamos a barbearia associada
-            /*
             const dbUser = await db.user.findUnique({
                where: { email: user.email! },
                include: { Barbershop: true }
@@ -71,9 +70,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.barbershopId = dbUser.Barbershop.id;
                 token.isSuspended = dbUser.Barbershop.isSuspended; // Add suspension status
             }
-            */
-           // TEMP DEBUG: Simpler token
-           token.role = user.role;
         } catch (error) {
             console.error("Erro no callback JWT:", error);
             // Não quebramos o login, apenas seguimos sem o barbershopId se der erro no banco

@@ -20,39 +20,26 @@ export default function LoginPage() {
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData)
 
-    try {
       if (isLogin) {
-        // DEBUG: Manual fetch to see the error
-        console.log("Debug: Manual Login Fetch");
-        
-        // 1. Get CSRF Token
-        const csrfRes = await fetch("/api/auth/csrf");
-        const csrfData = await csrfRes.json();
-        
-        // 2. Post Credentials
-        const res = await fetch("/api/auth/callback/credentials", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                ...data,
-                csrfToken: csrfData.csrfToken,
-                json: "true"
-            })
-        });
+        // LÓGICA DE LOGIN
+        const result = await signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        })
 
-        const text = await res.text();
-        console.log("Login Raw Response:", text);
-        console.log("Login Status:", res.status);
-
-        if (!res.ok) {
-            throw new Error(`Erro ${res.status}: ${text.slice(0, 100)}`);
+        if (result?.error) {
+          console.error("Login Result Error:", result);
+            // Tenta extrair mensagem amigável
+            if (result.error.includes("code")) {
+                 alert("Credenciais inválidas ou erro no servidor.");
+            } else {
+                 alert("Erro ao entrar: " + result.error);
+            }
+        } else {
+          router.push("/");
+          router.refresh();
         }
-
-        // Se passar, recarrega
-        window.location.href = "/";
-        return;
       } else {
         // LÓGICA DE CADASTRO (Server Action)
         const res = await registerUser(formData);
