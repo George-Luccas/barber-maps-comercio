@@ -63,11 +63,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, trigger, session }) {
       if (user) {
         try {
-            // REDUCED PAYLOAD to prevent cookie chunking/header overflow
-            token.role = user.role;
-            // token.barbershopId ... (removed for stability)
+            // Quando o usuário faz login, buscamos a barbearia associada
+            // OTIMIZAÇÃO: Buscamos APENAS o necessário para o cookie (evitar estouro de 4KB)
+            const dbUser = await db.user.findUnique({
+               where: { email: user.email! },
+               select: { 
+                   role: true,
+                   Barbershop: {
+                       select: {
+                           id: true,
+                           isSuspended: true
+                       }
+                   }
+               }
+            });
+            
+            if (dbUser) {
+                token.role = dbUser.role; // Passa a ROLE para o token
+            }
+            if (dbUser?.Barbershop) {
+                token.barbershopId = dbUser.Barbershop.id;
+                token.isSuspended = dbUser.Barbershop.isSuspended; // Add suspension status
+            }
         } catch (error) {
             console.error("Erro no callback JWT:", error);
+            // Não quebramos o login, apenas seguimos sem o barbershopId se der erro no banco
         }
       }
       return token;
