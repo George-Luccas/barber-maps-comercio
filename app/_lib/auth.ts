@@ -16,6 +16,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
+            console.log("Tentando autorizar:", credentials?.email);
             if (!credentials?.email || !credentials?.password) return null;
 
             const email = (credentials.email as string).trim().toLowerCase();
