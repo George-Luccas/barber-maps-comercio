@@ -37,12 +37,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (!isValid) return null;
 
             // return user; 
-            // Retornamos um objeto simples para evitar erros de serialização (Dates, Decimals)
+            // Validação de segurança para o Cookie
+            let safeImage = user.image;
+            if (safeImage && safeImage.length > 500) {
+                console.warn(`[AUTH] Imagem do usuário ${user.email} muito grande (${safeImage.length} chars). Removendo do token.`);
+                safeImage = null; // Remove imagem se for base64 gigante
+            }
+
             return {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                image: user.image,
+                image: safeImage,
                 role: user.role,
             };
         } catch (error) {
