@@ -39,7 +39,10 @@ export default function LoginPage() {
         params.append("csrfToken", csrfToken);
         params.append("json", "true");
 
-        const res = await fetch("/api/auth/callback/credentials", {
+        const fetchUrl = "/api/auth/callback/credentials";
+        console.log("Fetch URL:", fetchUrl);
+
+        const res = await fetch(fetchUrl, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/x-www-form-urlencoded",
