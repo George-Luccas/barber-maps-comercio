@@ -3,7 +3,7 @@
 import { db } from "../app/_lib/prisma";
 
 const API_URL = "http://localhost:3000/api/external/v1";
-const API_KEY = "dev-api-key-123";
+const API_KEY = "sk_ryw3jqn5b_ml1r6ge0";
 
 // HARDCODED IDs FROM PREVIOUS STEP (Replace these manually or fetch dynamically)
 // Since I can't interactively paste, I will fetch them dynamically inside this script too
@@ -13,8 +13,8 @@ async function main() {
   console.log("🚀 Starting Integration Test for Barber Maps API...");
 
   // 1. Setup: Get Valid IDs (Targeting the Demo Shop specifically)
-  const shop = await db.barbershop.findUnique({ 
-      where: { id: "demo-shop-uuid" },
+  const shop = await db.barbershop.findFirst({ 
+      where: { name: { contains: "Car", mode: 'insensitive' } },
       include: { BarbershopService: true }
   });
   if (!shop || shop.BarbershopService.length === 0) {
