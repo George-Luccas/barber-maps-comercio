@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAdminDashboardData, toggleBarbershopSuspension } from "./_actions/admin-actions";
 import Link from "next/link";
-import { ChevronLeft, Loader2, ShieldAlert, Store, User, Users, Download } from "lucide-react";
+import { ChevronLeft, Loader2, ShieldAlert, Store, User, Users, Download, Key, Trash, Copy, Plus } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -14,7 +14,7 @@ export default function AdminPage() {
     const [barbershops, setBarbershops] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [activeTab, setActiveTab] = useState<'BARBERSHOPS' | 'USERS' | 'REPORTS'>('BARBERSHOPS');
+    const [activeTab, setActiveTab] = useState<'BARBERSHOPS' | 'USERS' | 'REPORTS' | 'API'>('BARBERSHOPS');
 
     useEffect(() => {
         loadData();
@@ -121,6 +121,12 @@ export default function AdminPage() {
                         >
                             Relatórios
                         </button>
+                        <button 
+                            onClick={() => setActiveTab('API')}
+                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'API' ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                            Integrações
+                        </button>
                     </div>
 
                     <Link href="/" className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-brand-primary transition-colors">
@@ -204,6 +210,12 @@ export default function AdminPage() {
                          <DiscountReportSection />
                     </div>
                 )}
+
+                {activeTab === 'API' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4">
+                         <ApiKeysSection />
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -254,6 +266,226 @@ function DiscountReportSection() {
                         <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">Nenhum desconto registrado ainda</p>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+}
+
+function ApiKeysSection() {
+    const [keys, setKeys] = useState<any[]>([]);
+    const [webhooks, setWebhooks] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    async function loadData() {
+        setLoading(true);
+        const mod = await import("./_actions/admin-actions");
+        
+        const [keysRes, webhooksRes] = await Promise.all([
+            mod.getApiKeys(),
+            mod.getWebhooks()
+        ]);
+
+        if (keysRes.success) setKeys(keysRes.keys || []);
+        if (webhooksRes.success) setWebhooks(webhooksRes.webhooks || []);
+        
+        setLoading(false);
+    }
+
+    async function handleCreateKey() {
+        const name = window.prompt("Nome da Aplicação / Integração:");
+        if (!name) return;
+
+        const mod = await import("./_actions/admin-actions");
+        const res = await mod.createApiKey(name);
+
+        if (res.success && res.key) {
+            toast.success("Chave criada com sucesso!");
+            loadData();
+            window.alert(`Sua nova chave de API:\n\n${res.key.key}\n\nCopie agora, ela não será mostrada novamente nessa tela.`);
+        } else {
+            toast.error("Erro ao criar chave: " + res.error);
+        }
+    }
+    
+    async function handleCreateWebhook() {
+        const name = window.prompt("Nome do Webhook (ex: Barber Maps Prod):");
+        if (!name) return;
+        
+        const url = window.prompt("URL do Endpoint (https://...):");
+        if (!url) return;
+
+        const mod = await import("./_actions/admin-actions");
+        const res = await mod.createWebhook(url, name);
+
+        if (res.success) {
+            toast.success("Webhook criado com sucesso!");
+            loadData();
+        } else {
+            toast.error("Erro ao criar webhook: " + res.error);
+        }
+    }
+
+    async function handleRevokeKey(id: string) {
+        if (!confirm("Tem certeza? A aplicação que usa essa chave perderá o acesso imediatamente.")) return;
+        
+        const mod = await import("./_actions/admin-actions");
+        const res = await mod.revokeApiKey(id);
+        
+        if (res.success) {
+            toast.success("Chave revogada!");
+            loadData();
+        } else {
+            toast.error("Erro: " + res.error);
+        }
+    }
+
+    async function handleDeleteWebhook(id: string) {
+        if (!confirm("Tem certeza? O endpoint deixará de receber notificações.")) return;
+        
+        const mod = await import("./_actions/admin-actions");
+        const res = await mod.deleteWebhook(id);
+        
+        if (res.success) {
+            toast.success("Webhook removido!");
+            loadData();
+        } else {
+            toast.error("Erro: " + res.error);
+        }
+    }
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Copiado para a área de transferência!");
+    };
+
+    if (loading) return <div className="p-4 text-center text-muted-foreground">Carregando integrações...</div>;
+
+    return (
+        <div className="space-y-10">
+            {/* API KEYS SECTION */}
+            <div className="space-y-6">
+                <header className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                            <Key size={20} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black uppercase tracking-tighter">Chaves de <span className="text-blue-500">API</span></h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Gestão de Acesso Externo</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={handleCreateKey}
+                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition"
+                    >
+                        <Plus size={16} /> Nova Chave
+                    </button>
+                </header>
+
+                <div className="space-y-4">
+                    {keys.length > 0 ? keys.map((apiKey) => (
+                        <div key={apiKey.id} className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${apiKey.isActive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                                    <Key size={20} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-sm uppercase">{apiKey.name}</h3>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded mt-1">
+                                        {apiKey.key.substring(0, 10)}...{apiKey.key.substring(apiKey.key.length - 4)}
+                                        <button onClick={() => copyToClipboard(apiKey.key)} className="hover:text-foreground">
+                                            <Copy size={12} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="text-right hidden md:block">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Criado em</p>
+                                    <p className="text-xs font-medium">{new Date(apiKey.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <button 
+                                    onClick={() => handleRevokeKey(apiKey.id)}
+                                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    title="Revogar Chave"
+                                >
+                                    <Trash size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    )) : (
+                        <div className="p-8 text-center border-2 border-dashed border-border rounded-2xl">
+                            <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">Nenhuma chave de API ativa</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* WEBHOOKS SECTION */}
+            <div className="space-y-6">
+                <header className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 bg-pink-500/10 rounded-lg text-pink-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8c0 4.5-3.5 5.5-3.5 10"/><path d="M14 14.5a2 2 0 1 0-4 0"/><path d="M10 16c0-2 2-3.5 2-8.5"/><circle cx="18" cy="8" r="3"/><circle cx="10" cy="16" r="3"/><circle cx="6" cy="8" r="3"/></svg>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black uppercase tracking-tighter">Web<span className="text-pink-500">hooks</span></h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Notificações em Tempo Real</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={handleCreateWebhook}
+                        className="flex items-center gap-2 bg-pink-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-pink-700 transition"
+                    >
+                        <Plus size={16} /> Novo Webhook
+                    </button>
+                </header>
+
+                <div className="space-y-4">
+                    {webhooks.length > 0 ? webhooks.map((hook) => (
+                        <div key={hook.id} className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-pink-500/10 text-pink-500`}>
+                                    <ShieldAlert size={20} />
+                                </div>
+                                <div className="overflow-hidden">
+                                    <h3 className="font-bold text-sm uppercase">{hook.name}</h3>
+                                    <p className="text-xs text-muted-foreground font-mono truncate max-w-[200px] md:max-w-md" title={hook.url}>{hook.url}</p>
+                                    <div className="flex gap-2 mt-1">
+                                        {hook.events.map((evt: string) => (
+                                            <span key={evt} className="text-[8px] uppercase font-black bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{evt.split('.')[1]}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button 
+                                    onClick={() => handleDeleteWebhook(hook.id)}
+                                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    title="Remover Webhook"
+                                >
+                                    <Trash size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    )) : (
+                        <div className="p-8 text-center border-2 border-dashed border-border rounded-2xl">
+                            <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">Nenhum webhook configurado</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-xl">
+                <h4 className="font-bold text-blue-500 text-xs uppercase tracking-widest mb-2">Como usar</h4>
+                <div className="text-xs space-y-2">
+                    <p>1. Use as chaves de API para autenticar requisições do seu app.</p>
+                    <p>2. Configure webhooks para receber atualizações quando um agendamento mudar.</p>
+                </div>
             </div>
         </div>
     );

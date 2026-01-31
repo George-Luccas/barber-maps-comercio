@@ -120,3 +120,128 @@ export async function getDiscountStats() {
         return { success: false, error: error.message };
     }
 }
+
+// --- API Keys Management ---
+
+export async function getApiKeys() {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const keys = await db.apiKey.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
+        return { success: true, keys };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function createApiKey(name: string) {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        // Generate a simple key
+        const key = "sk_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now().toString(36);
+
+        const newKey = await db.apiKey.create({
+            data: {
+                name,
+                key,
+                isActive: true
+            }
+        });
+        
+        revalidatePath("/admin");
+        return { success: true, key: newKey };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function revokeApiKey(id: string) {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        await db.apiKey.delete({
+            where: { id }
+        });
+        
+        revalidatePath("/admin");
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+// --- Webhook Management ---
+
+export async function getWebhooks() {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const webhooks = await db.webhook.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
+        return { success: true, webhooks };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function createWebhook(url: string, name: string) {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        // Simple validation
+        if (!url.startsWith("http")) {
+             return { success: false, error: "URL inválida. Deve começar com http/https" };
+        }
+
+        const newWebhook = await db.webhook.create({
+            data: {
+                name,
+                url,
+                events: ["booking.created", "booking.cancelled", "booking.rescheduled"], // Default to all needed events
+                secret: "whsec_" + Math.random().toString(36).substr(2, 9)
+            }
+        });
+        
+        revalidatePath("/admin");
+        return { success: true, webhook: newWebhook };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function deleteWebhook(id: string) {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        await db.webhook.delete({
+            where: { id }
+        });
+        
+        revalidatePath("/admin");
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}

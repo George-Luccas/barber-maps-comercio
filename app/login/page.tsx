@@ -125,7 +125,7 @@ export default function LoginPage() {
           {!isLogin && (
             <div className="relative group">
               <User size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
-              <input name="name" type="text" placeholder="NOME COMPLETO" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
+              <input name="name" type="text" placeholder="Nome Completo" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground tracking-widest" />
             </div>
           )}
 
@@ -134,18 +134,18 @@ export default function LoginPage() {
             <input 
               name="email" 
               type="email" 
-              placeholder="EMAIL" 
+              placeholder="Email" 
               required 
               autoCapitalize="none"
               onInput={(e) => e.currentTarget.value = e.currentTarget.value.toLowerCase()}
-              className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest lowercase-input" 
+              className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground tracking-widest lowercase-input" 
             />
           </div>
 
           {!isLogin && (
             <div className="relative group">
               <Phone size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
-              <input name="phone" type="tel" placeholder="NÚMERO DE WHATSAPP" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" />
+              <input name="phone" type="tel" placeholder="Número de WhatsApp" required className="w-full bg-card border-2 border-border p-6 pl-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground tracking-widest" />
             </div>
           )}
 
@@ -154,9 +154,9 @@ export default function LoginPage() {
             <input 
               name="password" 
               type={showPassword ? "text" : "password"} 
-              placeholder="SENHA" 
+              placeholder="Senha" 
               required 
-              className="w-full bg-card border-2 border-border p-6 pl-14 pr-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground uppercase tracking-widest" 
+              className="w-full bg-card border-2 border-border p-6 pl-14 pr-14 rounded-2xl text-foreground text-xl font-bold focus:border-brand-primary outline-none transition-all placeholder:text-muted-foreground tracking-widest" 
             />
             <button
               type="button"

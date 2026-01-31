@@ -18,9 +18,14 @@ export async function cancelBooking(bookingId: string) {
       },
       data: {
           cancelledAt: new Date(),
-          cancellationReason: "Cancelado pela barbearia"
       }
     });
+
+    // Webhook Trigger
+    const booking = await db.booking.findUnique({ where: { id: bookingId } });
+    if (booking) {
+       await import("@/app/_lib/webhooks").then(mod => mod.triggerWebhooks("booking.cancelled", booking));
+    }
 
     revalidatePath("/barbearia");
     revalidatePath("/");

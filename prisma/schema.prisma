@@ -363,3 +363,27 @@ model PasswordResetToken {
   
   @@map("password_reset_token")
 }
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("api_key")
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  url       String
+  name      String
+  events    String[] // e.g. ["booking.created", "booking.cancelled"]
+  isActive  Boolean  @default(true)
+  secret    String?  // For signature verification
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("webhook")
+}
