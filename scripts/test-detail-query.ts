@@ -40,8 +40,16 @@ async function main() {
       },
     });
 
-    console.log("SUCCESS:", !!shop);
-    if (shop) console.log(JSON.stringify(shop, null, 2));
+    // Simulate the API logic
+    if (shop) {
+       console.log("NAME:", shop.name);
+       
+       // @ts-ignore
+       const reviews = await db.review.findMany({
+         where: { barbershopId: id }
+       });
+       console.log("REVIEWS FETCHED:", reviews.length);
+    }
   } catch (error) {
     console.error("FAILURE:", error);
   }

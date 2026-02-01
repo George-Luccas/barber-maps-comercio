@@ -55,14 +55,40 @@ export async function GET(
       }
 
       if (!shop) {
-        console.warn(`[DEBUG] Barbershop not found for term: ${id}`);
+        console.warn(`[DEBUG] Barbershop not found for ID: ${id}`);
         return NextResponse.json({ error: "Barbershop not found" }, { status: 404 });
       }
 
-      return NextResponse.json(shop);
+      // 3. Get Ratings and Reviews (New Migration)
+      const reviewsData = await db.review.findMany({
+        where: { barbershopId: id },
+        include: {
+          user: {
+            select: {
+              name: true,
+              image: true,
+            }
+          }
+        },
+        orderBy: { createdAt: "desc" }
+      });
+
+      const ratingCount = reviewsData.length;
+      const ratingAverage = ratingCount > 0 
+        ? parseFloat((reviewsData.reduce((acc: number, r: any) => acc + r.rating, 0) / ratingCount).toFixed(1))
+        : 0;
+
+      return NextResponse.json({
+        ...shop,
+        rating: {
+          average: ratingAverage,
+          count: ratingCount,
+        },
+        reviews: reviewsData
+      });
     } catch (dbError) {
       console.error(`[DEBUG] Database error fetching shop ${id}:`, dbError);
-      throw dbError; 
+      throw dbError; // rethrow to be caught by outer catch
     }
   } catch (error) {
     console.error("API GET Shop Error:", error);

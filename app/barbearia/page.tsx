@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown, Star } from "lucide-react";
 import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
 import { getBarbershopData } from "./_actions/get-barbershop";
 import { getBarbershopProducts, saveBarbershopProduct, deleteBarbershopProduct } from "./_actions/product-actions";
 import { getCities, addCity } from "../_actions/city-actions";
+import { getBarbershopReviews } from "@/app/_actions/review-actions";
+import { ReviewList } from "@/app/components/review-list";
+import { RatingSummary } from "@/app/components/rating-stars";
 
 // Sugestões para agilidade
 const SUGESTOES_SERVICOS = [
@@ -24,7 +27,7 @@ export default function MinhaBarbearia() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const [activeTab, setActiveTab] = useState<"geral" | "galeria" | "sobre" | "frigobar">("geral");
+  const [activeTab, setActiveTab] = useState<"geral" | "galeria" | "sobre" | "frigobar" | "avaliacoes">("geral");
   
   // Estados do Formulário
   const [nomeBarbearia, setNomeBarbearia] = useState("");
@@ -57,6 +60,9 @@ export default function MinhaBarbearia() {
     almocoFim: "",
     fechamento: "18:00"
   });
+
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [rating, setRating] = useState({ average: 0, count: 0 });
 
   useEffect(() => {
     async function loadData() {
@@ -98,6 +104,13 @@ export default function MinhaBarbearia() {
                 quantity: p.quantity
             })));
         }
+
+        const reviewsData = await getBarbershopReviews(data.id);
+        setReviews(reviewsData as any);
+        
+        const sum = reviewsData.reduce((acc: number, r: any) => acc + r.rating, 0);
+        const avg = reviewsData.length > 0 ? sum / reviewsData.length : 0;
+        setRating({ average: avg, count: reviewsData.length });
 
         // Carregar cidades
         const citiesList = await getCities();
@@ -288,12 +301,18 @@ export default function MinhaBarbearia() {
              >
                 Frigobar
              </button>
-             <button 
-                onClick={() => setActiveTab("galeria")}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "galeria" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
-             >
-                Galeria
-             </button>
+              <button 
+                 onClick={() => setActiveTab("galeria")}
+                 className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "galeria" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                 Galeria
+              </button>
+              <button 
+                 onClick={() => setActiveTab("avaliacoes")}
+                 className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === "avaliacoes" ? "bg-brand-primary text-primary-foreground shadow-lg shadow-brand-primary/20" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                 Avaliações
+              </button>
           </div>
         </header>
 
@@ -730,8 +749,25 @@ export default function MinhaBarbearia() {
             </div>
         )}
 
-        {/* Botão SALVAR apenas se NÃO for Frigobar (já salva direto) ou se quiser salvar o About US na aba Sobre */}
-        {activeTab !== 'frigobar' && (
+        {activeTab === "avaliacoes" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm space-y-6">
+                    <div className="flex justify-between items-center">
+                        <label className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                            <Star size={16} className="text-brand-primary" /> Depoimentos e Notas
+                        </label>
+                        <RatingSummary average={rating.average} count={rating.count} />
+                    </div>
+                    
+                    <div className="pt-4 border-t border-border">
+                        <ReviewList reviews={reviews} />
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Botão SALVAR apenas se NÃO for Frigobar ou Avaliações */}
+        {activeTab !== 'frigobar' && activeTab !== 'avaliacoes' && (
              <button 
               onClick={handleSave}
               disabled={loading}
