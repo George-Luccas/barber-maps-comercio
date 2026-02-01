@@ -9,13 +9,13 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // 1. Auth Check
+    // 1. Auth Check (move before params to fail fast)
     const apiKey = await validateApiKey(request);
     if (!apiKey) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     console.log(`[DEBUG] API GET Shop request for ID: ${id}`);
 
     // 2. Fetch Data

@@ -13,7 +13,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   // 2. Fetch Services and Barbers
   // We want to know which barbers perform which service, or just a list of services + list of barbers.
