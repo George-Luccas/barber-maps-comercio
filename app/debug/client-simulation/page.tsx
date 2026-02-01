@@ -19,7 +19,7 @@ export default function ClientSimulationPage() {
       // 1. Simulate Shop Detail Request
       addLog(`Fetching Shop Details: /api/external/v1/shops/${shopId}...`);
       const shopRes = await fetch(`/api/external/v1/shops/${shopId}`, {
-        headers: { "x-api-key": "sk_ryw3jqn5b_ml1r6ge0" } // Simulating the key
+        headers: { "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0" } // Fixed header
       });
       
       const shopStatus = shopRes.status;
@@ -29,7 +29,7 @@ export default function ClientSimulationPage() {
       // 2. Simulate Services Request
       addLog(`Fetching Services: /api/external/v1/shops/${shopId}/services...`);
       const servicesRes = await fetch(`/api/external/v1/shops/${shopId}/services`, {
-        headers: { "x-api-key": "sk_ryw3jqn5b_ml1r6ge0" }
+        headers: { "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0" } // Fixed header
       });
 
       const servicesStatus = servicesRes.status;
