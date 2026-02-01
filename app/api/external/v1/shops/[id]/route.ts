@@ -16,49 +16,60 @@ export async function GET(
     }
 
     const { id } = params;
+    console.log(`[DEBUG] API GET Shop request for ID: ${id}`);
 
     // 2. Fetch Data
-    const shop = await db.barbershop.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        description: true,
-        imageUrl: true,
-        phones: true,
-        city: true,
-        isOpen: true,
-        latitude: true,
-        longitude: true,
-        photos: true,
-        styles: {
-          select: {
-            id: true,
-            name: true,
-            imageUrl: true,
-          }
-        },
-        products: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            imageUrl: true,
-            priceInCents: true,
-            quantity: true,
-          }
+    try {
+      let shop = await db.barbershop.findUnique({
+        where: { id },
+        include: {
+          BarbershopService: {
+            where: { deletedAt: null }
+          },
+          barbers: true,
+          products: true,
+          styles: true,
         }
-      },
-    });
+      });
 
-    if (!shop) {
-      return NextResponse.json({ error: "Barbershop not found" }, { status: 404 });
+      // 3. Fallback: Search by Name if not found by UUID
+      // This helps if the client app is accidentally sending a slugified name or partial name
+      if (!shop) {
+        console.log(`[DEBUG] Shop not found by ID. Trying name fallback for: ${id}`);
+        shop = await db.barbershop.findFirst({
+          where: { 
+            OR: [
+              { name: { contains: id, mode: 'insensitive' } },
+              { name: { contains: id.replace(/-/g, ' '), mode: 'insensitive' } }
+            ]
+          },
+          include: {
+            BarbershopService: {
+              where: { deletedAt: null }
+            },
+            barbers: true,
+            products: true,
+            styles: true,
+          }
+        });
+      }
+
+      if (!shop) {
+        console.warn(`[DEBUG] Barbershop not found for term: ${id}`);
+        return NextResponse.json({ error: "Barbershop not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(shop);
+    } catch (dbError) {
+      console.error(`[DEBUG] Database error fetching shop ${id}:`, dbError);
+      throw dbError; 
     }
-
-    return NextResponse.json(shop);
   } catch (error) {
     console.error("API GET Shop Error:", error);
-    return NextResponse.json({ error: "Internal Server Error", details: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Internal Server Error", 
+      details: error instanceof Error ? error.message : String(error),
+      path: `shops/${params?.id}`
+    }, { status: 500 });
   }
 }
