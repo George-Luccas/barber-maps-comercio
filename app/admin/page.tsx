@@ -8,13 +8,14 @@ import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getClients } from "../clientes/_actions/client-actions";
+import { ClientSimulator } from "./_components/ClientSimulator";
 
 export default function AdminPage() {
     const [users, setUsers] = useState<any[]>([]);
     const [barbershops, setBarbershops] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [activeTab, setActiveTab] = useState<'BARBERSHOPS' | 'USERS' | 'REPORTS' | 'API'>('BARBERSHOPS');
+    const [activeTab, setActiveTab] = useState<'BARBERSHOPS' | 'USERS' | 'REPORTS' | 'API' | 'SIMULATOR'>('BARBERSHOPS');
 
     useEffect(() => {
         loadData();
@@ -127,6 +128,12 @@ export default function AdminPage() {
                         >
                             Integrações
                         </button>
+                        <button 
+                            onClick={() => setActiveTab('SIMULATOR')}
+                            className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'SIMULATOR' ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                            Simulador
+                        </button>
                     </div>
 
                     <Link href="/" className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-brand-primary transition-colors">
@@ -214,6 +221,12 @@ export default function AdminPage() {
                 {activeTab === 'API' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
                          <ApiKeysSection />
+                    </div>
+                )}
+
+                {activeTab === 'SIMULATOR' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4">
+                         <ClientSimulator />
                     </div>
                 )}
             </div>
