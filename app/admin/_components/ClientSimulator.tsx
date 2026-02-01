@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Activity, Server, Smartphone } from "lucide-react";
+import { Copy, Activity, Server, Smartphone, Calendar } from "lucide-react";
 
 export function ClientSimulator() {
     const [shopId, setShopId] = useState("a4061b12-3c70-42d0-bb19-f5f0d6a12d68");

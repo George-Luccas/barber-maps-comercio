@@ -4,7 +4,7 @@ import { getBarberAnalytics } from "./_actions/get-analytics";
 import Sidebar from "@/app/components/Sidebar";
 import Link from 'next/link';
 import { redirect } from "next/navigation";
-import { Plus, User, Trash2, Edit2, Shield, Mail, Phone, ArrowLeft } from "lucide-react";
+import { Plus, User, Trash2, Edit2, Shield, Mail, Phone, ArrowLeft, Calendar } from "lucide-react";
 import Image from "next/image";
 import { BarbersManager } from "./_components/barbers-manager";
 
@@ -70,6 +70,10 @@ export default async function BarbersPage() {
                 Gestão da Equipe e Desempenho
               </p>
             </div>
+            <Link href="/barbeiros/agenda" className="ml-auto flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-muted transition-colors">
+                <Calendar size={16} className="text-orange-500" />
+                Bloqueios & Folgas
+            </Link>
           </div>
         </header>
 

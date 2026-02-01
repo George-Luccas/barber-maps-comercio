@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown, Star } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown, Star, Calendar } from "lucide-react";
 import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
@@ -314,6 +314,10 @@ export default function MinhaBarbearia() {
                  Avaliações
               </button>
           </div>
+           <Link href="/barbeiros/agenda" className="ml-4 flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-muted transition-colors whitespace-nowrap">
+                <Calendar size={16} className="text-orange-500" />
+                Bloqueios & Folgas
+            </Link>
         </header>
 
         {activeTab === "geral" ? (
