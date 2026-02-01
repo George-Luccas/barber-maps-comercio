@@ -73,7 +73,14 @@ export default function ClientSimulationPage() {
         </button>
       </div>
 
-      {results && (
+      {results?.error && (
+        <div className="border rounded-lg p-4 border-red-500 bg-red-50/10 text-red-600">
+           <h3 className="font-bold">❌ Erro Crítico na Execução do Teste</h3>
+           <p>{results.error}</p>
+        </div>
+      )}
+
+      {results && !results.error && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Shop Detail Result */}
           <div className={`border rounded-lg p-4 ${results.shop.status === 200 ? "border-green-500 bg-green-50/10" : "border-red-500 bg-red-50/10"}`}>
