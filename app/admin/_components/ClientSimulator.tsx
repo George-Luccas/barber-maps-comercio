@@ -77,6 +77,63 @@ export function ClientSimulator() {
         }
     };
 
+    const simulateBooking = async () => {
+        setLoading(true);
+        const logs: string[] = [];
+        const addLog = (msg: string) => logs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+
+        try {
+            addLog("Preparing Booking Test...");
+            const date = new Date();
+            date.setDate(date.getDate() + 1); // Tomorrow
+            date.setHours(10, 0, 0, 0);
+            const dateStr = date.toISOString();
+
+            // 1. Get Service ID (Need one to book)
+            addLog(`Fetching Services to pick one...`);
+            const servicesRes = await fetch(`/api/external/v1/shops/${shopId}/services`, {
+                headers: { "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0" }
+            });
+            const services = await servicesRes.json();
+            if (!services || services.length === 0) throw new Error("No services found to book");
+            const serviceId = services[0].id;
+            addLog(`Selected Service: ${serviceId}`);
+
+            // 2. Send Booking Request
+            const payload = {
+                serviceId,
+                date: dateStr,
+                user: {
+                    name: "Simulador Admin",
+                    email: "simulador@admin.com",
+                    phone: "99999999999"
+                }
+            };
+            addLog(`POST /api/external/v1/bookings...`);
+            
+            const res = await fetch("/api/external/v1/bookings", {
+                method: "POST",
+                headers: { 
+                    "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const status = res.status;
+            const data = await res.json();
+            addLog(`Booking Response: ${status}`);
+
+            setResults({ booking: { status, data }, logs });
+
+        } catch (e) {
+            addLog(`BOOKING TEST FAILED: ${e}`);
+            setResults({ error: String(e), logs });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <header className="flex items-center gap-2">
@@ -118,6 +175,14 @@ export function ClientSimulator() {
                             <Activity size={16} />
                             Check DB
                         </button>
+                        <button
+                            onClick={simulateBooking}
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
+                        >
+                            <Calendar size={16} />
+                            Agendar Teste
+                        </button>
                     </div>
                 </div>
 
@@ -128,6 +193,25 @@ export function ClientSimulator() {
                             <Activity size={16} /> Erro Crítico
                         </h3>
                         <p className="text-xs font-mono mt-2">{results.error}</p>
+                    </div>
+                )}
+
+                {/* BOOKING RESULT */}
+                {results?.booking && (
+                     <div className={`border rounded-xl p-4 ${results.booking.status === 201 ? "border-green-500/50 bg-green-500/5" : "border-red-500/50 bg-red-500/5"}`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                                <Calendar size={14} /> Resultado do Agendamento
+                            </h3>
+                            <span className={`px-2 py-1 rounded text-[10px] uppercase font-black tracking-widest ${results.booking.status === 201 ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                                HTTP {results.booking.status}
+                            </span>
+                        </div>
+                        <div className="overflow-auto max-h-[300px]">
+                            <pre className="text-[10px] bg-black/5 dark:bg-black/50 p-4 rounded-lg font-mono">
+                                {JSON.stringify(results.booking.data, null, 2)}
+                            </pre>
+                        </div>
                     </div>
                 )}
 

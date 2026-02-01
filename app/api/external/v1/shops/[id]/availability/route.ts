@@ -55,9 +55,17 @@ export async function GET(
     }
     
     // Parse Opening/Closing Times
-    // We assume these strings (e.g. "09:00") refer to the Shop's Local Time.
-    const startHourConfig = shop.openingTime || "09:00";
-    const endHourConfig = shop.closingTime || "18:00";
+    // Strict Mode: If not configured, returns unavailable.
+    if (!shop.openingTime || !shop.closingTime) {
+         return NextResponse.json({ 
+             date: dateStr, 
+             availableSlots: [], 
+             message: "Shop hours not configured" 
+         });
+    }
+
+    const startHourConfig = shop.openingTime;
+    const endHourConfig = shop.closingTime;
 
     // 3. Fetch Existing Bookings
     // Strategy: Fetch a wide range of bookings around the target date to ensure we catch everything regardless of Timezone shifts.
