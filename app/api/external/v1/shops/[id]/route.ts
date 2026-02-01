@@ -20,17 +20,23 @@ export async function GET(
 
     // 2. Fetch Data
     try {
-      let shop = await db.barbershop.findUnique({
-        where: { id },
-        include: {
-          BarbershopService: {
-            where: { deletedAt: null }
-          },
-          barbers: true,
-          products: true,
-          styles: true,
-        }
-      });
+      let shop = null;
+      try {
+        shop = await db.barbershop.findUnique({
+          where: { id },
+          include: {
+            BarbershopService: {
+              where: { deletedAt: null }
+            },
+            barbers: true,
+            products: true,
+            styles: true,
+          }
+        });
+      } catch (e) {
+        console.log(`[DEBUG] Shop Detail: ID ${id} is likely not a UUID. Proceeding to name fallback.`);
+        shop = null;
+      }
 
       // 3. Fallback: Search by Name if not found by UUID
       // This helps if the client app is accidentally sending a slugified name or partial name
