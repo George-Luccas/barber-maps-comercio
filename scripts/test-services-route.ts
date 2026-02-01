@@ -7,7 +7,7 @@ async function main() {
     console.error("Shop not found");
     return;
   }
-  const id = shop.id;
+  const id = "invalid-uuid-string-123"; // Intentionally invalid to trigger try/catch and fallback
   console.log(`Testing services logic for Shop ID: ${id}`);
 
   try {
