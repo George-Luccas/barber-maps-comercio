@@ -4,6 +4,16 @@ import { validateApiKey } from "@/app/api/external/v1/_middleware/auth";
 import { NextResponse } from "next/server";
 import { addMinutes, format, isBefore, isValid, parse, setHours, setMinutes } from "date-fns";
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export const dynamic = "force-dynamic";
 
 export async function GET(
@@ -185,7 +195,7 @@ export async function GET(
             close: endHourConfig,
             lunch: shop.lunchStart ? `${shop.lunchStart}-${shop.lunchEnd}` : null
         }
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error("Availability Error:", error);
