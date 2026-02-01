@@ -25,8 +25,24 @@ export async function POST(request: Request) {
     const { serviceId, barberId, date, user } = body;
 
     // 2. Validation
-    if (!serviceId || !date || !user || !user.name) {
-        return NextResponse.json({ error: "Missing required fields: serviceId, date, user (name)" }, { status: 400, headers: corsHeaders });
+    const missingFields = [];
+    if (!serviceId) missingFields.push("serviceId");
+    if (!date) missingFields.push("date");
+    if (!user) {
+        missingFields.push("user");
+    } else {
+        if (!user.name) missingFields.push("user.name");
+        // user.email is used for lookup but name is required for creation. 
+        // We should explicitly check email if it's critical, but code creates user with name+email.
+        // If email missing, we can't look up.
+        if (!user.email) missingFields.push("user.email");
+    }
+
+    if (missingFields.length > 0) {
+        return NextResponse.json({ 
+            error: `Missing required fields: ${missingFields.join(", ")}`,
+            received: body 
+        }, { status: 400, headers: corsHeaders });
     }
 
     // 3. Find Service & Shop Context
