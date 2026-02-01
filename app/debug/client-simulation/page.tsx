@@ -29,22 +29,28 @@ export default function ClientSimulationPage() {
       // 2. Simulate Services Request
       addLog(`Fetching Services: /api/external/v1/shops/${shopId}/services...`);
       const servicesRes = await fetch(`/api/external/v1/shops/${shopId}/services`, {
-        headers: { "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0" } // Fixed header
+        headers: { "Authorization": "Bearer sk_ryw3jqn5b_ml1r6ge0" }
       });
 
       const servicesStatus = servicesRes.status;
-      const servicesData = await servicesRes.json();
+      let servicesData;
+      const servicesText = await servicesRes.text();
+      try {
+        servicesData = JSON.parse(servicesText);
+      } catch (e) {
+        servicesData = { error: "Failed to parse JSON", rawResponse: servicesText.slice(0, 500) };
+      }
       addLog(`Services Response: ${servicesStatus} ${servicesRes.statusText}`);
 
-      setResults({
-        shop: { status: shopStatus, data: shopData },
+      setResults((prev: any) => ({
+        ...prev,
         services: { status: servicesStatus, data: servicesData },
         logs
-      });
+      }));
 
     } catch (error) {
       addLog(`CRITICAL ERROR: ${error}`);
-      setResults({ error: String(error), logs });
+      setResults((prev: any) => ({ ...prev, error: String(error), logs }));
     } finally {
       setLoading(false);
     }
@@ -80,9 +86,10 @@ export default function ClientSimulationPage() {
         </div>
       )}
 
-      {results && !results.error && (
+      {results && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Shop Detail Result */}
+          {results.shop && (
           <div className={`border rounded-lg p-4 ${results.shop.status === 200 ? "border-green-500 bg-green-50/10" : "border-red-500 bg-red-50/10"}`}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">1. Detalhes da Loja</h3>
@@ -96,8 +103,10 @@ export default function ClientSimulationPage() {
               </pre>
             </div>
           </div>
+          )}
 
           {/* Services Result */}
+          {results.services && (
           <div className={`border rounded-lg p-4 ${results.services.status === 200 ? "border-green-500 bg-green-50/10" : "border-red-500 bg-red-50/10"}`}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">2. Lista de Serviços</h3>
@@ -111,6 +120,7 @@ export default function ClientSimulationPage() {
               </pre>
             </div>
           </div>
+          )}
         </div>
       )}
 
