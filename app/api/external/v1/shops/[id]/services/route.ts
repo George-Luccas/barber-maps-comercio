@@ -23,13 +23,21 @@ export async function GET(
   // Current schema doesn't explicitly link Barber <-> Service (Many-to-Many).
   // So we assume all barbers in the shop can do the services.
 
-  let targetId = id;
 
-  // Verify if shop exists with this ID, if not try name fallback
-  const shopCheck = await db.barbershop.findUnique({ where: { id } });
+
+  let targetId = id;
+  let shopCheck = null;
+
+  try {
+     // Only try to find by ID if it *looks* like a UUID, or catch the error if it fails validation
+     shopCheck = await db.barbershop.findUnique({ where: { id } });
+  } catch (e) {
+     console.log(`[DEBUG] Services: ID ${id} is likely not a UUID. Proceeding to name fallback.`);
+     shopCheck = null;
+  }
   
   if (!shopCheck) {
-     console.log(`[DEBUG] Services: Shop not found by ID ${id}. Trying name fallback.`);
+     console.log(`[DEBUG] Services: Shop not found by unique ID request for "${id}". Trying name fallback.`);
      const shopByName = await db.barbershop.findFirst({
         where: { 
           OR: [
