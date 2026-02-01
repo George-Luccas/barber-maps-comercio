@@ -67,7 +67,7 @@ export async function GET(
 
       // 3. Get Ratings and Reviews (New Migration)
       const reviewsData = await db.review.findMany({
-        where: { barbershopId: id },
+        where: { barbershopId: shop.id },
         include: {
           user: {
             select: {
