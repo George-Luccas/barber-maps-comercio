@@ -56,6 +56,26 @@ export default function ClientSimulationPage() {
     }
   };
 
+  const checkHealth = async () => {
+    setLoading(true);
+    const logs: string[] = [];
+    const addLog = (msg: string) => logs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+    
+    try {
+      addLog("Checking System Health...");
+      const res = await fetch("/api/external/v1/health");
+      const status = res.status;
+      const data = await res.json();
+      addLog(`Health Status: ${status}`);
+      setResults({ health: { status, data }, logs });
+    } catch (e) {
+      addLog(`HEALTH CHECK FAILED: ${e}`);
+      setResults({ error: String(e), logs });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold mb-4">Simulador do "Client App" (Barber Maps)</h1>
@@ -75,7 +95,14 @@ export default function ClientSimulationPage() {
           disabled={loading}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? "Testando..." : "Simular Acesso do Cliente"}
+          {loading ? "Testando..." : "Simular Acesso"}
+        </button>
+        <button 
+          onClick={checkHealth} 
+          disabled={loading}
+          className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+        >
+          Testar Saúde (DB)
         </button>
       </div>
 
@@ -86,7 +113,16 @@ export default function ClientSimulationPage() {
         </div>
       )}
 
-      {results && (
+      {results && results.health && (
+        <div className={`border rounded-lg p-4 ${results.health.status === 200 ? "border-green-500 bg-green-50/10" : "border-red-500 bg-red-50/10"}`}>
+            <h3 className="font-semibold mb-2">Relatório de Saúde do Sistema</h3>
+            <pre className="text-xs bg-slate-950 text-slate-50 p-4 rounded overflow-auto">
+              {JSON.stringify(results.health.data, null, 2)}
+            </pre>
+        </div>
+      )}
+
+      {results && !results.health && !results.error && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Shop Detail Result */}
           {results.shop && (
