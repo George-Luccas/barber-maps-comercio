@@ -23,9 +23,31 @@ export async function GET(
   // Current schema doesn't explicitly link Barber <-> Service (Many-to-Many).
   // So we assume all barbers in the shop can do the services.
 
+  let targetId = id;
+
+  // Verify if shop exists with this ID, if not try name fallback
+  const shopCheck = await db.barbershop.findUnique({ where: { id } });
+  
+  if (!shopCheck) {
+     console.log(`[DEBUG] Services: Shop not found by ID ${id}. Trying name fallback.`);
+     const shopByName = await db.barbershop.findFirst({
+        where: { 
+          OR: [
+            { name: { contains: id, mode: 'insensitive' } },
+            { name: { contains: id.replace(/-/g, ' '), mode: 'insensitive' } }
+          ]
+        }
+     });
+     if (shopByName) {
+        targetId = shopByName.id;
+     } else {
+        return NextResponse.json({ error: "Barbershop not found" }, { status: 404 });
+     }
+  }
+
   const [services, barbers] = await Promise.all([
     db.barbershopService.findMany({
-      where: { barbershopId: id, deletedAt: null },
+      where: { barbershopId: targetId, deletedAt: null },
       select: {
         id: true,
         name: true,
@@ -36,7 +58,7 @@ export async function GET(
       }
     }),
     db.barber.findMany({
-      where: { barbershopId: id },
+      where: { barbershopId: targetId },
       select: {
         id: true,
         name: true,
