@@ -13,6 +13,59 @@ export async function OPTIONS() {
     return NextResponse.json({}, { headers: corsHeaders });
 }
 
+export async function GET(request: Request) {
+    try {
+        const apiKey = await validateApiKey(request);
+        if (!apiKey) return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: corsHeaders });
+
+        const { searchParams } = new URL(request.url);
+        const email = searchParams.get("email");
+
+        if (!email) {
+            return NextResponse.json({ error: "Email is required" }, { status: 400, headers: corsHeaders });
+        }
+
+        const user = await db.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return NextResponse.json({ bookings: [] }, { status: 200, headers: corsHeaders });
+        }
+
+        const bookings = await db.booking.findMany({
+            where: { userId: user.id },
+            include: {
+                Barbershop: {
+                    select: { name: true, address: true, imageUrl: true }
+                },
+                Service: {
+                    select: { name: true, priceInCents: true }
+                },
+                Barber: {
+                    select: { name: true }
+                }
+            },
+            orderBy: { date: 'desc' }
+        });
+
+        const formattedBookings = bookings.map(b => ({
+            id: b.id,
+            date: b.date,
+            status: b.status,
+            barbershopName: b.Barbershop.name,
+            serviceName: b.Service?.name || "Serviço",
+            price: (b.Service?.priceInCents || 0) / 100,
+            barberName: b.Barber?.name || null
+        }));
+
+        return NextResponse.json(formattedBookings, { status: 200, headers: corsHeaders });
+
+    } catch (error) {
+        return NextResponse.json({ error: String(error) }, { status: 500, headers: corsHeaders });
+    }
+}
+
 export async function POST(request: Request) {
   try {
     // 1. Auth Check
