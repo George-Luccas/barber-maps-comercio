@@ -35,7 +35,7 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
                 barbershopId: barbershopId,
                 date: { gte: startOfDay, lt: endOfDay }
             },
-            include: { user: true, BarbershopService: true },
+            include: { BarbershopService: true },
             orderBy: { date: 'asc' }
         });
     } catch {
@@ -140,6 +140,7 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
 
 function calculateStatus(booking: any) {
     if (booking.cancelledAt || booking.status === 'CANCELLED') return 'cancelado';
+    if (booking.status === 'COMPLETED') return 'realizado';
     
     // Se o status no banco for PENDING, retornamos 'pendente' (aguardando confirmação)
     if (booking.status === 'PENDING') return 'pendente';

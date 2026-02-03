@@ -257,7 +257,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                             </button>
                         )}
 
-                        {item.status === 'confirmed' && (
+                        {item.status === 'confirmado' && (
                              <button 
                                 onClick={async () => {
                                      if(confirm("Deseja marcar como CONCLUÍDO e pontuar o cliente?")) {
