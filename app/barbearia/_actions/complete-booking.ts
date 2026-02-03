@@ -1,68 +1,39 @@
+"use server";
 
 import { db } from "@/app/_lib/prisma";
-import { NextResponse } from "next/server";
+import { auth } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { calculateServicePoints } from "@/app/_utils/loyalty";
 import { triggerWebhooks } from "@/app/_lib/webhooks";
 
+export async function completeBooking(bookingId: string) {
+  const session = await auth();
+  
+  if (!session?.user) {
+    return { success: false, message: "Não autorizado" };
+  }
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
   try {
-    // 0. Security Check (API Key)
-    const authHeader = request.headers.get("authorization");
-    const API_SECRET = process.env.API_SECRET || "barber-secret-123"; // Fallback only for dev
-
-    if (authHeader !== `Bearer ${API_SECRET}`) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const bookingId = params.id;
-
-    if (!bookingId) {
-      return NextResponse.json(
-        { error: "Booking ID is required" },
-        { status: 400 }
-      );
-    }
-
-    // 1. Find the booking and associated service
+    // 1. Get Booking details first to calculate points
     const booking = await db.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        BarbershopService: true,
-      },
+        where: { id: bookingId },
+        include: { BarbershopService: true }
     });
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+        return { success: false, message: "Agendamento não encontrado" };
     }
 
-    if (booking.status === "COMPLETED") {
-      return NextResponse.json(
-        { message: "Booking already completed" },
-        { status: 200 }
-      );
-    }
-
-
-    // 2. Calculate points based on service name
+    // 2. Calculate Points
     const points = calculateServicePoints(booking.BarbershopService.name, booking.BarbershopService.points || 10);
 
-
-    // 3. Update Booking Status
+    // 3. Update Status
     const updatedBooking = await db.booking.update({
-      where: { id: bookingId },
+      where: {
+        id: bookingId,
+      },
       data: {
-        status: "COMPLETED",
+          status: "COMPLETED",
       },
       include: {
         Barbershop: true,
@@ -71,10 +42,10 @@ export async function POST(
       }
     });
 
-    // Trigger Webhook
+    // 4. Trigger Webhook
     await triggerWebhooks("booking.completed", updatedBooking);
 
-    // 4. Update Loyalty Card (ONLY IF NOT A SHADOW USER)
+    // 5. Update Loyalty Card (Same logic as API)
     const user = await db.user.findUnique({
         where: { id: booking.userId }
     });
@@ -82,7 +53,7 @@ export async function POST(
     // Check if it's a shadow user
     const isShadowUser = user?.email.endsWith("@sememail.com");
 
-    if (!isShadowUser) {
+    if (!isShadowUser && user) {
         let loyaltyCard = await db.loyaltyCard.findUnique({
         where: {
             userId_barbershopId: {
@@ -111,8 +82,6 @@ export async function POST(
         const newCurrentPoints = loyaltyCard.currentPoints + points;
         const newTotalPoints = loyaltyCard.totalLifetimePoints + points;
 
-
-    // Recalculate Tier
         let newTier: "BRONZE" | "SILVER" | "GOLD" = "BRONZE";
         if (newTotalPoints >= 1000) newTier = "GOLD";
         else if (newTotalPoints >= 300) newTier = "SILVER";
@@ -129,21 +98,13 @@ export async function POST(
         });
     }
 
-    // Revalidate paths that might show this data
-    revalidatePath("/bookings");
+    revalidatePath("/barbearia");
     revalidatePath("/agenda");
-
-    return NextResponse.json({
-      message: "Booking completed successfully",
-      pointsEarned: isShadowUser ? 0 : points,
-      isShadowUser: isShadowUser,
-      note: isShadowUser ? "User is shadow/placeholder, no points awarded." : "Points awarded."
-    });
+    revalidatePath("/");
+    
+    return { success: true };
   } catch (error) {
-    console.error("Error completing booking:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Erro ao concluir agendamento:", error);
+    return { success: false, message: "Erro ao concluir agendamento" };
   }
 }

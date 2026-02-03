@@ -1,7 +1,7 @@
 
 import { db } from "@/app/_lib/prisma";
 
-type WebhookEvent = "booking.created" | "booking.cancelled" | "booking.rescheduled";
+type WebhookEvent = "booking.created" | "booking.cancelled" | "booking.rescheduled" | "booking.completed";
 
 export async function triggerWebhooks(event: WebhookEvent, payload: any) {
   try {

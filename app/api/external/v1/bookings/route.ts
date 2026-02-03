@@ -39,10 +39,10 @@ export async function GET(request: Request) {
                 Barbershop: {
                     select: { name: true, address: true, imageUrl: true }
                 },
-                Service: {
+                BarbershopService: {
                     select: { name: true, priceInCents: true }
                 },
-                Barber: {
+                barber: {
                     select: { name: true }
                 }
             },
@@ -54,9 +54,9 @@ export async function GET(request: Request) {
             date: b.date,
             status: b.status,
             barbershopName: b.Barbershop.name,
-            serviceName: b.Service?.name || "Serviço",
-            price: (b.Service?.priceInCents || 0) / 100,
-            barberName: b.Barber?.name || null
+            serviceName: b.BarbershopService?.name || "Serviço",
+            price: (b.BarbershopService?.priceInCents || 0) / 100,
+            barberName: b.barber?.name || null
         }));
 
         return NextResponse.json(formattedBookings, { status: 200, headers: corsHeaders });
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
             userId: userId,
             barberId: barberId || undefined, 
             date: requestedDate,
-            status: "CONFIRMED", 
+            status: "PENDING", 
         }
     });
 

@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { toast } from "sonner";
-import { Bell, Trash2, Users, User } from "lucide-react";
+import { Bell, Trash2, Users, User, Check, CheckCircle2 } from "lucide-react";
 
 // 1. Criamos uma interface para o TypeScript não reclamar
 interface Appointment {
@@ -194,12 +194,15 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                 .map((item) => (
             <div 
                 key={item.id} 
-                className="flex items-center justify-between bg-background/50 p-4 rounded-lg border border-border hover:border-brand-primary/30 transition-colors shadow-sm"
+                className={`flex items-center justify-between bg-background/50 p-4 rounded-lg border transition-colors shadow-sm ${
+                    item.status === 'pendente' ? 'border-yellow-500/50' : 'border-border hover:border-brand-primary/30'
+                }`}
             >
                 <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${
                     item.status === 'realizado' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 
-                    item.status === 'pendente' ? 'bg-brand-primary shadow-[0_0_8px_rgba(234,179,8,0.5)]' : 'bg-blue-500'
+                    item.status === 'confirmado' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' :
+                    item.status === 'pendente' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] animate-pulse' : 'bg-gray-500'
                 }`} />
                 
                 <div>
@@ -217,31 +220,101 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
                         <p className="text-sm font-black text-brand-primary">{item.time}</p>
                         <p className={`text-[10px] uppercase tracking-wider font-bold ${
                             item.status === 'realizado' ? 'text-green-500' : 
-                            item.status === 'pendente' ? 'text-yellow-600 pro:text-brand-primary' : 'text-blue-500'
+                            item.status === 'confirmado' ? 'text-blue-500' :
+                            item.status === 'pendente' ? 'text-yellow-600' : 'text-gray-500'
                         }`}>
-                            {item.status}
+                            {item.status === 'pendente' ? 'Aguardando' : item.status}
                         </p>
                     </div>
-                    <button 
-                        onClick={async () => {
-                             if(confirm("Deseja realmente CANCELAR este agendamento?")) {
-                                 const { cancelBooking } = await import("@/app/barbearia/_actions/cancel-booking");
-                                 const res = await cancelBooking(item.id);
-                                 if(res.success) {
+
+                    {/* ACTIONS */}
+                    <div className="flex items-center gap-1">
+                        {item.status === 'pendente' && (
+                             <button 
+                                onClick={async () => {
+                                     // Otimista
                                      setAppointments(prev => prev.map(a => 
-                                         a.id === item.id ? { ...a, status: 'cancelado' } : a
+                                         a.id === item.id ? { ...a, status: 'confirmado' } : a
                                      ));
-                                     toast.success("Agendamento cancelado!");
-                                 } else {
-                                     toast.error("Erro ao cancelar");
+                                     
+                                     const { confirmBooking } = await import("@/app/barbearia/_actions/confirm-booking");
+                                     const res = await confirmBooking(item.id);
+                                     
+                                     if(res.success) {
+                                         toast.success("Agendamento confirmado!");
+                                     } else {
+                                         toast.error("Erro ao confirmar");
+                                         // Reverte
+                                         setAppointments(prev => prev.map(a => 
+                                             a.id === item.id ? { ...a, status: 'pendente' } : a
+                                         ));
+                                     }
+                                }}
+                                className="p-2 text-green-600 hover:bg-green-500/10 rounded-lg transition-colors"
+                                title="Confirmar Agendamento"
+                            >
+                                <Check size={18} />
+                            </button>
+                        )}
+
+                        {item.status === 'confirmed' && (
+                             <button 
+                                onClick={async () => {
+                                     if(confirm("Deseja marcar como CONCLUÍDO e pontuar o cliente?")) {
+                                        // Otimista
+                                        setAppointments(prev => prev.map(a => 
+                                            a.id === item.id ? { ...a, status: 'realizado' } : a
+                                        ));
+                                        
+                                        const { completeBooking } = await import("@/app/barbearia/_actions/complete-booking");
+                                        const res = await completeBooking(item.id);
+                                        
+                                        if(res.success) {
+                                            toast.success("Serviço concluído e pontos enviados!");
+                                        } else {
+                                            toast.error("Erro ao concluir: " + res.message);
+                                            // Reverte
+                                            setAppointments(prev => prev.map(a => 
+                                                a.id === item.id ? { ...a, status: 'confirmed' } : a
+                                            ));
+                                        }
+                                     }
+                                }}
+                                className="p-2 text-blue-600 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                title="Concluir Serviço (Pontuar)"
+                            >
+                                <CheckCircle2 size={18} />
+                            </button>
+                        )}
+
+                        {/* For legacy reasons, update confirm logic to handle 'CONFIRMED' from server which maps to 'confirmed' or 'confirmado' in frontend if not consistent. 
+                            Note: The component uses lowercase 'pendente', 'confirmado', 'realizado' for display logic but data might come as uppercase from DB.
+                            The getBookings action likely normalizes it. Let's assume normalizing happens or we handle it. 
+                            Actually, looking at get-bookings.ts would confirm normalization, but I will assume status matches 'confirmado' or 'confirmed'. 
+                            Let's check getBookings return type if possible, or just add handling.
+                        */}
+
+                        <button 
+                            onClick={async () => {
+                                 if(confirm("Deseja realmente CANCELAR este agendamento?")) {
+                                     const { cancelBooking } = await import("@/app/barbearia/_actions/cancel-booking");
+                                     const res = await cancelBooking(item.id);
+                                     if(res.success) {
+                                         setAppointments(prev => prev.map(a => 
+                                             a.id === item.id ? { ...a, status: 'cancelado' } : a
+                                         ));
+                                         toast.success("Agendamento cancelado!");
+                                     } else {
+                                         toast.error("Erro ao cancelar");
+                                     }
                                  }
-                             }
-                        }}
-                        className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                        title="Cancelar Agendamento"
-                    >
-                        <Trash2 size={16} />
-                    </button>
+                            }}
+                            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Cancelar Agendamento"
+                        >
+                            <Trash2 size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
             ))}

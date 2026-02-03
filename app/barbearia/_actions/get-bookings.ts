@@ -139,14 +139,21 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
 }
 
 function calculateStatus(booking: any) {
-    if (booking.cancelledAt) return 'cancelado';
+    if (booking.cancelledAt || booking.status === 'CANCELLED') return 'cancelado';
     
+    // Se o status no banco for PENDING, retornamos 'pendente' (aguardando confirmação)
+    if (booking.status === 'PENDING') return 'pendente';
+
     const now = new Date();
     const bookingTime = new Date(booking.date);
     const endTime = new Date(bookingTime.getTime() + 45 * 60000); 
     
     if (now > endTime) return 'realizado';
     if (now >= bookingTime && now <= endTime) return 'em-atendimento';
-    return 'pendente';
+    
+    // Se já foi confirmado e não passou, é 'confirmado'
+    if (booking.status === 'CONFIRMED') return 'confirmado';
+
+    return 'pendente'; // Fallback
 }
 
