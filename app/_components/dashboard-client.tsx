@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2, Users } from "lucide-react";
+import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2, Users, Check, CheckCircle2 } from "lucide-react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { getWeeklyRevenue } from "@/app/barbearia/_actions/analytics";
@@ -270,9 +270,10 @@ export default function DashboardClient({
 
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 flex-1">
+                        <div className="flex gap-6 md:gap-8 flex-1 overflow-x-auto pb-4 snap-x">
                             {[
-                                { id: 'pendente', label: 'Agendado' },
+                                { id: 'pendente', label: 'Pendente' },
+                                { id: 'confirmado', label: 'Confirmado' },
                                 { id: 'em-atendimento', label: 'Na Cadeira' },
                                 { id: 'realizado', label: 'Concluído' },
                                 { id: 'cancelado', label: 'Cancelado' }
@@ -281,7 +282,7 @@ export default function DashboardClient({
                                     .filter(b => activeBarberId === "all" || b.barberId === activeBarberId)
                                     .filter(b => b.status === col.id);
                                 return (
-                                    <div key={col.id} className="flex flex-col gap-4 md:gap-8">
+                                    <div key={col.id} className="flex flex-col gap-4 md:gap-8 min-w-[200px]">
                                         <div className="flex items-center justify-between px-3 md:px-4">
                                             <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-muted-foreground">{col.label}</span>
                                             <div className="bg-muted px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] font-black text-muted-foreground/80">{columnBookings.length}</div>
@@ -299,6 +300,61 @@ export default function DashboardClient({
                                                                 <Timer size={10} className="text-brand-primary" />
                                                                 <span className="text-[8px] md:text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate">{booking.time} • {booking.serviceName}</span>
                                                             </div>
+                                                        </div>
+                                                        
+                                                        {/* ACTION BUTTONS */}
+                                                        <div className="ml-auto flex flex-col gap-1 items-end z-20 mr-8">
+                                                            {col.id === 'pendente' && (
+                                                                <button
+                                                                    onClick={async (e) => {
+                                                                        e.stopPropagation();
+                                                                        // Otimista
+                                                                        setBookings(prev => prev.map(b => 
+                                                                             b.id === booking.id ? { ...b, status: 'confirmado' } : b
+                                                                         ));
+                                                                        const { confirmBooking } = await import("@/app/barbearia/_actions/confirm-booking");
+                                                                        const res = await confirmBooking(booking.id);
+                                                                        if (res.success) {
+                                                                            toast.success("Confirmado!");
+                                                                        } else {
+                                                                            toast.error("Erro ao confirmar");
+                                                                            setBookings(prev => prev.map(b => 
+                                                                                 b.id === booking.id ? { ...b, status: 'pendente' } : b
+                                                                             ));
+                                                                        }
+                                                                    }}
+                                                                    className="p-2 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all shadow-sm"
+                                                                    title="Confirmar"
+                                                                >
+                                                                    <Check size={14} />
+                                                                </button>
+                                                            )}
+                                                            {col.id === 'confirmado' && (
+                                                                <button
+                                                                    onClick={async (e) => {
+                                                                        e.stopPropagation();
+                                                                        if(confirm("Confirmar conclusão e pontuar cliente?")) {
+                                                                            setBookings(prev => prev.map(b => 
+                                                                                 b.id === booking.id ? { ...b, status: 'realizado' } : b
+                                                                             ));
+                                                                            const { completeBooking } = await import("@/app/barbearia/_actions/complete-booking");
+                                                                            const res = await completeBooking(booking.id);
+                                                                            if (res.success) {
+                                                                                toast.success("Concluído!");
+                                                                            } else {
+                                                                                toast.error("Erro ao concluir: " + res.message);
+                                                                                setBookings(prev => prev.map(b => 
+                                                                                     b.id === booking.id ? { ...b, status: 'confirmado' } : b
+                                                                                 ));
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all shadow-sm animate-pulse-slow"
+                                                                    title="Concluir"
+                                                                >
+                                                                    <CheckCircle2 size={14} />
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className={`text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] px-3 md:px-5 py-1.5 md:py-2 rounded-lg md:rounded-xl inline-block ${col.id === 'realizado' ? 'bg-green-500/10 text-green-500' : 'bg-brand-primary/10 text-brand-primary'}`}>
