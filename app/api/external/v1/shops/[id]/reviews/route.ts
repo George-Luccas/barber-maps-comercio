@@ -11,9 +11,12 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: barbershopId } = await params;
+    const { id: routeId } = await params;
     const body = await request.json();
-    const { userId, rating, comment, userName, userImage } = body;
+    const { userId, rating, comment, userName, userImage, barbershopId: bodyShopId } = body;
+
+    // Prioritize ID from body if sent, otherwise use route param
+    const barbershopId = bodyShopId || routeId;
 
     if (!userId || !rating) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
