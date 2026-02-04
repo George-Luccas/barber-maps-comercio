@@ -11,7 +11,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: barbershopId } = params;
+    const { id: barbershopId } = await params;
     const body = await request.json();
     const { userId, rating, comment, userName, userImage } = body;
 
@@ -31,11 +31,14 @@ export async function POST(
     // Check if user exists, if not, create a placeholder to satisfy foreign key
     let user = await db.user.findUnique({ where: { id: userId } });
     
-    if (!user && userName) {
+    if (!user) {
+        // Fallback name if none provided
+        const safeName = userName || `Visitante ${userId.slice(0, 4)}`;
+        
         user = await db.user.create({
             data: {
                 id: userId,
-                name: userName,
+                name: safeName,
                 email: `${userId}@external.com`, // Placeholder email
                 image: userImage,
                 role: "CLIENT"
