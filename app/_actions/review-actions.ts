@@ -13,6 +13,24 @@ interface CreateReviewParams {
 export const createBarbershopReview = async (params: CreateReviewParams) => {
   const { barbershopId, userId, rating, comment } = params;
 
+  // Ensure user exists (shadow user logic like in API)
+  let user = await db.user.findUnique({ where: { id: userId } });
+  
+  if (!user) {
+     // We don't have userName here in type, but we can assume "Visitante" or require it?
+     // Since this is internal action, maybe simpler to specific "Visitante"
+     // Or we update CreateReviewParams to include userName optionally?
+     // Let's create a placeholder.
+     user = await db.user.create({
+        data: {
+            id: userId,
+            name: `Visitante ${userId.slice(0,4)}`,
+            email: `${userId}@created-by-action.com`,
+            role: "CLIENT"
+        }
+     });
+  }
+
   const review = await db.review.upsert({
     where: {
       userId_barbershopId: {
@@ -32,7 +50,8 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     },
   });
 
-  revalidatePath(`/barbearia/${barbershopId}`); // Adjusting based on Comercio's internal routes
+  revalidatePath(`/barbearia/${barbershopId}`); 
+  revalidatePath(`/`); // Revalidate home too just in case
   return review;
 };
 
