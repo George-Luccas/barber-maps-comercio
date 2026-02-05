@@ -50,15 +50,18 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     },
   });
 
+  /* 
   try {
     revalidatePath(`/barbearia/${barbershopId}`);
     revalidatePath(`/`);
   } catch (error) {
     console.warn("Revalidation failed:", error);
   }
+  */
 
   // Return a clear success object or serializable data
-  return JSON.parse(JSON.stringify(review));
+  // Simplified return to avoid any serialization issues with Date/Decimal
+  return { success: true };
 };
 
 export const getBarbershopReviews = async (barbershopId: string) => {
