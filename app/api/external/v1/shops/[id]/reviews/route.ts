@@ -1,4 +1,3 @@
-import { db } from "@/app/_lib/prisma";
 import { NextResponse } from "next/server";
 import { validateApiKey } from "@/app/api/external/v1/_middleware/auth";
 export async function POST(

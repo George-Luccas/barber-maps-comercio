@@ -26,6 +26,7 @@ export default async function AdminDashboard() {
             id: true,
             name: true,
             email: true,
+            role: true, // Needed for BARBER_PROMO redirect
             Barbershop: true // Select the relation
         }
     });
@@ -50,6 +51,11 @@ export default async function AdminDashboard() {
 
   if (dbUser.Barbershop?.isSuspended) {
       redirect("/suspended");
+  }
+
+  // BARBER_PROMO users go to their profile, not the owner dashboard
+  if (dbUser.role === "BARBER_PROMO") {
+    redirect("/perfil-barbeiro");
   }
 
   // Pre-calculate today's date for initial view

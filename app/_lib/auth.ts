@@ -95,8 +95,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (dbUser?.Barbershop) {
                 token.barbershopId = dbUser.Barbershop.id;
                 token.isSuspended = dbUser.Barbershop.isSuspended; // Add suspension status
-            } else if (dbUser && (dbUser.role === 'BARBER' || dbUser.role === 'ADMIN')) {
-                // AUTO-RECOVERY: Se for Barbeiro/Admin e não tiver barbearia, cria uma automaticamente.
+            } else if (dbUser && dbUser.role === 'BARBER') {
+                // AUTO-RECOVERY: Se for Barbeiro (OWNER) e não tiver barbearia, cria uma automaticamente.
+                // NOTA: BARBER_PROMO não precisa de barbearia própria
                 console.warn(`[AUTH] Usuário ${user.email} sem barbearia. Criando automaticamente...`);
                 try {
                     const newShop = await db.barbershop.create({
@@ -114,7 +115,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 } catch (createError) {
                     console.error("[AUTH] Erro ao criar barbearia automática:", createError);
                 }
+            } else if (dbUser && dbUser.role === 'ADMIN' && !dbUser.Barbershop) {
+                // Admin sem barbearia também cria uma
+                console.warn(`[AUTH] Admin ${user.email} sem barbearia. Criando automaticamente...`);
+                try {
+                    const newShop = await db.barbershop.create({
+                        data: {
+                            name: `${dbUser.name || 'Minha'} Barbearia`,
+                            managerId: dbUser.id,
+                            phones: dbUser.phone ? [dbUser.phone] : ["(00) 00000-0000"],
+                            description: "Barbearia gerada automaticamente.",
+                            address: "Endereço Pendente"
+                        }
+                    });
+                    console.log(`[AUTH] Barbearia criada para Admin: ${newShop.id}`);
+                    token.barbershopId = newShop.id;
+                    token.isSuspended = false;
+                } catch (createError) {
+                    console.error("[AUTH] Erro ao criar barbearia automática para Admin:", createError);
+                }
             }
+            // BARBER_PROMO: não precisa de barbearia, apenas continua sem barbershopId
         } catch (error) {
             console.error("Erro no callback JWT:", error);
             // Não quebramos o login, apenas seguimos sem o barbershopId se der erro no banco

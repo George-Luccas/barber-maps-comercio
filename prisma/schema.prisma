@@ -199,6 +199,12 @@ model User {
   role                   UserRole           @default(BARBER)
   welcomeDiscountClaimed Boolean            @default(false)
   welcomeDiscountUsed    Boolean            @default(false)
+  // Campos para Barbeiro-Divulgação
+  workplaceName          String?            // Nome da barbearia onde trabalha (se não autônomo)
+  isAutonomous           Boolean            @default(false) // Se é barbeiro autônomo
+  bio                    String?            // Biografia do barbeiro
+  specialties            String[]           @default([]) // Especialidades (ex: "Degradê", "Barba")
+  yearsOfExperience      Int?               // Anos de experiência como barbeiro
   Barbershop             Barbershop?
   LoyaltyCard            LoyaltyCard[]
   PlatformFeedback       PlatformFeedback[]
@@ -303,6 +309,7 @@ model Promotion {
 enum UserRole {
   CLIENT
   BARBER
+  BARBER_PROMO  // Barbeiro para Divulgação (sem barbearia própria)
   ADMIN
 }
 

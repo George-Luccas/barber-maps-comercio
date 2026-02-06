@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List, User, ShieldCheck } from 'lucide-react'
+import { Menu, X, DollarSign, Scissors, Palette, LogOut, Home, Sparkles, LayoutGrid, Calendar, BarChart3, Lightbulb, Settings, Package, Briefcase, AlertCircle, List, User, ShieldCheck, Image, Star } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 import { usePathname } from 'next/navigation'
@@ -15,7 +15,7 @@ export default function Sidebar() {
   const [mounted, setMounted] = useState(false)
   const { theme } = useTheme()
   const pathname = usePathname()
-  const { data: session } = useSession() // Hook moved to top
+  const { data: session } = useSession()
 
   useEffect(() => {
     setMounted(true)
@@ -28,10 +28,20 @@ export default function Sidebar() {
 
   const isPro = theme === 'pro' && mounted
 
-  // Admin Check
-  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+  // Role checks
+  const userRole = (session?.user as any)?.role
+  const isAdmin = userRole === 'ADMIN'
+  const isBarberPromo = userRole === 'BARBER_PROMO'
 
-  // Itens padrão para Light/Dark
+  // Menu items para Barbeiro-Divulgação
+  const barberPromoMenuItems = [
+    { name: 'Meu Perfil', icon: User, href: '/perfil-barbeiro' },
+    { name: 'Meus Trabalhos', icon: Image, href: '/galeria-barbeiro' },
+    { name: 'Meus Serviços', icon: Scissors, href: '/servicos-barbeiro' },
+    { name: 'Avaliações', icon: Star, href: '/avaliacoes-barbeiro' },
+  ]
+
+  // Itens padrão para Light/Dark (Proprietário)
   const standardMenuItems = [
     { name: 'Início', icon: Home, href: '/' },
     { name: 'Financeiro', icon: DollarSign, href: '/financeiro' },
@@ -43,7 +53,7 @@ export default function Sidebar() {
     { name: 'Agendamentos', icon: Calendar, href: '/agenda' },
   ]
 
-  // Itens específicos do PRO (como na imagem)
+  // Itens específicos do PRO (Proprietário)
   const proMenuItems = [
     { name: 'Dashboard', icon: LayoutGrid, href: '/' },
     { name: 'Agenda', icon: Calendar, href: '/agenda' },
@@ -62,20 +72,27 @@ export default function Sidebar() {
     { name: 'Menus seleis', icon: List, href: '#' },
   ]
 
-  /* ... imports ... */
-
   // Admin Menu Item
   const adminItem = { name: 'Painel Admin', icon: ShieldCheck, href: '/admin' }
 
-  // Modify render logic to include adminItem if isAdmin
-  const itemsToRender = isPro 
-      ? (isAdmin ? [adminItem, ...proMenuItems] : proMenuItems)
-      : (isAdmin ? [adminItem, ...standardMenuItems] : standardMenuItems)
+  // Determinar quais itens mostrar baseado no role
+  let itemsToRender;
+  
+  if (isBarberPromo) {
+    // Barbeiro-Divulgação: menu simplificado
+    itemsToRender = barberPromoMenuItems;
+  } else if (isPro) {
+    // Proprietário tema PRO
+    itemsToRender = isAdmin ? [adminItem, ...proMenuItems] : proMenuItems;
+  } else {
+    // Proprietário tema padrão
+    itemsToRender = isAdmin ? [adminItem, ...standardMenuItems] : standardMenuItems;
+  }
 
   return (
     <>
       {/* MOBILE TOGGLE (Hidden on Pro Desktop) */}
-      <div className={`fixed top-6 right-4 md:top-20 md:left-0 h-auto w-12 flex flex-col items-center z-[100] ${isPro ? 'md:hidden' : ''}`}>
+      <div className={`fixed top-6 right-4 md:top-20 md:left-0 h-auto w-12 flex flex-col items-center z-[100] ${isPro && !isBarberPromo ? 'md:hidden' : ''}`}>
         {!isOpen && (
           <button 
             onClick={() => setIsOpen(true)}
@@ -97,15 +114,15 @@ export default function Sidebar() {
       {/* SIDEBAR CONTAINER */}
       <div className={`
         fixed top-0 left-0 h-full bg-card text-foreground z-[95] border-r border-border transition-all duration-500
-        ${isPro ? 'w-64 translate-x-0 hidden md:flex' : 'w-64 transform ' + (isOpen ? 'translate-x-0' : '-translate-x-full')}
+        ${isPro && !isBarberPromo ? 'w-64 translate-x-0 hidden md:flex' : 'w-64 transform ' + (isOpen ? 'translate-x-0' : '-translate-x-full')}
         ${isOpen && isPro ? '!flex !translate-x-0 shadow-2xl' : ''}
-        ${!isPro && 'shadow-2xl'}
+        ${(!isPro || isBarberPromo) && 'shadow-2xl'}
       `}>
         <div className="flex flex-col w-full h-full">
           
-          {/* HEADER (Fluxo Pro style vs Standard) */}
+          {/* HEADER */}
           <div className="p-8 flex items-center justify-between">
-            {isPro ? (
+            {isPro && !isBarberPromo ? (
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-3 group cursor-pointer">
                   <div className="w-10 h-10 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center group-hover:bg-brand-primary/20 transition-all">
@@ -130,7 +147,15 @@ export default function Sidebar() {
               </div>
             ) : (
               <>
-                <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain animate-spin-y-10s" />
+                <div className="flex items-center gap-3">
+                  <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain animate-spin-y-10s" />
+                  {isBarberPromo && (
+                    <div className="flex flex-col">
+                      <span className="text-lg font-black text-foreground">Barbeiro</span>
+                      <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Divulgação</span>
+                    </div>
+                  )}
+                </div>
                 <button onClick={() => setIsOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground transition-colors">
                   <X size={24} />
                 </button>
@@ -146,7 +171,7 @@ export default function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => !isPro && setIsOpen(false)}
+                    onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all group ${
                         isActive 
                         ? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20 shadow-sm shadow-brand-primary/10' 
@@ -160,8 +185,8 @@ export default function Sidebar() {
                )
              })}
 
-             {/* EXTRA SECTION (PRO ONLY) */}
-             {isPro && (
+             {/* EXTRA SECTION (PRO ONLY, não para Barbeiro-Divulgação) */}
+             {isPro && !isBarberPromo && (
                 <>
                   <div className="pt-8 pb-4">
                       <span className="px-4 text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-50">Donate</span>
@@ -177,6 +202,22 @@ export default function Sidebar() {
                       </Link>
                   ))}
                 </>
+             )}
+
+             {/* Opção de Migrar para Proprietário (apenas para Barbeiro-Divulgação) */}
+             {isBarberPromo && (
+               <div className="pt-6 mt-4 border-t border-border/50">
+                 <Link
+                   href="/migrar-proprietario"
+                   className="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all group text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                 >
+                   <Sparkles size={20} className="group-hover:text-brand-primary transition-colors" />
+                   <div className="flex flex-col">
+                     <span className="font-bold uppercase tracking-[0.15em] text-[10px]">Virar Proprietário</span>
+                     <span className="text-[9px] opacity-70">Criar minha barbearia</span>
+                   </div>
+                 </Link>
+               </div>
              )}
           </nav>
 
