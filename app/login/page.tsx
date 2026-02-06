@@ -23,9 +23,14 @@ export default function LoginPage() {
     
     const formData = new FormData(event.currentTarget)
     
-    // Adicionar tipo de conta e status de autônomo ao FormData
+    // Validar tipo de conta no cadastro
     if (!isLogin) {
-      formData.set('accountType', accountType || 'owner')
+      if (!accountType) {
+        alert("Selecione o tipo de conta: Proprietário ou Barbeiro");
+        setLoading(false);
+        return;
+      }
+      formData.set('accountType', accountType)
       formData.set('isAutonomous', isAutonomous ? 'true' : 'false')
     }
 
