@@ -44,18 +44,19 @@ export default async function AdminDashboard() {
   const barbershopId = dbUser.Barbershop?.id;
   const userFirstName = dbUser.name.split(' ')[0];
 
+  // IMPORTANTE: Verificar BARBER_PROMO PRIMEIRO, antes de qualquer verificação de barbearia
+  // BARBER_PROMO não precisa de barbearia, vai direto para seu perfil
+  if (dbUser.role === "BARBER_PROMO") {
+    redirect("/perfil-barbeiro");
+  }
+
+  // Apenas para BARBER (proprietário) e ADMIN: se não tem barbearia, vai para onboarding
   if (!barbershopId) {
-    // Authenticated user but NO barbershop -> Redirect to Onboarding
     redirect("/onboarding");
   }
 
   if (dbUser.Barbershop?.isSuspended) {
       redirect("/suspended");
-  }
-
-  // BARBER_PROMO users go to their profile, not the owner dashboard
-  if (dbUser.role === "BARBER_PROMO") {
-    redirect("/perfil-barbeiro");
   }
 
   // Pre-calculate today's date for initial view
