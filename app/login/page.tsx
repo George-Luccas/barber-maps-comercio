@@ -68,14 +68,31 @@ export default function LoginPage() {
         console.log(`Login Status: ${res.status}`);
         console.log(`Login Raw Body: ${text}`);
 
-        if (!res.ok) {
-            alert(`Erro do Servidor (${res.status}):\n\n${text.slice(0, 200)}`);
-            throw new Error(`Erro server: ${res.status}`);
+        // Tratar erro de credenciais inválidas (401 ou URL com error)
+        if (!res.ok || text.includes("error=CredentialsSignin")) {
+            // Mensagem amigável para usuário não encontrado ou senha incorreta
+            setLoading(false);
+            alert(
+                "❌ Email ou senha incorretos!\n\n" +
+                "Se você ainda não tem uma conta, clique em 'Criar Conta' para se cadastrar.\n\n" +
+                "Acesse nosso app e faça parte da comunidade Barber Maps! 🏆"
+            );
+            return;
         }
 
         try {
             const json = JSON.parse(text);
             if (json.url) {
+                // Check if URL contains error
+                if (json.url.includes("error=")) {
+                    setLoading(false);
+                    alert(
+                        "📋 Conta não encontrada!\n\n" +
+                        "Parece que você ainda não tem cadastro.\n" +
+                        "Clique em 'Criar Conta' e cadastre-se para acessar nosso app! 🚀"
+                    );
+                    return;
+                }
                 window.location.href = json.url;
                 return;
             }
