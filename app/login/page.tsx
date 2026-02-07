@@ -125,6 +125,21 @@ export default function LoginPage() {
   // Componente de seleção de tipo de conta
   const AccountTypeSelector = () => (
     <div className="space-y-4 mb-6">
+      <style jsx>{`
+        @keyframes neonPulse {
+          0%, 100% {
+            box-shadow: 0 0 5px #eab308, 0 0 10px #eab308, 0 0 15px #eab308;
+            border-color: #eab308;
+          }
+          50% {
+            box-shadow: 0 0 10px #eab308, 0 0 20px #eab308, 0 0 30px #eab308, 0 0 40px #eab308;
+            border-color: #fde047;
+          }
+        }
+        .neon-pulse {
+          animation: neonPulse 1.5s ease-in-out infinite;
+        }
+      `}</style>
       <p className="text-center text-muted-foreground text-xs font-black uppercase tracking-[0.15em]">
         Escolha seu perfil
       </p>
@@ -135,11 +150,11 @@ export default function LoginPage() {
           onClick={() => { setAccountType('owner'); setIsAutonomous(false); }}
           className={`group p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-3 ${
             accountType === 'owner'
-              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
-              : 'border-border bg-card hover:border-brand-primary/50 text-muted-foreground hover:text-foreground'
+              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary scale-105'
+              : 'border-yellow-400 bg-card text-yellow-400 hover:scale-105 neon-pulse'
           }`}
         >
-          <Store size={32} className={`transition-colors ${accountType === 'owner' ? 'text-brand-primary' : 'group-hover:text-brand-primary'}`} />
+          <Store size={32} className={`transition-colors ${accountType === 'owner' ? 'text-brand-primary' : 'text-yellow-400'}`} />
           <span className="text-xs font-black uppercase tracking-widest">Proprietário</span>
           <span className="text-[10px] text-center opacity-70">Tenho uma barbearia</span>
         </button>
@@ -150,11 +165,11 @@ export default function LoginPage() {
           onClick={() => setAccountType('barber_promo')}
           className={`group p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-3 ${
             accountType === 'barber_promo'
-              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
-              : 'border-border bg-card hover:border-brand-primary/50 text-muted-foreground hover:text-foreground'
+              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary scale-105'
+              : 'border-yellow-400 bg-card text-yellow-400 hover:scale-105 neon-pulse'
           }`}
         >
-          <Scissors size={32} className={`transition-colors ${accountType === 'barber_promo' ? 'text-brand-primary' : 'group-hover:text-brand-primary'}`} />
+          <Scissors size={32} className={`transition-colors ${accountType === 'barber_promo' ? 'text-brand-primary' : 'text-yellow-400'}`} />
           <span className="text-xs font-black uppercase tracking-widest">Barbeiro</span>
           <span className="text-[10px] text-center opacity-70">Quero divulgar meu trabalho</span>
         </button>
