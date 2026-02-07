@@ -45,6 +45,47 @@ export default function AdminPage() {
         }
     }
 
+    async function handleDeleteUser(userId: string, userName: string, userEmail: string) {
+        // Double confirmation for destructive action
+        const confirmed = confirm(
+            `⚠️ ATENÇÃO: Você está prestes a EXCLUIR permanentemente:\n\n` +
+            `Usuário: ${userName}\n` +
+            `Email: ${userEmail}\n\n` +
+            `Isso irá deletar TODOS os dados relacionados:\n` +
+            `- Barbearia (se for proprietário)\n` +
+            `- Agendamentos\n` +
+            `- Serviços\n` +
+            `- Reviews\n` +
+            `- Cartões de fidelidade\n` +
+            `- Transações financeiras\n\n` +
+            `Esta ação NÃO pode ser desfeita!\n\n` +
+            `Deseja continuar?`
+        );
+        
+        if (!confirmed) return;
+        
+        // Second confirmation
+        const typedEmail = prompt(`Para confirmar, digite o email do usuário:\n${userEmail}`);
+        if (typedEmail !== userEmail) {
+            toast.error("Email não confere. Exclusão cancelada.");
+            return;
+        }
+
+        const loadingToast = toast.loading("Excluindo usuário e dados relacionados...");
+        
+        const { deleteUser } = await import("./_actions/admin-actions");
+        const res = await deleteUser(userId);
+        
+        toast.dismiss(loadingToast);
+        
+        if (res.success) {
+            toast.success(`Usuário ${res.deletedUser?.name} excluído com sucesso!`);
+            loadData(); // Refresh the list
+        } else {
+            toast.error("Erro ao excluir: " + res.error);
+        }
+    }
+
     const handleExportClients = async () => {
         const loadingToast = toast.loading("Gerando PDF...");
         const res = await getClients();
@@ -203,9 +244,24 @@ export default function AdminPage() {
                                             <p className="text-xs text-muted-foreground">{user.email}</p>
                                         </div>
                                     </div>
-                                    <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-black tracking-widest ${user.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-500' : 'bg-blue-500/10 text-blue-500'}`}>
-                                        {user.role}
-                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-black tracking-widest ${
+                                            user.role === 'ADMIN' 
+                                                ? 'bg-purple-500/10 text-purple-500' 
+                                                : user.role === 'BARBER_PROMO'
+                                                    ? 'bg-green-500/10 text-green-500'
+                                                    : 'bg-blue-500/10 text-blue-500'
+                                        }`}>
+                                            {user.role}
+                                        </span>
+                                        <button 
+                                            onClick={() => handleDeleteUser(user.id, user.name, user.email)}
+                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            title="Excluir usuário (cascata)"
+                                        >
+                                            <Trash size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
