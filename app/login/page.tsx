@@ -128,11 +128,11 @@ export default function LoginPage() {
       <style jsx>{`
         @keyframes neonPulse {
           0%, 100% {
-            box-shadow: 0 0 5px #eab308, 0 0 10px #eab308, 0 0 15px #eab308;
+            box-shadow: 0 0 3px #eab308, 0 0 6px #eab308;
             border-color: #eab308;
           }
           50% {
-            box-shadow: 0 0 10px #eab308, 0 0 20px #eab308, 0 0 30px #eab308, 0 0 40px #eab308;
+            box-shadow: 0 0 5px #eab308, 0 0 10px #eab308, 0 0 15px #eab308;
             border-color: #fde047;
           }
         }
