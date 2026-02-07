@@ -44,6 +44,17 @@ export default async function BarberProfilePage() {
     redirect("/");
   }
 
+  // Fetch portfolio server-side
+  const portfolioItems = await db.barberPortfolio.findMany({
+    where: { userId: dbUser.id },
+    orderBy: { createdAt: "desc" },
+    select: {
+        id: true,
+        imageUrl: true,
+        description: true,
+    }
+  });
+
   return (
     <BarberProfileClient 
       user={{
@@ -58,6 +69,7 @@ export default async function BarberProfilePage() {
         workplaceName: dbUser.workplaceName || "",
         createdAt: dbUser.createdAt.toISOString(),
       }}
+      initialPortfolio={portfolioItems}
     />
   );
 }

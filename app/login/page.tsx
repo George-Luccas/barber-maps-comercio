@@ -128,16 +128,16 @@ export default function LoginPage() {
       <style jsx>{`
         @keyframes neonPulse {
           0%, 100% {
-            box-shadow: 0 0 3px #eab308, 0 0 6px #eab308;
+            box-shadow: 0 0 2px rgba(234, 179, 8, 0.4);
             border-color: #eab308;
           }
           50% {
-            box-shadow: 0 0 5px #eab308, 0 0 10px #eab308, 0 0 15px #eab308;
-            border-color: #fde047;
+            box-shadow: 0 0 4px rgba(234, 179, 8, 0.6), 0 0 8px rgba(234, 179, 8, 0.3);
+            border-color: #facc15;
           }
         }
         .neon-pulse {
-          animation: neonPulse 1.5s ease-in-out infinite;
+          animation: neonPulse 2s ease-in-out infinite;
         }
       `}</style>
       <p className="text-center text-muted-foreground text-xs font-black uppercase tracking-[0.15em]">
@@ -156,7 +156,7 @@ export default function LoginPage() {
         >
           <Store size={32} className={`transition-colors ${accountType === 'owner' ? 'text-brand-primary' : 'text-yellow-400'}`} />
           <span className="text-xs font-black uppercase tracking-widest">Proprietário</span>
-          <span className="text-[10px] text-center opacity-70">Tenho uma barbearia</span>
+          <span className="text-sm text-center opacity-70">Tenho uma barbearia</span>
         </button>
 
         {/* Barbeiro Divulgação */}
@@ -171,7 +171,7 @@ export default function LoginPage() {
         >
           <Scissors size={32} className={`transition-colors ${accountType === 'barber_promo' ? 'text-brand-primary' : 'text-yellow-400'}`} />
           <span className="text-xs font-black uppercase tracking-widest">Barbeiro</span>
-          <span className="text-[10px] text-center opacity-70">Quero divulgar meu trabalho</span>
+          <span className="text-sm text-center opacity-70">Quero divulgar meu trabalho</span>
         </button>
       </div>
     </div>

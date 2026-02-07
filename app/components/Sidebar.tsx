@@ -36,7 +36,7 @@ export default function Sidebar() {
   // Menu items para Barbeiro-Divulgação
   const barberPromoMenuItems = [
     { name: 'Meu Perfil', icon: User, href: '/perfil-barbeiro' },
-    { name: 'Meus Trabalhos', icon: Image, href: '/galeria-barbeiro' },
+    // A galeria agora fica dentro do perfil
     { name: 'Meus Serviços', icon: Scissors, href: '/servicos-barbeiro' },
     { name: 'Avaliações', icon: Star, href: '/avaliacoes-barbeiro' },
   ]

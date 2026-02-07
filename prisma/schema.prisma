@@ -211,8 +211,20 @@ model User {
   account                Account[]
   session                Session[]
   reviews                Review[]
+  portfolio              BarberPortfolio[]
 
   @@map("user")
+}
+
+model BarberPortfolio {
+  id          String   @id @default(uuid())
+  userId      String
+  imageUrl    String
+  description String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Verification {
