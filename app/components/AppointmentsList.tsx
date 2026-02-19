@@ -3,7 +3,8 @@ import { useEffect, useState, useRef } from "react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { toast } from "sonner";
-import { Bell, Trash2, Users, User, Check, CheckCircle2 } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/app/components/ui/dialog";
+import { Copy, FileImage, X, Bell, Trash2, Users, User, Check, CheckCircle2 } from "lucide-react";
 
 // 1. Criamos uma interface para o TypeScript não reclamar
 interface Appointment {
@@ -13,6 +14,7 @@ interface Appointment {
   time: string;
   status: string;
   barberId?: string;
+  receiptUrl?: string | null;
 }
 
 // Som de notificação (Ding simples)
@@ -29,6 +31,7 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
   const [barbers, setBarbers] = useState<{id: string, name: string}[]>([]);
   const [activeBarberId, setActiveBarberId] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
 
   if (!barbershopId) {
     return (
@@ -229,6 +232,17 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
 
                     {/* ACTIONS */}
                     <div className="flex items-center gap-1">
+                        {/* BOTÃO DE COMPROVANTE (Se existir) */}
+                        {item.receiptUrl && (
+                             <button 
+                                onClick={() => setSelectedReceipt(item.receiptUrl || null)}
+                                className="p-2 text-purple-600 hover:bg-purple-500/10 rounded-lg transition-colors"
+                                title="Ver Comprovante"
+                            >
+                                <FileImage size={18} />
+                            </button>
+                        )}
+                        
                         {item.status === 'pendente' && (
                              <button 
                                 onClick={async () => {
@@ -320,6 +334,27 @@ export default function AppointmentsList({ barbershopId, selectedDate, onDateCha
             ))}
         </div>
       )}
+      
+      {/* DIALOG DE COMPROVANTE */}
+      <Dialog open={!!selectedReceipt} onOpenChange={(open) => !open && setSelectedReceipt(null)}>
+        <DialogContent className="max-w-md w-full p-0 overflow-hidden bg-transparent border-none shadow-none flex justify-center items-center relative">
+            <div className="relative bg-white rounded-lg overflow-hidden">
+                <button 
+                    onClick={() => setSelectedReceipt(null)}
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full z-10"
+                >
+                    <X size={20} />
+                </button>
+                {selectedReceipt && (
+                    <img 
+                        src={selectedReceipt} 
+                        alt="Comprovante" 
+                        className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
+                    />
+                )}
+            </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

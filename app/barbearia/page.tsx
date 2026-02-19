@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown, Star, Calendar } from "lucide-react";
+import { ChevronLeft, CheckCircle2, Loader2, Store, Edit3, Camera, Clock, Image as ImageIcon, Trash2, Plus, X, MapPin, ChevronDown, Star, Calendar, DollarSign, Shield } from "lucide-react";
 import Link from "next/link";
 import { UploadButton } from "@uploadthing/react";
 import { saveBarberServices } from "./_actions/save-services";
@@ -38,6 +38,7 @@ export default function MinhaBarbearia() {
   const [longitude, setLongitude] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
+  const [pixKey, setPixKey] = useState("");
   const [barbershopId, setBarbershopId] = useState("");
   
   // Novo Estado de Serviços Dinâmicos
@@ -63,6 +64,8 @@ export default function MinhaBarbearia() {
 
   const [reviews, setReviews] = useState<any[]>([]);
   const [rating, setRating] = useState({ average: 0, count: 0 });
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -76,7 +79,9 @@ export default function MinhaBarbearia() {
         if (data.latitude) setLatitude(data.latitude.toString());
         if (data.longitude) setLongitude(data.longitude.toString());
         if (data.city) setCity(data.city);
+        if (data.city) setCity(data.city);
         if (data.state) setState(data.state);
+        if (data.pixKey) setPixKey(data.pixKey);
         
         // Carrega serviços existentes
         if (data.BarbershopService && data.BarbershopService.length > 0) {
@@ -221,6 +226,11 @@ export default function MinhaBarbearia() {
     if (!nomeBarbearia.trim()) return alert("Digite o nome da sua barbearia!");
     if (servicos.length === 0) return alert("Adicione pelo menos um serviço!");
 
+    // Validação Chave Pix Aleatória
+    if (pixKey && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pixKey)) {
+        return alert("Por segurança, use apenas uma Chave Aleatória (formato UUID).");
+    }
+
     setLoading(true);
     
     // Payload simplificado para o formato esperado pela action
@@ -242,22 +252,28 @@ export default function MinhaBarbearia() {
         },
         aboutUs,
         city,
-        state
+        aboutUs,
+        city,
+        state,
+        pixKey
       );
       
       if (result && result.success) {
-          alert("✅ Configurações salvas com sucesso!");
+          setSaveSuccess(true);
+          setSaveError("");
+          setTimeout(() => setSaveSuccess(false), 3000);
       } else {
-          // @ts-ignore
-          alert(`❌ Erro ao salvar: ${result?.error || "Desconhecido"}`);
+          setSaveError(result?.error || "Erro desconhecido ao salvar");
+          setSaveSuccess(false);
       }
     } catch (error: any) {
-      console.error(error);
-      alert(`❌ Erro inesperado: ${error.message}`);
+        setSaveError(error?.message || "Erro de conexão");
+        setSaveSuccess(false);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
+
 
   if (!mounted || fetching) {
     return (
@@ -403,6 +419,50 @@ export default function MinhaBarbearia() {
                   className="w-full bg-card border border-border rounded-xl p-4 focus:border-brand-primary outline-none transition-all font-black text-sm text-foreground placeholder:text-muted-foreground"
                   placeholder="-46.6333"
                 />
+              </div>
+            </div>
+
+            {/* CHAVE PIX */}
+            <div className="bg-brand-primary/5 border border-brand-primary/20 p-6 rounded-[2rem] space-y-4">
+              <div className="flex items-start gap-4">
+                  <div className="p-3 bg-brand-primary/10 rounded-xl text-brand-primary">
+                      <Shield size={24} />
+                  </div>
+                  <div className="space-y-1">
+                      <label className="text-brand-primary text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                         Chave Aleatória (Segurança)
+                      </label>
+                      <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                        Para sua segurança, aceitamos <strong>apenas chaves aleatórias</strong>. 
+                        Isso evita expor seus dados pessoais (CPF, Email, Telefone) para os clientes.
+                      </p>
+                  </div>
+              </div>
+              
+              <div className="relative space-y-2">
+                <input 
+                  type="text"
+                  value={pixKey}
+                  onChange={(e) => setPixKey(e.target.value)}
+                  className="w-full bg-background border border-border rounded-xl p-4 pl-12 focus:border-brand-primary outline-none transition-all font-black text-lg text-foreground placeholder:text-muted-foreground/50 shadow-sm"
+                  placeholder="Ex: 550e8400-e29b-41d4-a716-446655440000"
+                />
+                <div className="absolute left-4 top-4 text-muted-foreground">
+                    <DollarSign size={16} />
+                </div>
+                
+                {/* Validação Granular */}
+                {pixKey && (
+                   pixKey.length !== 36 ? (
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                          <X size={12} /> Tamanho incorreto ({pixKey.length}/36 caracteres). Falta {36 - pixKey.length} dígito(s).
+                      </p>
+                   ) : !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pixKey) ? (
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                          <X size={12} /> Caracteres inválidos. Use apenas letras de A a F e números.
+                      </p>
+                   ) : null
+                )}
               </div>
             </div>
 
@@ -779,6 +839,33 @@ export default function MinhaBarbearia() {
             >
               {loading ? <Loader2 className="animate-spin" /> : "SALVAR ALTERAÇÕES"}
             </button>
+        )}
+
+        {saveSuccess && (
+            <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
+                <CheckCircle2 size={24} />
+                <span className="font-bold uppercase tracking-widest text-xs">Salvo com sucesso!</span>
+            </div>
+        )}
+
+        {saveError && (
+            <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-red-500/10 border border-red-500/50 backdrop-blur-xl text-red-500 p-4 rounded-xl shadow-2xl space-y-2 animate-in slide-in-from-bottom-5 z-50">
+                <div className="flex items-center gap-2 font-bold uppercase tracking-widest text-xs border-b border-red-500/20 pb-2 mb-2">
+                    <X size={16} /> Erro ao Salvar
+                </div>
+                <p className="text-xs font-medium leading-relaxed break-all select-all font-mono bg-red-500/10 p-2 rounded-lg">
+                    {saveError}
+                </p>
+                <p className="text-[10px] text-red-500/70 font-bold uppercase tracking-widest">
+                   * Tente reiniciar o servidor se o erro persistir.
+                </p>
+                <button 
+                  onClick={() => setSaveError("")}
+                  className="absolute top-2 right-2 text-red-500 hover:bg-red-500/20 p-1 rounded-lg"
+                >
+                    <X size={14} />
+                </button>
+            </div>
         )}
       </div>
     </div>

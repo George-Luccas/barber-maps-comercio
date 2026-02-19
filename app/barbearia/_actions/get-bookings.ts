@@ -128,7 +128,8 @@ export async function getBookings(barbershopId: string, dateStr?: string) {
             serviceName: booking.BarbershopService?.name || "Serviço",
             time: timeString,
             status: calculateStatus(booking),
-            barberId: booking.barberId
+            barberId: booking.barberId,
+            receiptUrl: booking.receiptUrl
         };
     });
 

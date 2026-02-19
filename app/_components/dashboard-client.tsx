@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2, Users, Check, CheckCircle2 } from "lucide-react";
+import { TrendingUp, DollarSign, Timer, Package, Zap, ArrowRight, Sparkles, Store, MapPin, AlertCircle, Palette, Calendar, Brain, ChevronRight, X, Truck, Shield, User, Trash2, Users, Check, CheckCircle2, FileImage } from "lucide-react";
 import { getBookings } from "@/app/barbearia/_actions/get-bookings";
 import { getBarbers } from "@/app/barbeiros/_actions/barber-actions";
 import { getWeeklyRevenue } from "@/app/barbearia/_actions/analytics";
@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/app/components/ThemeToggle";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 import { useTheme } from "next-themes";
+import { Dialog, DialogContent } from "@/app/components/ui/dialog";
 
 const AppointmentsList = dynamic(() => import('@/app/components/AppointmentsList'), { ssr: false });
 const AgendamentosTicker = dynamic(() => import('@/app/components/AgendamentosTicker'), { ssr: false });
@@ -50,6 +51,7 @@ export default function DashboardClient({
   const [bookings, setBookings] = useState<any[]>(initialBookings);
   const [barbers, setBarbers] = useState<{id: string, name: string}[]>([]);
   const [activeBarberId, setActiveBarberId] = useState<string>("all");
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchBarbers() {
@@ -304,6 +306,20 @@ export default function DashboardClient({
                                                         
                                                         {/* ACTION BUTTONS */}
                                                         <div className="ml-auto flex flex-col gap-1 items-end z-20 mr-8">
+                                                            {/* RECEIPT BUTTON */}
+                                                            {booking.receiptUrl && (
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedReceipt(booking.receiptUrl);
+                                                                    }}
+                                                                    className="p-2 bg-purple-500/10 text-purple-500 rounded-lg hover:bg-purple-500 hover:text-white transition-all shadow-sm"
+                                                                    title="Ver Comprovante"
+                                                                >
+                                                                    <FileImage size={14} />
+                                                                </button>
+                                                            )}
+                                                            
                                                             {col.id === 'pendente' && (
                                                                 <button
                                                                     onClick={async (e) => {
@@ -692,6 +708,27 @@ export default function DashboardClient({
           )}
 
       </div>
+      
+      {/* DIALOG DE COMPROVANTE (GLOBAL) */}
+      <Dialog open={!!selectedReceipt} onOpenChange={(open) => !open && setSelectedReceipt(null)}>
+        <DialogContent className="max-w-md w-full p-0 overflow-hidden bg-transparent border-none shadow-none flex justify-center items-center relative">
+            <div className="relative bg-white rounded-lg overflow-hidden">
+                <button 
+                    onClick={() => setSelectedReceipt(null)}
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full z-10"
+                >
+                    <X size={20} />
+                </button>
+                {selectedReceipt && (
+                    <img 
+                        src={selectedReceipt} 
+                        alt="Comprovante" 
+                        className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
+                    />
+                )}
+            </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

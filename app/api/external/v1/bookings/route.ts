@@ -161,7 +161,7 @@ export async function POST(request: Request) {
             userId: userId,
             barberId: barberId || undefined, 
             date: requestedDate,
-            status: "PENDING", 
+            status: body.status || "PENDING", 
         }
     });
 

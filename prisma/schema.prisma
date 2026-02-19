@@ -34,11 +34,12 @@ model Barbershop {
   products              BarbershopProduct[]
   BarbershopService     BarbershopService[]
   Booking               Booking[]
-  FinancialTransactions FinancialTransaction[]
+  financialTransactions FinancialTransaction[]
   LoyaltyCard           LoyaltyCard[]
   StockItems            StockItem[]
   styles                Style[]
   reviews               Review[]
+  pixKey                String?                // Chave Pix para recebimento
 }
 
 model BarbershopProduct {
@@ -98,7 +99,8 @@ model Booking {
   barberId          String?
   isSubscription    Boolean           @default(false)
   isWelcomeDiscount Boolean           @default(false)
-  status            BookingStatus     @default(CONFIRMED)
+  receiptUrl        String?           @db.Text
+  status            BookingStatus     @default(PENDING)
   userName          String?
   barber            Barber?           @relation(fields: [barberId], references: [id])
   Barbershop        Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)

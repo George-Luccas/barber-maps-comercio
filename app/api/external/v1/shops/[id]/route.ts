@@ -86,6 +86,7 @@ export async function GET(
 
       return NextResponse.json({
         ...shop,
+        pixKey: shop.pixKey, // Explicitly exposed for external payment integration
         rating: {
           average: ratingAverage,
           count: ratingCount,

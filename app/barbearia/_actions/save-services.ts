@@ -13,7 +13,8 @@ export async function saveBarberServices(
   location?: { latitude: number | null, longitude: number | null },
   aboutUs?: string,
   city?: string,
-  state?: string
+  state?: string,
+  pixKey?: string
 ) {
   try {
     const session = await auth();
@@ -50,6 +51,7 @@ export async function saveBarberServices(
         aboutUs: aboutUs || null,
         city: city || null,
         state: state || null,
+        pixKey: pixKey || null,
       },
       create: {
         name: barbershopName,
@@ -67,6 +69,7 @@ export async function saveBarberServices(
         managerId: userId,
         city: city || null,
         state: state || null,
+        pixKey: pixKey || null,
       },
     });
 
